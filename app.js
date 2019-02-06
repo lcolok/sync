@@ -23,7 +23,9 @@ var app = express();
 
 // 设置模板引擎
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+var ejs = require('ejs');  //我是新引入的ejs插件,让express也能够加载html
+app.engine('html', ejs.__express);
+app.set('view engine', 'html');
 
 app.use(express.static('public'));
 
