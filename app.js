@@ -22,12 +22,12 @@ require('require-all')({
 var app = express();
 
 // 设置模板引擎
-app.set('views', path.join(__dirname, ''));
+app.set('views', path.join(__dirname, 'views'));
 var ejs = require('ejs');  //我是新引入的ejs插件,让express也能够加载html
 app.engine('html', ejs.__express);
 app.set('view engine', 'html');
 
-app.use(express.static(path.join(__dirname,'')));
+app.use(express.static(path.join(__dirname,'public')));//利用 Express 托管静态文件
 
 // 设置默认超时时间
 app.use(timeout('150s'));
