@@ -27,7 +27,7 @@ var ejs = require('ejs');  //我是新引入的ejs插件,让express也能够加�
 app.engine('html', ejs.__express);
 app.set('view engine', 'html');
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname,'')));
 
 // 设置默认超时时间
 app.use(timeout('150s'));
