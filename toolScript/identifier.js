@@ -39,7 +39,6 @@ function run(json) {
             if (browser.versions.webKit) { alert("is webKit"); }
             //判断是否移动端
             if (browser.versions.mobile || browser.versions.android || browser.versions.ios) { alert("移动端"); } */
-
     }
     var rules, func;
     if (json) {

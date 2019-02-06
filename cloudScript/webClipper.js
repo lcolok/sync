@@ -1,6 +1,7 @@
-const id = require('./identifier.js');
+var AV = require('leanengine');
 
-async function webClipper(request) {
+AV.Cloud.define('webClipper', function (request) {
+
     console.log('正在进行webClipper页面剪藏..');
     const TurndownService = require('turndown');
     const http = require('request');
@@ -64,13 +65,12 @@ async function webClipper(request) {
             article.close();
         });
     });
-}
+
+});
 
 
+const id = require('../toolScript/identifier.js');
 
-module.exports = {
-    webClipper: webClipper
-}
 
 id.run({
     rules: 'vscode',
