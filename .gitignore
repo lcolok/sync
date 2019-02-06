@@ -7,3 +7,5 @@ start.sh
 # VIM
 *~
 *.swp
+demo/.DS_Store
+.DS_Store
