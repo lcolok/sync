@@ -12,7 +12,7 @@ AV.Cloud.define('recipient', function (request) {
 async function recipient(input) {
     var data = input.params.data;
     var size = input.params.size;
-    var filename = data.path.split('/').pop();;
+    var filename = data.path?data.path.split('/').pop():input.params.filename;
 
     var token = await getTokenShimo();
     const r = request.post({
@@ -33,8 +33,6 @@ async function recipient(input) {
     form.append('file', data, { filename: filename });//这个可以强制改名字
 
 
-
-
     var prevUploaded = 0;
     var duration = 1000;
     var start = new Date();
@@ -47,7 +45,7 @@ async function recipient(input) {
         var speed = chunk / (duration / 1000);
         console.log(`Uploaded: ${KB2MB(uploaded).toFixed(2)} MB; Progress: ${percent}%; Upload_Speed: ${speed.toFixed(2)} MB/s`);
         prevUploaded = uploaded;
-        if (percent == 100) {
+        if (percent >= 100) {
             clearInterval(interval);
             var end = new Date();
             var averageSpeed = (KB2MB(size) / ((end - start) / 1000));
