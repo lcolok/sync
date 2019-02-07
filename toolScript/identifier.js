@@ -1,5 +1,5 @@
 
-function run(json) {
+function run(json,func) {
     var runner = {
         env: typeof window === 'undefined' ? 'global' : 'window',
     };
@@ -42,8 +42,9 @@ function run(json) {
     }
     var rules, func;
     if (json) {
-        rules = json.rules;
-        func = json.func;
+        rules = json.rules ? json.rules : json;
+        if(rules.match('!')){return};
+        func = json.func ? json.func : func;
 
         var rulesArr = rules.split(/(\&\&|\|\|)/);
         var i = 0, newArr = [];

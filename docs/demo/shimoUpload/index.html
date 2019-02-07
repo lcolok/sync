@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<input type="file" id="photoFileUpload" change="getFileName()" />
+<input type="button" onclick="upload()" value="上传" />
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
+<script src="./upload2Recipient.js"></script>
+<script>
+    AV.init({
+        appId: '1oHwyqv3qyzH6hFsjCJULJ31-gzGzoHsz',
+        appKey: 'g7G4uPGRbJc5GaK4yn36FqkC',
+    });
+
+
+    function upload() {
+        var fileUploadControl = $('#photoFileUpload')[0];
+        if (fileUploadControl.files.length > 0) {
+            var localFile = fileUploadControl.files[0];
+            var name = localFile.name;
+            var size = localFile.size;
+            var path = $(fileUploadControl).val();
+            upload2Recipient(path,size);
+        }
+    }
+
+
+    function getFileName(obj) {
+
+        if (typeof (obj) == "undefined") {
+            var obj = $('#photoFileUpload')[0];
+        }
+
+        // console.log($(obj).val());
+        fileName = $(obj).val().split("\\").pop();
+        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+        return fileName;
+    }
+</script>
