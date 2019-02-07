@@ -2,6 +2,7 @@ var request = require('request');
 var axios = require('axios');
 const Qs = require("qs");
 var fs = require('fs');
+const httpOrig = require('http');
 
 const shimoCookie = "shimo_sid=s:UmcqxgbtanN5R-yaheURrLnKpXDD9xlg.jn9p7u5voFG4bsuGZkiBvbURLOACUeoRMrARh3+B5Qs;";
 
@@ -89,12 +90,12 @@ async function uploadShimo(src) {
     form.append('accessToken', token);
     // form.append('file', fs.createReadStream('demo/demo.jpg'), {filename: 'unicycle.jpg'});//这个可以强制改名字
     form.append('file', data);
-    
+
     var start = new Date();
     var interval = setInterval(() => {
 
         var uploaded = r.req.connection._bytesDispatched;
-        var mb = uploaded/(1024*1024);
+        var mb = uploaded / (1024 * 1024);
         var percent = (uploaded / size * 100).toFixed(0);
         if (percent == 100) {
             clearInterval(interval);
@@ -102,24 +103,65 @@ async function uploadShimo(src) {
 
         prev = percent;
         var end = new Date();
-        var duration = (end-start)/1000;
-        var speed = mb/duration;
+        var duration = (end - start) / 1000;
+        var speed = mb / duration;
         console.log(`Uploaded: ${mb.toFixed(2)} MB; Progress: ${percent}%; Upload_Speed: ${speed.toFixed(2)} MB/s`);
 
     }, 500);
 
 }
 
-function download(url) {
+async function newUploadShimo(data) {
+    var token = await getToken();
+    console.log("拿到石墨评论中的Token:  " + token);
+
+    var data = fs.createReadStream(src);
+    var size = fs.lstatSync(src).size;
+    console.info(size);
+
+    const r = request.post({
+        url: 'https://uploader.shimo.im/upload2',
+        // header: headers,
+    }, function optionalCallback(err, httpResponse, body) {
+        console.log(body);
+    })
+    const form = r.form();
+    form.append('server', 'qiniu');
+    form.append('type', 'attachments');
+    form.append('accessToken', token);
+    // form.append('file', fs.createReadStream('demo/demo.jpg'), {filename: 'unicycle.jpg'});//这个可以强制改名字
+    form.append('file', data);
+
+    var start = new Date();
+    var interval = setInterval(() => {
+
+        var uploaded = r.req.connection._bytesDispatched;
+        var mb = uploaded / (1024 * 1024);
+        var percent = (uploaded / size * 100).toFixed(0);
+        if (percent == 100) {
+            clearInterval(interval);
+        }
+
+        prev = percent;
+        var end = new Date();
+        var duration = (end - start) / 1000;
+        var speed = mb / duration;
+        console.log(`Uploaded: ${mb.toFixed(2)} MB; Progress: ${percent}%; Upload_Speed: ${speed.toFixed(2)} MB/s`);
+
+    }, 500);
+
+}
+
+function download(url,src) {
     var file = request
         .get(url)
         .on('error', function (err) {
             console.log(err)
-        }).pipe(fs.createWriteStream(`/Users/seisakubu/Downloads/demo.mov`))
+        }).pipe(fs.createWriteStream(src));
 }
 
 void (async () => {
-    uploadShimo('demo/カサネテク- 女孩聯誼必勝招式歌曲 (完美版中文字幕)Full Ver..mp4');
-    // download('https://t.cn/E5knY0Y');
-
+    var src = `/Users/seisakubu/Downloads/demo.mov`
+    download('https://uploader.shimo.im/f/YvLQHbS6cns78sJ2.mp4',src);
+    uploadShimo(src);
 })();
