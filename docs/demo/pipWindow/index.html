@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!-- saved from url=(0073)https://www.zhangxinxu.com/study/201812/video-picture-in-picture-demo.php -->
+<html>
+
+<head>
+  <style>
+  </style>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Video视频画中画效果</title>
+  <link rel="stylesheet" href="./assets/demo.css">
+  <link rel="stylesheet" href="./assets/hl.css">
+  <link rel="stylesheet" href="./assets/Button.css">
+  <link rel="stylesheet" type="text/css" href="main.css">
+
+</head>
+
+<body class="M">
+  <div id="main">
+    <h1>Video视频画中画效果实例页面</h1>
+    <a href="" id="back">回到石墨床</a>
+    <div id="body" class="light">
+      <div id="content" class="show">
+        <h3>展示</h3>
+        <div class="demo">
+          <video id="video" src="" poster="" controls="" playsinline="" loop=""></video>
+          <div class="layout">
+            <input type="button" id="pipBtn" class="ui-button ui-button-primary" value="点击进入画中画状态">
+            <input type="button" id="clearBtn" class="ui-button ui-button-primary" value="清除log"
+              onclick="output.innerHTML=''">
+            <h4>输出log：</h4>
+
+            <div id="output" class="output">
+              <p><small class="description">Tips: 画中画视频尺寸可以拉伸</small></p>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    var log = function (content) {
+      if (!output.innerHTML) {
+        output.innerHTML = content;
+      } else {
+        output.innerHTML += '<br>' + content;
+      }
+      output.scrollTop = 99999;
+    };
+
+    var pipWindow;
+
+    pipBtn.addEventListener('click', function (event) {
+      log('切换Picture-in-Picture模式...');
+      // 禁用按钮，防止二次点击
+      this.disabled = true;
+      try {
+        if (video !== document.pictureInPictureElement) {
+          // 尝试进入画中画模式
+          video.requestPictureInPicture();
+        } else {
+          // 退出画中画
+          document.exitPictureInPicture();
+        }
+      } catch (error) {
+        log('&gt; 出错了！' + error);
+      } finally {
+        this.disabled = false;
+      }
+    });
+
+    // 点击切换按钮可以触发画中画模式，同样，在有些浏览器中，右键也可以切换，甚至可以自动进入画中画模式
+    video.addEventListener('enterpictureinpicture', function (event) {
+      log('&gt; 视频已进入Picture-in-Picture模式');
+      pipBtn.value = pipBtn.value.replace('进入', '退出');
+
+      pipWindow = event.pictureInPictureWindow;
+      log('&gt; 视频窗体尺寸为：' + pipWindow.width + ' × ' + pipWindow.height);
+
+      // 添加resize事件，一切都是为了测试API
+      pipWindow.addEventListener('resize', onPipWindowResize);
+    });
+    // 退出画中画模式时候
+    video.addEventListener('leavepictureinpicture', function (event) {
+      log('&gt; 视频已退出Picture-in-Picture模式');
+      pipBtn.value = pipBtn.value.replace('退出', '进入');
+      // 移除resize事件
+      pipWindow.removeEventListener('resize', onPipWindowResize);
+    });
+    // 视频窗口尺寸改变时候执行的事件
+    var onPipWindowResize = function (event) {
+      log('&gt; 窗口尺寸改变为：' + pipWindow.width + ' × ' + pipWindow.height);
+    }
+    /* 特征检测 */
+    if ('pictureInPictureEnabled' in document == false) {
+      log('当前浏览器不支持视频画中画。');
+      togglePipButton.disabled = true;
+    }
+  </script>
+
+
+
+
+  <script>
+    function getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+        vars[key] = value;
+      });
+      return vars;
+    }
+    var v = getUrlVars()['v'];
+    console.log(v);
+    document.getElementById('video').setAttribute("src", v);
+  </script>
+
+
+</html>
