@@ -17,6 +17,14 @@ var app = require('./app');
 // LeanEngine 运行时会分配端口并赋值到该变量。
 var PORT = parseInt(process.env.LEANCLOUD_APP_PORT || process.env.PORT || 3000);
 
+/* 
+访问存储服务时使用的地址（类似于 https://api.leancloud.cn）。
+该值会因为所在数据中心等原因导致不一样，
+所以使用 REST API 请求存储服务或 LeanCloud 其他服务时请使用此环境变量的值。
+在云引擎中不要直接使用 https://api.leancloud.cn。 
+*/
+// console.log(process.env.LEANCLOUD_API_SERVER);
+
 app.listen(PORT, function (err) {
   console.log('Node app is running on port:', PORT);
 

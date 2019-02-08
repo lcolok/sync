@@ -35,12 +35,13 @@
         // Loop through the FileList and render image files as thumbnails.
         for (var i = 0, f; f = files[i]; i++) {
 
-            // Only process image files.
-            if (!f.type.match('image.*')) {
-                continue;
-            }
+            var size = f.size;
+            var name = f.name;
+            console.log(f);
+
 
             var reader = new FileReader();
+
 
 
             // Closure to capture the file information.
@@ -52,17 +53,23 @@
                 //         '" title="', escape(theFile.name), '"/>'].join('');
                 //     document.getElementById('list').insertBefore(span, null);
                 // };
-                console.log(theFile);
+                console.log(theFile.target.result);
                 console.log(reader.result);
-                AV.Cloud.run('recipient', { data: reader.result, size: 0, filename: "123231.png" });
+                AV.Cloud.run('recipient', {
+                    data: reader.result,
+                    size: size,
+                    filename: name,
+                });
             }
 
 
-            reader.readAsBinaryString(f);
+            reader.readAsDataURL(f);
 
 
         }
     }
+
+
 
     document.getElementById('files').addEventListener('change', handleFileSelect, false);
 

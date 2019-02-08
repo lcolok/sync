@@ -16,7 +16,7 @@
         if (fileUploadControl.files.length > 0) {
             var localFile = fileUploadControl.files[0];
             var name = getFileName(fileUploadControl);
-
+            console.log(localFile);
             var file = new AV.File(name, localFile);
             file.save({
                 onprogress: function (e) {
