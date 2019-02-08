@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <!-- saved from url=(0073)https://www.zhangxinxu.com/study/201812/video-picture-in-picture-demo.php -->
-<html>
+<html allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" msallowfullscreen="msallowfullscreen"
+  oallowfullscreen="oallowfullscreen" webkitallowfullscreen="webkitallowfullscreen">
 
 <head>
+
   <style>
   </style>
 
@@ -14,7 +16,10 @@
   <link rel="stylesheet" href="./assets/demo.css">
   <link rel="stylesheet" href="./assets/hl.css">
   <link rel="stylesheet" href="./assets/Button.css">
-  <link rel="stylesheet" type="text/css" href="main.css">
+  <link rel="stylesheet" type="text/css" href="./assets/main.css">
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.css">
 
 </head>
 
@@ -26,7 +31,11 @@
       <div id="content" class="show">
         <h3>展示</h3>
         <div class="demo">
-          <video id="video" src="" poster="" controls="" playsinline="" loop=""></video>
+
+          <div id="dplayerContainer" class="dplayerContainer" src="" poster="" controls="" playsinline="" loop=""
+            x5-video-player-type="h5" x5-video-player-fullscreen="true" autoplay></div>
+          <!-- 只要把div标签换成是video标签,画中画功能就恢复了 -->
+
           <div class="layout">
             <input type="button" id="pipBtn" class="ui-button ui-button-primary" value="点击进入画中画状态">
             <input type="button" id="clearBtn" class="ui-button ui-button-primary" value="清除log"
@@ -45,81 +54,6 @@
   </div>
   </div>
 
-  <script>
-    var log = function (content) {
-      if (!output.innerHTML) {
-        output.innerHTML = content;
-      } else {
-        output.innerHTML += '<br>' + content;
-      }
-      output.scrollTop = 99999;
-    };
-
-    var pipWindow;
-
-    pipBtn.addEventListener('click', function (event) {
-      log('切换Picture-in-Picture模式...');
-      // 禁用按钮，防止二次点击
-      this.disabled = true;
-      try {
-        if (video !== document.pictureInPictureElement) {
-          // 尝试进入画中画模式
-          video.requestPictureInPicture();
-        } else {
-          // 退出画中画
-          document.exitPictureInPicture();
-        }
-      } catch (error) {
-        log('&gt; 出错了！' + error);
-      } finally {
-        this.disabled = false;
-      }
-    });
-
-    // 点击切换按钮可以触发画中画模式，同样，在有些浏览器中，右键也可以切换，甚至可以自动进入画中画模式
-    video.addEventListener('enterpictureinpicture', function (event) {
-      log('&gt; 视频已进入Picture-in-Picture模式');
-      pipBtn.value = pipBtn.value.replace('进入', '退出');
-
-      pipWindow = event.pictureInPictureWindow;
-      log('&gt; 视频窗体尺寸为：' + pipWindow.width + ' × ' + pipWindow.height);
-
-      // 添加resize事件，一切都是为了测试API
-      pipWindow.addEventListener('resize', onPipWindowResize);
-    });
-    // 退出画中画模式时候
-    video.addEventListener('leavepictureinpicture', function (event) {
-      log('&gt; 视频已退出Picture-in-Picture模式');
-      pipBtn.value = pipBtn.value.replace('退出', '进入');
-      // 移除resize事件
-      pipWindow.removeEventListener('resize', onPipWindowResize);
-    });
-    // 视频窗口尺寸改变时候执行的事件
-    var onPipWindowResize = function (event) {
-      log('&gt; 窗口尺寸改变为：' + pipWindow.width + ' × ' + pipWindow.height);
-    }
-    /* 特征检测 */
-    if ('pictureInPictureEnabled' in document == false) {
-      log('当前浏览器不支持视频画中画。');
-      togglePipButton.disabled = true;
-    }
-  </script>
-
-
-
-
-  <script>
-    function getUrlVars() {
-      var vars = {};
-      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-        vars[key] = value;
-      });
-      return vars;
-    }
-    var v = getUrlVars()['v'];
-    console.log(v);
-    document.getElementById('video').setAttribute("src", v);
-  </script>
-
+  <script src="index.js"></script>
 
 </html>
