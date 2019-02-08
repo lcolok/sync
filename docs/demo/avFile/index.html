@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <input type="file" id="photoFileUpload" change="getFileName()" />
-<input type="button" onclick="upload()" value="上传" />
+<!-- <input type="button" onclick="upload()" value="上传" /> -->
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
 <script>
@@ -16,7 +16,7 @@
         if (fileUploadControl.files.length > 0) {
             var localFile = fileUploadControl.files[0];
             var name = getFileName(fileUploadControl);
-            console.log(localFile);
+            
             var file = new AV.File(name, localFile);
             file.save({
                 onprogress: function (e) {
@@ -45,4 +45,6 @@
         fileName = fileName.substring(0, fileName.lastIndexOf("."));
         return fileName;
     }
+
+    document.getElementById('photoFileUpload').addEventListener('change', upload, false);
 </script>

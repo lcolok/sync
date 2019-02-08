@@ -1,20 +1,24 @@
 'use strict';
 const request = require('request');
-const fs = require('fs');
-const axios = require('axios');
-const Qs = require("qs");
-var AV = require('leanengine');
+const AV = require('leanengine');
+const stream = require('stream');
+
 
 AV.Cloud.define('recipient', function (request) {
     recipient(request);
 })
 
+
+
 async function recipient(input) {
+    console.log(input.data);
+
+    return
     var data = input.params.data;
     var size = input.params.size;
-    var filename = data.path?data.path.split('/').pop():input.params.filename;
-
+    var filename = input.params.filename ? input.params.filename : data.path.split('/').pop();
     var token = await getTokenShimo();
+
     const r = request.post({
         url: 'https://uploader.shimo.im/upload2',
         // header: headers,
@@ -45,13 +49,20 @@ async function recipient(input) {
         var speed = chunk / (duration / 1000);
         console.log(`Uploaded: ${KB2MB(uploaded).toFixed(2)} MB; Progress: ${percent}%; Upload_Speed: ${speed.toFixed(2)} MB/s`);
         prevUploaded = uploaded;
-        if (percent >= 100) {
+        if ((percent >= 100)||(percent == 0)) {
             clearInterval(interval);
             var end = new Date();
             var averageSpeed = (KB2MB(size) / ((end - start) / 1000));
             return console.log(`Average speed:  ${averageSpeed.toFixed(2)} MB/s`);
         }
     }, duration);
+
+
+
+
+
+
+
 
 }
 
