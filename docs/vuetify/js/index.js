@@ -23,6 +23,7 @@ var app = new Vue({
     loading3: false,
     loading4: false,
     alert: true,
+    floatBTN_Occur: 0,
     rules: {
       required: value => !!value || '必填信息',
       counter: value => (value == null ? 0 : value.length) <= 20 || '最多只能填写20个字符',
@@ -35,7 +36,9 @@ var app = new Vue({
         console.log(shannonEntropy);
         return `信息熵:${shannonEntropy}`
       }
-    }
+    },
+    offsetTop: 0,
+    scrollTargetStyle: ""
   }),
   computed: {
     progress() {
@@ -44,7 +47,11 @@ var app = new Vue({
     },
     color() {
       return ['error', 'warning', 'success'][Math.floor(this.progress / 40)]
-    }
+    },
+
+  },
+  mounted() {
+    this.occurFab();
   },
   watch: {
     loader() {
@@ -58,8 +65,16 @@ var app = new Vue({
     }
   },
   methods: {
+    occurFab() {
+      console.log(document.documentElement.scrollTop);
+      // console.log(app.offsetTop);
 
-
+      if (document.documentElement.scrollTop > 0) {
+        return this.floatBTN_Occur = 1;
+      } else {
+        return this.floatBTN_Occur = 0;
+      }
+    },
     searchByKeyword(delay) {
       var target = this;
       if (target.keywordLasttime != target.keyword) {
@@ -70,7 +85,8 @@ var app = new Vue({
           searchLC(target, delay);
         }
       }
-    }
+    },
+
 
   },
 
@@ -89,6 +105,11 @@ var floatBTN = new Vue({
     bottom: true,
     left: false,
     transition: 'scale-transition',
+    windowSize: {
+      x: 0,
+      y: 0
+    },
+
   }),
 
   computed: {
@@ -98,9 +119,12 @@ var floatBTN = new Vue({
         case false: return { color: "blue darken-2", icon: 'more_horiz' }
         default: return {}
       }
-    }
-  },
+    },
+    showOrNot() {
+      return app.floatBTN_Occur
+    },
 
+  },
   watch: {
     top(val) {
       this.bottom = !val
@@ -113,10 +137,23 @@ var floatBTN = new Vue({
     },
     left(val) {
       this.right = !val
+    },
+
+  },
+
+  mounted() {
+
+  },
+
+  methods: {
+    hoverOrNot() {
+      this.hover = false;
+      setTimeout(()=>{
+        this.hover = true;
+      },800)
     }
   }
 })
-
 
 
 

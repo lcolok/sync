@@ -17,25 +17,8 @@
 <body>
 
 
-  <v-speed-dial id="floatBTN" v-model="fab" :top="top" :bottom="bottom" :right="right" :left="left"
-    :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
-    <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab>
-      <v-icon>{{ activeFab.icon }}</v-icon>
-      <!-- <v-icon>more_horiz</v-icon>
-      <v-icon>keyboard_arrow_up</v-icon> -->
-    </v-btn>
-    <v-btn fab dark small color="green">
-      <v-icon>edit</v-icon>
-    </v-btn>
-    <v-btn fab dark small color="indigo">
-      <v-icon>add</v-icon>
-    </v-btn>
-    <v-btn fab dark small color="red">
-      <v-icon>delete</v-icon>
-    </v-btn>
-  </v-speed-dial>
 
-  <div id="app">
+  <div id="app" v-scroll="occurFab">
 
 
 
@@ -59,7 +42,7 @@
 
       <v-content>
 
-        <v-container fluid>
+        <v-container>
 
           <v-layout align-center justify-center>
             <v-flex xs10>
@@ -235,14 +218,37 @@
     </v-app>
 
 
-
-
-
-
-
-
   </div>
 
+
+  <div id="floatBTN">
+
+    <v-fab-transition>
+      <v-speed-dial slot="activator" v-show="showOrNot" v-model="fab" :top="top" :bottom="bottom" :right="right" :left="left"
+        :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
+
+        <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab  @click="$vuetify.goTo(0);">
+          <v-icon>{{ activeFab.icon }}</v-icon>
+        </v-btn>
+
+        <v-btn fab dark small color="green" @click="hoverOrNot">
+          <v-icon>edit</v-icon>
+        </v-btn>
+        <v-btn fab dark small color="indigo">
+          <v-icon>add</v-icon>
+        </v-btn>
+        <v-btn fab dark small color="red">
+          <v-icon>delete</v-icon>
+        </v-btn>
+      </v-speed-dial>
+    </v-fab-transition>
+
+    <v-fab-transition>
+      <v-btn v-show="showOrNot" color="pink" fab dark bottom left fixed>
+        <v-icon>edit</v-icon>
+      </v-btn>
+    </v-fab-transition>
+  </div>
 
 
 
