@@ -1,4 +1,4 @@
-new Vue({
+var app = new Vue({
   el: '#app',
   data: () => ({
     dark: false,
@@ -75,6 +75,48 @@ new Vue({
   },
 
 })
+
+var floatBTN = new Vue({
+  el: '#floatBTN',//Floating Action Button
+  data: () => ({
+    direction: 'top',
+    fab: false,
+    fling: false,
+    hover: true,
+    tabs: null,
+    top: false,
+    right: true,
+    bottom: true,
+    left: false,
+    transition: 'scale-transition',
+  }),
+
+  computed: {
+    activeFab() {
+      switch (this.fab) {
+        case true: return { color: 'orange', icon: 'keyboard_arrow_up' }
+        case false: return { color: "blue darken-2", icon: 'more_horiz' }
+        default: return {}
+      }
+    }
+  },
+
+  watch: {
+    top(val) {
+      this.bottom = !val
+    },
+    right(val) {
+      this.left = !val
+    },
+    bottom(val) {
+      this.top = !val
+    },
+    left(val) {
+      this.right = !val
+    }
+  }
+})
+
 
 
 
