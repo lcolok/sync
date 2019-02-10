@@ -66,10 +66,10 @@ var app = new Vue({
   },
   methods: {
     occurFab() {
-      console.log(document.documentElement.scrollTop);
-      // console.log(app.offsetTop);
-
-      if (document.documentElement.scrollTop > 0) {
+      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+      console.log(scrollTop);
+      
+      if (scrollTop > 0) {
         return this.floatBTN_Occur = 1;
       } else {
         return this.floatBTN_Occur = 0;
