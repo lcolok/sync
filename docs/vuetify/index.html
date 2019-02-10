@@ -18,16 +18,12 @@
 
 
 
-  <div id="app" v-scroll="occurFab">
+  <div id="app">
 
 
 
 
     <v-app id="sandbox" :dark="dark">
-
-
-
-
 
       <v-navigation-drawer v-model="primaryDrawer.model" :permanent="primaryDrawer.type === 'permanent'"
         :temporary="primaryDrawer.type === 'temporary'" :clipped="primaryDrawer.clipped"
@@ -38,31 +34,49 @@
         <v-toolbar-side-icon v-if="primaryDrawer.type !== 'permanent'"
           @click.stop="primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
         <v-toolbar-title>石墨床VUE</v-toolbar-title>
+
       </v-toolbar>
 
       <v-content>
-
         <v-container>
-
           <v-layout align-center justify-center>
-            <v-flex xs10>
 
-              <v-text-field v-model="keyword" label="搜索" prepend-inner-icon="search" solo clearable autofocus
-                v-on:input="searchByKeyword(500)" @keydown.enter="searchByKeyword(0)" loading hint="随便搜点什么吧..."
-                :rules="[rules.required,rules.entropy]">
-                <v-scale-transition slot="append">
-                  <!-- <v-progress-circular v-if="searchLoading" size="24" color="info" indeterminate></v-progress-circular> -->
-                </v-scale-transition>
-                <!-- <v-progress-linear v-if="custom" slot="progress" :value="progress" :color="color" height="3"></v-progress-linear> -->
-                <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
+            <!-- <v-toolbar app fixed height="70px" width="80px">
+              <v-text-field solo v-model="keyword" label="搜索" prepend-icon="search" clearable autofocus
+                v-on:input="searchByKeyword({delay:500})" @keydown.enter="searchByKeyword({delay:500})" loading
+                hint="随便搜点什么吧..." :rules="[rules.required,rules.entropy]">
+                <v-progress-linear v-if="custom" slot="progress" height="2"></v-progress-linear>
               </v-text-field>
 
-            </v-flex>
-          </v-layout>
+              <v-btn icon>
+                <v-icon>my_location</v-icon>
+              </v-btn>
 
-          <v-layout align-center justify-center>
+              <v-btn icon>
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+            </v-toolbar> -->
 
-            <v-flex xs10>
+
+
+            <v-flex>
+
+
+              <v-layout align-center justify-center>
+                <v-flex>
+                  <v-text-field id="keyword" v-model="keyword" label="搜索" prepend-inner-icon="search" solo clearable
+                    autofocus v-on:input="searchByKeyword({delay:500})" @keydown.enter="searchByKeyword({delay:500})"
+                    loading hint="随便搜点什么吧..." :rules="[rules.required,rules.entropy]">
+                    <v-scale-transition slot="append">
+                      <!-- <v-progress-circular v-if="searchLoading" size="24" color="info" indeterminate></v-progress-circular> -->
+                    </v-scale-transition>
+                    <!-- <v-progress-linear v-if="custom" slot="progress" :value="progress" :color="color" height="3"></v-progress-linear> -->
+                    <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
+                  </v-text-field>
+                </v-flex>
+              </v-layout>
+
+
               <v-card>
                 <v-card-text>
                   <v-layout row wrap>
@@ -209,7 +223,7 @@
 
       </v-content>
 
-      <v-footer :inset="footer.inset" app>
+      <v-footer :inset="footer.inset">
 
         <span class="px-3">&copy; {{ new Date().getFullYear() }}</span>
 
@@ -221,33 +235,33 @@
   </div>
 
 
-  <div id="floatBTN">
+  <div id="floatBTN" v-scroll="occurFab">
 
     <v-fab-transition>
-      <v-speed-dial slot="activator" v-show="showOrNot" v-model="fab" :top="top" :bottom="bottom" :right="right" :left="left"
-        :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
+      <v-speed-dial slot="activator" v-show="floatBTN_Occur" v-model="fab" :top="top" :bottom="bottom" :right="right"
+        :left="left" :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
 
-        <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab  @click="$vuetify.goTo(0);">
+        <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab>
           <v-icon>{{ activeFab.icon }}</v-icon>
         </v-btn>
 
-        <v-btn fab dark small color="green" @click="hoverOrNot">
-          <v-icon>edit</v-icon>
+        <v-btn fab dark small color="green" @click="hoverOrNot;$vuetify.goTo(target)">
+          <v-icon>search</v-icon>
         </v-btn>
         <v-btn fab dark small color="indigo">
           <v-icon>add</v-icon>
         </v-btn>
-        <v-btn fab dark small color="red">
-          <v-icon>delete</v-icon>
+        <v-btn fab dark small color="orange" @click="$vuetify.goTo(0);">
+          <v-icon>keyboard_arrow_up</v-icon>
         </v-btn>
       </v-speed-dial>
     </v-fab-transition>
 
-    <v-fab-transition>
+    <!-- <v-fab-transition>
       <v-btn v-show="showOrNot" color="pink" fab dark bottom left fixed>
         <v-icon>edit</v-icon>
       </v-btn>
-    </v-fab-transition>
+    </v-fab-transition> -->
   </div>
 
 

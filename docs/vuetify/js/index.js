@@ -23,7 +23,7 @@ var app = new Vue({
     loading3: false,
     loading4: false,
     alert: true,
-    floatBTN_Occur: 0,
+    scrollStyle: "",
     rules: {
       required: value => !!value || '必填信息',
       counter: value => (value == null ? 0 : value.length) <= 20 || '最多只能填写20个字符',
@@ -37,10 +37,10 @@ var app = new Vue({
         return `信息熵:${shannonEntropy}`
       }
     },
-    offsetTop: 0,
-    scrollTargetStyle: ""
   }),
   computed: {
+
+
     progress() {
       var num = this.keyword == null ? 0 : this.keyword.length;
       return Math.min(100, num * 10)
@@ -51,7 +51,7 @@ var app = new Vue({
 
   },
   mounted() {
-    this.occurFab();
+    this.getScrollStyle()
   },
   watch: {
     loader() {
@@ -65,17 +65,12 @@ var app = new Vue({
     }
   },
   methods: {
-    occurFab() {
-      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
-      console.log(scrollTop);
-      
-      if (scrollTop > 0) {
-        return this.floatBTN_Occur = 1;
-      } else {
-        return this.floatBTN_Occur = 0;
-      }
+    getScrollStyle() {
+
+      return this.scrollStyle = `max-height: ${window.innerHeight - 120}px`
     },
-    searchByKeyword(delay) {
+    searchByKeyword(request) {
+      var delay = request.delay;
       var target = this;
       if (target.keywordLasttime != target.keyword) {
         if (target.lastTime == 0) {
@@ -86,6 +81,8 @@ var app = new Vue({
         }
       }
     },
+
+
 
 
   },
@@ -105,25 +102,22 @@ var floatBTN = new Vue({
     bottom: true,
     left: false,
     transition: 'scale-transition',
-    windowSize: {
-      x: 0,
-      y: 0
-    },
-
+    floatBTN_Occur: 0,
+    windowSize: {},
   }),
 
   computed: {
     activeFab() {
       switch (this.fab) {
-        case true: return { color: 'orange', icon: 'keyboard_arrow_up' }
+        case true: return { color: 'red', icon: 'close' }
         case false: return { color: "blue darken-2", icon: 'more_horiz' }
         default: return {}
       }
     },
-    showOrNot() {
-      return app.floatBTN_Occur
+    target() {
+      const value = this
+      return value
     },
-
   },
   watch: {
     top(val) {
@@ -148,10 +142,23 @@ var floatBTN = new Vue({
   methods: {
     hoverOrNot() {
       this.hover = false;
-      setTimeout(()=>{
+      setTimeout(() => {
         this.hover = true;
-      },800)
-    }
+      }, 800)
+    },
+    occurFab() {
+      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+      console.log(scrollTop);
+      this.windowSize = { x: window.innerWidth, y: window.innerHeight }
+      if (scrollTop > this.windowSize.y * 0.1) {
+        this.floatBTN_Occur = 1;
+        return 1
+      } else {
+        this.floatBTN_Occur = 0;
+        return 0
+      }
+    },
+
   }
 })
 
@@ -165,7 +172,7 @@ function searchLC(target, delay) {
     target.keywordLasttime = key;
     window.location.href = `#/${key}`
     console.log('关键词为:' + key);
-    bingDic(key);
+    // bingDic(key);
   }, delay)
 }
 

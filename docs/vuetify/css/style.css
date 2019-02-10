@@ -2,6 +2,18 @@
   animation: loader 1s infinite;
   display: flex;
 }
+.card--flex-toolbar {
+  margin-top: -64px;
+}
+
+.scrollContainer{
+  width: auto;
+  height: auto;   
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;       
+  overflow-x: hidden;    
+}
+
 @-moz-keyframes loader {
   from {
     transform: rotate(0);
