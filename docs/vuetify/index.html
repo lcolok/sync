@@ -9,6 +9,8 @@
   <title>石墨床VUE</title>
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'>
   <link rel='stylesheet' href='https://unpkg.com/vuetify/dist/vuetify.min.css'>
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous"></script>
   <link rel="stylesheet" href="css/style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
   <!-- 以上这句代码用于适配手机 -->
@@ -17,9 +19,7 @@
 <body>
 
 
-
   <div id="app">
-
 
 
 
@@ -61,18 +61,20 @@
 
             <v-flex>
 
-
               <v-layout align-center justify-center>
                 <v-flex>
-                  <v-text-field id="keyword" v-model="keyword" label="搜索" prepend-inner-icon="search" solo clearable
-                    autofocus v-on:input="searchByKeyword({delay:500})" @keydown.enter="searchByKeyword({delay:500})"
-                    loading hint="随便搜点什么吧..." :rules="[rules.required,rules.entropy]">
-                    <v-scale-transition slot="append">
-                      <!-- <v-progress-circular v-if="searchLoading" size="24" color="info" indeterminate></v-progress-circular> -->
-                    </v-scale-transition>
-                    <!-- <v-progress-linear v-if="custom" slot="progress" :value="progress" :color="color" height="3"></v-progress-linear> -->
-                    <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
-                  </v-text-field>
+                  <form action="javascript:return true">
+                    <v-text-field ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
+                      prepend-inner-icon="search" solo clearable autofocus
+                      @input="searchByKeyword({delay:500})" @keydown="submit($event)" loading
+                      hint="随便搜点什么吧..." :rules="[]" >
+                      <v-scale-transition slot="append">
+                        <!-- <v-progress-circular v-if="searchLoading" size="24" color="info" indeterminate></v-progress-circular> -->
+                      </v-scale-transition>
+                      <!-- <v-progress-linear v-if="custom" slot="progress" :value="progress" :color="color" height="3"></v-progress-linear> -->
+                      <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
+                    </v-text-field>
+                  </form>
                 </v-flex>
               </v-layout>
 
@@ -244,15 +246,14 @@
         <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab>
           <v-icon>{{ activeFab.icon }}</v-icon>
         </v-btn>
-
-        <v-btn fab dark small color="green" @click="hoverOrNot;$vuetify.goTo(target)">
-          <v-icon>search</v-icon>
+        <v-btn fab dark small color="orange" @click="$vuetify.goTo(0);">
+          <v-icon>keyboard_arrow_up</v-icon>
         </v-btn>
         <v-btn fab dark small color="indigo">
           <v-icon>add</v-icon>
         </v-btn>
-        <v-btn fab dark small color="orange" @click="$vuetify.goTo(0);">
-          <v-icon>keyboard_arrow_up</v-icon>
+        <v-btn fab dark small color="green" @click="hoverOrNot;backToSearchTarget.focus();">
+          <v-icon>search</v-icon>
         </v-btn>
       </v-speed-dial>
     </v-fab-transition>

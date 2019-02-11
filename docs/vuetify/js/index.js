@@ -40,7 +40,6 @@ var app = new Vue({
   }),
   computed: {
 
-
     progress() {
       var num = this.keyword == null ? 0 : this.keyword.length;
       return Math.min(100, num * 10)
@@ -51,7 +50,8 @@ var app = new Vue({
 
   },
   mounted() {
-    this.getScrollStyle()
+    this.getScrollStyle();
+    this.getQ()
   },
   watch: {
     loader() {
@@ -65,6 +65,18 @@ var app = new Vue({
     }
   },
   methods: {
+    getQ() {
+      var keyword = getUrlVars().q;
+      if (!keyword) { keyword = '' }
+      return this.keyword = keyword;
+    },
+    submit(e) {
+      // key.Code === 13表示回车键 
+      if (e.keyCode === 13) {
+        //逻辑处理
+        this.$refs.searchBar.blur();
+      }
+    },
     getScrollStyle() {
 
       return this.scrollStyle = `max-height: ${window.innerHeight - 120}px`
@@ -114,9 +126,15 @@ var floatBTN = new Vue({
         default: return {}
       }
     },
-    target() {
-      const value = this
-      return value
+    backToSearchTarget() {
+      return app.$refs.searchBar
+    },
+    backToSearchOptions() {
+      return {
+        offset: 16,
+        duration: 300,
+        easing: 'easeInOutCubic'
+      }
     },
   },
   watch: {
@@ -144,7 +162,7 @@ var floatBTN = new Vue({
       this.hover = false;
       setTimeout(() => {
         this.hover = true;
-      }, 800)
+      }, 800);
     },
     occurFab() {
       var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
@@ -163,14 +181,13 @@ var floatBTN = new Vue({
 })
 
 
-
 function searchLC(target, delay) {
 
   target.lastTime = setTimeout(() => {
     var key = target.keyword;
     showLoading(target);
     target.keywordLasttime = key;
-    window.location.href = `#/${key}`
+    window.location.href = `?q=${key}`
     console.log('关键词为:' + key);
     // bingDic(key);
   }, delay)
@@ -254,4 +271,12 @@ async function bingDic(word) {
   }
 
 
+}
+
+function getUrlVars() {
+  var vars = {};
+  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+    vars[key] = decodeURI(value);
+  });
+  return vars;
 }

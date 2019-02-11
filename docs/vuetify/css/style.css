@@ -46,3 +46,9 @@
     transform: rotate(360deg);
   }
 }
+
+input[type="search"]{
+  -webkit-appearance:none;
+
+}
+input::-webkit-search-cancel-button {display: none;}
