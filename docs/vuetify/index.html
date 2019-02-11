@@ -9,14 +9,16 @@
   <title>石墨床VUE</title>
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'>
   <link rel='stylesheet' href='https://unpkg.com/vuetify/dist/vuetify.min.css'>
-  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.css">
+
   <link rel="stylesheet" href="css/style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
   <!-- 以上这句代码用于适配手机 -->
 </head>
 
 <body>
+
+
 
 
   <div id="app">
@@ -65,9 +67,8 @@
                 <v-flex>
                   <form action="javascript:return true">
                     <v-text-field ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
-                      prepend-inner-icon="search" solo clearable autofocus
-                      @input="searchByKeyword({delay:500})" @keydown="submit($event)" loading
-                      hint="随便搜点什么吧..." :rules="[]" >
+                      prepend-inner-icon="search" solo clearable autofocus @input="searchByKeyword({delay:500})"
+                      @keydown="submit($event)" loading hint="随便搜点什么吧..." :rules="[]">
                       <v-scale-transition slot="append">
                         <!-- <v-progress-circular v-if="searchLoading" size="24" color="info" indeterminate></v-progress-circular> -->
                       </v-scale-transition>
@@ -233,9 +234,59 @@
 
     </v-app>
 
-
   </div>
 
+
+  
+  <div id="videoPlayer">
+    <v-app id="inspire" >
+      <div class="text-xs-center" >
+        <v-bottom-sheet inset >
+          <v-btn slot="activator" color="red" dark>
+            Show player
+          </v-btn>
+
+          <v-card tile>
+       
+              <div id="dplayerContainer" class="dplayerContainer" src="" poster="" controls="" playsinline="" loop=""
+                x5-video-player-type="h5" x5-video-player-fullscreen="true" autoplay></div>
+           
+
+            <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear>
+
+            <v-list>
+              <v-list-tile>
+                <v-list-tile-content>
+                  <v-list-tile-title>The Walker</v-list-tile-title>
+                  <v-list-tile-sub-title>Fitz & The Trantrums</v-list-tile-sub-title>
+                </v-list-tile-content>
+
+                <v-spacer></v-spacer>
+
+                <v-list-tile-action>
+                  <v-btn icon>
+                    <v-icon>fast_rewind</v-icon>
+                  </v-btn>
+                </v-list-tile-action>
+
+                <v-list-tile-action :class="{ 'mx-5': $vuetify.breakpoint.mdAndUp }">
+                  <v-btn icon>
+                    <v-icon>pause</v-icon>
+                  </v-btn>
+                </v-list-tile-action>
+
+                <v-list-tile-action :class="{ 'mr-3': $vuetify.breakpoint.mdAndUp }">
+                  <v-btn icon>
+                    <v-icon>fast_forward</v-icon>
+                  </v-btn>
+                </v-list-tile-action>
+              </v-list-tile>
+            </v-list>
+          </v-card>
+        </v-bottom-sheet>
+      </div>
+    </v-app>
+  </div>
 
   <div id="floatBTN" v-scroll="occurFab">
 
@@ -268,13 +319,15 @@
 
 
 
+
 </body>
 
 <script src='https://unpkg.com/vue/dist/vue.js'></script>
 <script src='https://unpkg.com/vuetify/dist/vuetify.min.js'></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
 <script src="js/index.js"></script>
 
 </html>
