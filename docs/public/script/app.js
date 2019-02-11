@@ -604,11 +604,12 @@ function LeanCloudInitMute() {
 function jump() {
   var currentURL = window.location.href;
   console.log(currentURL);
-  if (currentURL.match('lcolok.github.io/FBUI/')) {//如果是网页版的话
-    window.open('https://lcolok.github.io/FBUI/vuetify');
+  if (currentURL.match(/\/index\.html/)) {//如果存在index.html的话
+    var redirectURL = currentURL.replace(/\/index\.html/,'/vuetify')
+    window.open(redirectURL);
   } else {//如果是本地打开的话
-    var domain = currentURL.split('/').shift();
-    window.open(domain+'/vuetify/');
+    var domain = currentURL+'/vuetify';
+    window.open(domain);
   }
 
 }
