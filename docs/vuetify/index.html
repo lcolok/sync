@@ -19,10 +19,17 @@
 <body>
 
 
+  <v-snackbar  id="snackbar" ref="snackbar" top v-model="snackbar" :color="color" :timeout="timeout">
 
+    <v-icon color="white">{{snackbarIcon}}</v-icon>
+    <v-btn class="transparent" flat @click="snackbarAction"> {{ snackbarText }}</v-btn>
+    <v-btn dark flat @click="snackbar = false">
+      <v-icon color="white">close</v-icon>
+    </v-btn>
+
+  </v-snackbar>
 
   <div id="app">
-
 
 
     <v-app id="sandbox" :dark="dark">
@@ -32,199 +39,104 @@
         :floating="primaryDrawer.floating" :mini-variant="primaryDrawer.mini" absolute overflow app>
       </v-navigation-drawer>
 
-      <v-toolbar :clipped-left="primaryDrawer.clipped" app>
+      <!-- <v-toolbar :clipped-left="primaryDrawer.clipped" app scroll-toolbar-off-screen scroll-threshold=50 tabs >
         <v-toolbar-side-icon v-if="primaryDrawer.type !== 'permanent'"
           @click.stop="primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
         <v-toolbar-title>石墨床VUE</v-toolbar-title>
+      </v-toolbar> -->
+      <form action="javascript:return true"></form>
+      <v-toolbar color="primary" :dark="!dark" dense extension-height=80 app scroll-toolbar-off-screen fixed>
+        <v-toolbar-side-icon v-if="primaryDrawer.type !== 'permanent'"
+          @click.stop="primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
+        <v-toolbar-title>石墨床VUE</v-toolbar-title>
+        <v-spacer></v-spacer>
 
+        <v-btn icon>
+          <v-icon>search</v-icon>
+        </v-btn>
+
+        <v-btn icon>
+          <v-icon>apps</v-icon>
+        </v-btn>
+
+        <v-btn icon>
+          <v-icon>refresh</v-icon>
+        </v-btn>
+
+        <v-btn icon>
+          <v-icon>more_vert</v-icon>
+        </v-btn>
+
+        <v-toolbar color="primary" :dark="!dark" slot="extension" flat>
+
+          <v-text-field ref="searchBar" id="searchBar" v-model="keyword" label="搜索" prepend-inner-icon="search"
+            :append-icon="paste ? 'file_copy' : undefined" @click:append="pasteFromClipboard" solo-inverted clearable
+            autofocus @input="searchByKeyword({delay:500})" @keydown="submit($event)" loading hint="随便搜点什么吧..."
+            :rules="[rules.required]">
+            <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
+          </v-text-field>
+
+          <!-- <v-btn-toggle v-model="toggle_multiple" class="transparent" multiple >
+              <v-btn flat>
+                <v-icon>format_bold</v-icon>
+              </v-btn>
+              <v-btn flat>
+                <v-icon>format_italic</v-icon>
+              </v-btn>
+              <v-btn flat>
+                <v-icon>format_underlined</v-icon>
+              </v-btn>
+              <v-btn flat>
+                <v-icon>format_color_fill</v-icon>
+              </v-btn>
+            </v-btn-toggle> -->
+        </v-toolbar>
       </v-toolbar>
-
-      <v-content>
-        <v-container>
-          <v-layout align-center justify-center>
-
-            <!-- <v-toolbar app fixed height="70px" width="80px">
-              <v-text-field solo v-model="keyword" label="搜索" prepend-icon="search" clearable autofocus
-                v-on:input="searchByKeyword({delay:500})" @keydown.enter="searchByKeyword({delay:500})" loading
-                hint="随便搜点什么吧..." :rules="[rules.required,rules.entropy]">
-                <v-progress-linear v-if="custom" slot="progress" height="2"></v-progress-linear>
-              </v-text-field>
-
-              <v-btn icon>
-                <v-icon>my_location</v-icon>
-              </v-btn>
-
-              <v-btn icon>
-                <v-icon>more_vert</v-icon>
-              </v-btn>
-            </v-toolbar> -->
+      </form>
 
 
 
-            <v-flex>
+      <v-bottom-sheet inset>
+        <v-btn slot="activator" color="white" dark fab fixed bottom left>
+          <!-- <v-icon>keyboard_arrow_up</v-icon> -->
+          <img src='https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png' width='30' height='30'>
+        </v-btn>
+        <v-card tile>
+          <div id="dplayerContainer" class="dplayerContainer" src="" poster="" controls="" playsinline="" loop=""
+            x5-video-player-type="h5" x5-video-player-fullscreen="true"></div>
+          <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear>
 
-              <v-layout align-center justify-center>
-                <v-flex>
-                  <form action="javascript:return true">
-                    <v-text-field ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
-                      prepend-inner-icon="search" solo clearable autofocus @input="searchByKeyword({delay:500})"
-                      @keydown="submit($event)" loading hint="随便搜点什么吧..." :rules="[]">
-                      <v-scale-transition slot="append">
-                        <!-- <v-progress-circular v-if="searchLoading" size="24" color="info" indeterminate></v-progress-circular> -->
-                      </v-scale-transition>
-                      <!-- <v-progress-linear v-if="custom" slot="progress" :value="progress" :color="color" height="3"></v-progress-linear> -->
-                      <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
-                    </v-text-field>
-                  </form>
-                </v-flex>
-              </v-layout>
+          <v-list>
+            <v-list-tile>
+              <v-list-tile-content>
+                <v-list-tile-title>The Walker</v-list-tile-title>
+                <v-list-tile-sub-title>Fitz & The Trantrums</v-list-tile-sub-title>
+              </v-list-tile-content>
 
+              <v-spacer></v-spacer>
 
-              <v-card>
-                <v-card-text>
-                  <v-layout row wrap>
-                    <v-flex xs12 md6>
-                      <span>弹窗测试</span>
+              <v-list-tile-action>
+                <v-btn icon>
+                  <v-icon>fast_rewind</v-icon>
+                </v-btn>
+              </v-list-tile-action>
 
+              <v-list-tile-action :class="{ 'mx-5': $vuetify.breakpoint.mdAndUp }">
+                <v-btn icon>
+                  <v-icon>pause</v-icon>
+                </v-btn>
+              </v-list-tile-action>
 
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>主题</span>
-                      <v-switch v-model="dark" primary label="暗黑"></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Drawer</span>
-                      <v-radio-group v-model="primaryDrawer.type" column>
-                        <v-radio v-for="drawer in drawers" :key="drawer" :label="drawer" :value="drawer.toLowerCase()"
-                          primary></v-radio>
-                      </v-radio-group>
-                      <v-switch v-model="primaryDrawer.clipped" label="Clipped" primary></v-switch>
-                      <v-switch v-model="primaryDrawer.floating" label="Floating" primary></v-switch>
-                      <v-switch v-model="primaryDrawer.mini" label="Mini" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
+              <v-list-tile-action :class="{ 'mr-3': $vuetify.breakpoint.mdAndUp }">
+                <v-btn icon>
+                  <v-icon>fast_forward</v-icon>
+                </v-btn>
+              </v-list-tile-action>
+            </v-list-tile>
+          </v-list>
+        </v-card>
+      </v-bottom-sheet>
 
-
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-                    <v-flex xs12 md6>
-                      <span>Footer</span>
-                      <v-switch v-model="footer.inset" label="Inset" primary></v-switch>
-                    </v-flex>
-
-
-
-                  </v-layout>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn>取消</v-btn>
-                  <v-btn :loading="loading4" :disabled="loading4" color="info" @click="loader = 'loading4'">
-                    提交
-                    <!-- <span slot="loader" class="custom-loader">
-                      <v-icon light>cached</v-icon>
-                    </span> -->
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-container>
-
-      </v-content>
 
       <v-footer :inset="footer.inset">
 
@@ -237,56 +149,8 @@
   </div>
 
 
-  
-  <div id="videoPlayer">
-    <v-app id="inspire" >
-      <div class="text-xs-center" >
-        <v-bottom-sheet inset >
-          <v-btn slot="activator" color="red" dark>
-            Show player
-          </v-btn>
 
-          <v-card tile>
-       
-              <div id="dplayerContainer" class="dplayerContainer" src="" poster="" controls="" playsinline="" loop=""
-                x5-video-player-type="h5" x5-video-player-fullscreen="true" autoplay></div>
-           
 
-            <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear>
-
-            <v-list>
-              <v-list-tile>
-                <v-list-tile-content>
-                  <v-list-tile-title>The Walker</v-list-tile-title>
-                  <v-list-tile-sub-title>Fitz & The Trantrums</v-list-tile-sub-title>
-                </v-list-tile-content>
-
-                <v-spacer></v-spacer>
-
-                <v-list-tile-action>
-                  <v-btn icon>
-                    <v-icon>fast_rewind</v-icon>
-                  </v-btn>
-                </v-list-tile-action>
-
-                <v-list-tile-action :class="{ 'mx-5': $vuetify.breakpoint.mdAndUp }">
-                  <v-btn icon>
-                    <v-icon>pause</v-icon>
-                  </v-btn>
-                </v-list-tile-action>
-
-                <v-list-tile-action :class="{ 'mr-3': $vuetify.breakpoint.mdAndUp }">
-                  <v-btn icon>
-                    <v-icon>fast_forward</v-icon>
-                  </v-btn>
-                </v-list-tile-action>
-              </v-list-tile>
-            </v-list>
-          </v-card>
-        </v-bottom-sheet>
-      </div>
-    </v-app>
-  </div>
 
   <div id="floatBTN" v-scroll="occurFab">
 

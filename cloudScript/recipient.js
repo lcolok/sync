@@ -11,7 +11,7 @@ AV.Cloud.define('recipient', function (request) {
 
 
 async function recipient(input) {
-    console.log(input.data);
+    console.log(input);
 
     return
     var data = input.params.data;

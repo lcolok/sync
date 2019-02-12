@@ -24,6 +24,7 @@ var app = new Vue({
     loading4: false,
     alert: true,
     scrollStyle: "",
+    paste: true,
     rules: {
       required: value => !!value || '必填信息',
       counter: value => (value == null ? 0 : value.length) <= 20 || '最多只能填写20个字符',
@@ -65,10 +66,13 @@ var app = new Vue({
     }
   },
   methods: {
+    pasteFromClipboard() {
+      this.paste = !this.paste
+    },
     getQ() {
       var keyword = getUrlVars().q;
-      if (!keyword) { keyword = ''; }
-      return this.keyword = keyword;
+      if (!keyword) { return this.keyword = '' }
+      else { return this.keyword = decodeURIComponent(keyword); }
     },
     submit(e) {
       // key.Code === 13表示回车键 
@@ -181,9 +185,28 @@ var floatBTN = new Vue({
   }
 })
 
-var videoPlayer =new Vue({
-  el: '#videoPlayer',
-  
+var snackbar = new Vue({
+  el: '#snackbar',
+  data: () => ({
+    snackbar: true,
+    color: 'error',
+    mode: '',
+    timeout: 6000,
+    snackbarText: '这是一个小测试',
+    snackbarIcon: 'info',
+
+  }),
+  methods: {
+
+    snackbarAction: () => {
+      
+      snackbar.color='success';
+      snackbar.snackbarText='你成功啦!';
+      snackbar.snackbarIcon='done';
+    },
+
+  }
+
 })
 
 function searchLC(target, delay) {
@@ -287,23 +310,54 @@ function getUrlVars() {
 }
 
 
+//paste事件监听
+document.addEventListener("paste", function (e) {
+
+  var cbd = e.clipboardData;
+  var ua = window.navigator.userAgent;
+
+  // 如果是 Safari 直接 return
+  if (!(e.clipboardData && e.clipboardData.items)) {
+    return;
+  }
+
+  // Mac平台下Chrome49版本以下 复制Finder中的文件的Bug Hack掉
+  if (cbd.items && cbd.items.length === 2 && cbd.items[0].kind === "string" && cbd.items[1].kind === "file" &&
+    cbd.types && cbd.types.length === 2 && cbd.types[0] === "text/plain" && cbd.types[1] === "Files" &&
+    ua.match(/Macintosh/i) && Number(ua.match(/Chrome\/(\d{2})/i)[1]) < 49) {
+    return;
+  }
+
+  for (var i = 0; i < cbd.items.length; i++) {
+    var item = cbd.items[i];
+    console.log(item.kind);
+    if (item.kind == "file") {
+      var blob = item.getAsFile();
+      if (blob.size === 0) {
+        return;
+      }
+      console.log(blob);
+      // blob 就是从剪切板获得的文件 可以进行上传或其他操作
+    }
+  }
+}, false);
+
+
+
+
+
+
+
+
 //以下是新增的Dplayer播放窗口组件
 
 
 
-
-function getUrlVars() {
-  var vars = {};
-  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-      vars[key] = value;
-  });
-  return vars;
-}
 var v = getUrlVars()['v'];
 
 if (!v) {
   console.log('没有url参数,播放默认视频');
-  v = 'http://lc-1oHwyqv3.cn-n1.lcfile.com/f6affbae989b77d20120.mp4'
+  v = 'https://uploader.shimo.im/f/5Xl8MXleYAwTWkZV.mp4'
 } else {
   console.log('正在加载该视频:' + v);
 }
@@ -320,43 +374,43 @@ initPlayers();
 function initPlayers() {
   // dplayer-float
   window.dpFloat = new DPlayer({
-      container: document.getElementById('dplayerContainer'),
-      preload: 'auto',
-      autoplay: false,
-      screenshot: true,
-      video: {
-          url: v,
-      },
-      contextmenu: [
+    container: document.getElementById('dplayerContainer'),
+    preload: 'auto',
+    autoplay: false,
+    screenshot: true,
+    video: {
+      url: v,
+    },
+    contextmenu: [
 
-          {
-              text: '画中画',
-              click: (player) => {
-                  console.log(player);
-                  currentVideo.requestPictureInPicture();
-              }
-          },
-          {
-              text: '去石墨床看看',
-              link: ''
-          }
-      ],
+      {
+        text: '画中画',
+        click: (player) => {
+          console.log(player);
+          currentVideo.requestPictureInPicture();
+        }
+      },
+      {
+        text: '去石墨床看看',
+        link: ''
+      }
+    ],
   });
 };
 
 
 var log = function (content) {
   if (!output.innerHTML) {
-      output.innerHTML = content;
+    output.innerHTML = content;
   } else {
-      output.innerHTML += '<br>' + content;
+    output.innerHTML += '<br>' + content;
   }
   output.scrollTop = 99999;
 };
 
 var pipWindow, currentVideo;
 
-/* 
+/*
 // console.log(dplayerContainer);
 // console.log(dplayerContainer.getElementsByTagName('video')[0]);
 currentVideo = dplayerContainer.getElementsByTagName('video')[0];

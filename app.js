@@ -30,7 +30,7 @@ app.set('view engine', 'html');
 app.use(express.static(path.join(__dirname,'docs')));//利用 Express 托管静态文件
 
 // 设置默认超时时间
-app.use(timeout('150s'));
+app.use(timeout('240s'));
 
 // 加载云引擎中间件
 app.use(AV.express());
