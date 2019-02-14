@@ -5,6 +5,9 @@ var app = new Vue({
   el: '#app',
   data: () => ({
     dark: false,
+    bottomSheet: false,
+    currentVideoTitle: '',
+    currentVideoSubheading: '',
     mainList: {
       selected: [],
       items: [
@@ -130,6 +133,32 @@ var app = new Vue({
     }
   },
   methods: {
+    howToPlay(item) {
+      console.log(item.type);
+      switch (item.type) {
+        case 'mov': 
+        case 'mp4':
+          // document.getElementById('dplayerContainer').setAttribute("src", item.shortURL);
+          this.currentVideoTitle = item.name;
+
+          if (item.name !== item.name_trans) {
+            this.currentVideoSubheading = item.name_trans;
+          } else {
+            this.currentVideoSubheading = (item.size / 1048576).toFixed(2) + 'MB'
+          }
+          window.dpFloat.notice(`正在加载:${item.name}`, 2000, 0.8);
+
+          var url = item.uploaderURL ? item.uploaderURL : item.longURL;
+          window.dpFloat.switchVideo({
+            url: url,
+          });
+          window.dpFloat.play();
+          this.bottomSheet = true;
+          break;
+        default:
+          return;
+      }
+    },
     toggle(index) {
       const i = this.mainList.selected.indexOf(index)
 
@@ -361,7 +390,7 @@ function getUrlVars() {
   return vars;
 }
 
-function showTop20(){
+function showTop20() {
   app.snackbar = {
     show: true,
     color: 'info',

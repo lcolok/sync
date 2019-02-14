@@ -121,7 +121,7 @@
       </form>
 
 
-      <v-bottom-sheet inset>
+      <v-bottom-sheet v-model='bottomSheet' ref='bottomSheet' inset>
         <v-btn slot="activator" color="white" dark fab fixed bottom left tile>
           <!-- <v-icon>keyboard_arrow_up</v-icon> -->
           <img src='https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png' width='40' height='40'>
@@ -135,8 +135,8 @@
           <v-list>
             <v-list-tile>
               <v-list-tile-content>
-                <v-list-tile-title>The Walker</v-list-tile-title>
-                <v-list-tile-sub-title>Fitz & The Trantrums</v-list-tile-sub-title>
+                <v-list-tile-title>{{currentVideoTitle}}</v-list-tile-title>
+                <v-list-tile-sub-title>{{currentVideoSubheading}}</v-list-tile-sub-title>
               </v-list-tile-content>
 
               <v-spacer></v-spacer>
@@ -179,7 +179,7 @@
 
 
 
-                    <v-list-tile-avatar ripple @click="toggle(index)">
+                    <v-list-tile-avatar ripple @click="howToPlay(item)">
                       <v-btn v-if='item.icon!=undefined' :class="item.iconClass" icon>
                         <v-icon>{{ item.icon }}</v-icon>
                       </v-btn>
@@ -192,9 +192,11 @@
 
                     <v-list-tile-content ripple>
 
-                      <v-list-tile-title >{{ item.name }}</v-list-tile-title>
-                      <v-list-tile-sub-title class="text--primary">{{ item.headline }}</v-list-tile-sub-title>
-                      <v-list-tile-sub-title class="caption font-weight-light" v-if="item.size">{{ (item.size/1048576).toFixed(2) }} MB</v-list-tile-sub-title>
+                      <v-list-tile-title class="font-weight-bold subheading">{{ item.name }}</v-list-tile-title>
+                      <v-list-tile-sub-title class="body-2 font-weight-regular text--gray"
+                        v-if="item.name !== item.name_trans">{{ item.name_trans }}</v-list-tile-sub-title>
+                      <v-list-tile-sub-title class="caption font-weight-light" v-if="item.size">
+                        {{ (item.size/1048576).toFixed(2) }} MB</v-list-tile-sub-title>
 
 
                     </v-list-tile-content>
