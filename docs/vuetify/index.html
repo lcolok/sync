@@ -19,20 +19,24 @@
 <body>
 
 
-  <v-snackbar  id="snackbar" ref="snackbar" top v-model="snackbar" :color="color" :timeout="timeout">
 
-    <v-icon color="white">{{snackbarIcon}}</v-icon>
-    <v-btn class="transparent" flat @click="snackbarAction"> {{ snackbarText }}</v-btn>
-    <v-btn dark flat @click="snackbar = false">
-      <v-icon color="white">close</v-icon>
-    </v-btn>
-
-  </v-snackbar>
 
   <div id="app">
 
 
     <v-app id="sandbox" :dark="dark">
+
+      <v-snackbar ref="snackbar" top v-model="snackbar.show" :color="snackbar.color">
+
+        <v-icon color="white">{{ snackbar.snackbarIcon }}</v-icon>
+        <div class="transparent" flat :ripple="snackbar.ripple" @click="snackbar.action"> {{ snackbar.snackbarText }}
+        </div>
+        <v-btn icon dark flat @click="snackbar.show = false">
+          <v-icon color="white">close</v-icon>
+        </v-btn>
+
+      </v-snackbar>
+
 
       <v-navigation-drawer v-model="primaryDrawer.model" :permanent="primaryDrawer.type === 'permanent'"
         :temporary="primaryDrawer.type === 'temporary'" :clipped="primaryDrawer.clipped"
@@ -67,16 +71,9 @@
           <v-icon>more_vert</v-icon>
         </v-btn>
 
-        <v-toolbar color="primary" :dark="!dark" slot="extension" flat>
+        <!-- <v-toolbar color="primary" :dark="!dark" slot="extension" flat>
 
-          <v-text-field ref="searchBar" id="searchBar" v-model="keyword" label="搜索" prepend-inner-icon="search"
-            :append-icon="paste ? 'file_copy' : undefined" @click:append="pasteFromClipboard" solo-inverted clearable
-            autofocus @input="searchByKeyword({delay:500})" @keydown="submit($event)" loading hint="随便搜点什么吧..."
-            :rules="[rules.required]">
-            <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
-          </v-text-field>
-
-          <!-- <v-btn-toggle v-model="toggle_multiple" class="transparent" multiple >
+          <v-btn-toggle v-model="toggle_multiple" class="transparent" multiple >
               <v-btn flat>
                 <v-icon>format_bold</v-icon>
               </v-btn>
@@ -89,17 +86,46 @@
               <v-btn flat>
                 <v-icon>format_color_fill</v-icon>
               </v-btn>
-            </v-btn-toggle> -->
-        </v-toolbar>
+            </v-btn-toggle>
+        </v-toolbar> -->
+
+        <v-layout align-space-around justify-center row slot="extension" />
+
+        <v-flex xs5 lg2 mr-2>
+          <v-select solo-inverted v-model="searchType.value" :items="searchType.items" label="全部" multiple>
+            <template slot="selection" slot-scope="{ item, index }">
+              <v-chip v-if="index === 0" color="white" class="caption" text-color="primary">
+
+                <v-icon class="hidden-sm-and-down">find_in_page</v-icon>
+
+                {{ searchRange }}
+              </v-chip>
+              <!-- <span v-if="index === 1" class="caption">(等{{ searchType.value.length - 1 }}项 )</span> -->
+            </template>
+          </v-select>
+        </v-flex>
+
+        <v-flex>
+          <v-text-field solo-inverted ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
+            prepend-inner-icon="search" :append-icon="paste ? 'file_copy' : undefined"
+            @click:append="pasteFromClipboard" clearable autofocus @input="searchByKeyword({delay:500})"
+            @keydown="submit($event)" loading hint="随便搜点什么吧..." :rules="[]">
+            <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
+
+          </v-text-field>
+
+        </v-flex>
+
+        </v-layout>
       </v-toolbar>
       </form>
 
 
-
       <v-bottom-sheet inset>
-        <v-btn slot="activator" color="white" dark fab fixed bottom left>
+        <v-btn slot="activator" color="white" dark fab fixed bottom left tile>
           <!-- <v-icon>keyboard_arrow_up</v-icon> -->
-          <img src='https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png' width='30' height='30'>
+          <img src='https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png' width='40' height='40'>
+
         </v-btn>
         <v-card tile>
           <div id="dplayerContainer" class="dplayerContainer" src="" poster="" controls="" playsinline="" loop=""
@@ -137,6 +163,82 @@
         </v-card>
       </v-bottom-sheet>
 
+
+
+
+      <v-content>
+
+        <v-layout align-center justify-center>
+          <v-flex xs12 mb-5>
+            <v-card>
+              <v-list two-line>
+                <template v-for="(item, index) in mainList.items">
+
+                  <v-list-tile :key="item.title" avatar ripple>
+
+
+
+
+                    <v-list-tile-avatar ripple @click="toggle(index)">
+                      <v-btn v-if='item.icon!=undefined' :class="item.iconClass" icon>
+                        <v-icon>{{ item.icon }}</v-icon>
+                      </v-btn>
+                      <v-btn v-else class="grey lighten-1 white--text" icon>
+                        <div>{{item.type}}</div>
+                      </v-btn>
+
+                    </v-list-tile-avatar>
+
+
+                    <v-list-tile-content ripple>
+
+                      <v-list-tile-title >{{ item.name }}</v-list-tile-title>
+                      <v-list-tile-sub-title class="text--primary">{{ item.headline }}</v-list-tile-sub-title>
+                      <v-list-tile-sub-title class="caption font-weight-light" v-if="item.size">{{ (item.size/1048576).toFixed(2) }} MB</v-list-tile-sub-title>
+
+
+                    </v-list-tile-content>
+
+                    <!-- <v-list-tile-action @click="toggle(index)">
+
+                      <v-btn icon v-if="mainList.selected.indexOf(index) < 0">
+                        <v-icon color="grey lighten-1">
+                          star_border
+                        </v-icon>
+                      </v-btn>
+                      <v-btn icon v-else>
+                        <v-icon color="yellow darken-2">
+                          star
+                        </v-icon>
+                      </v-btn>
+                    </v-list-tile-action> -->
+
+                    <v-list-tile-action>
+                      <v-btn icon ripple>
+                        <v-icon color="grey lighten-1">more_vert</v-icon>
+                      </v-btn>
+                    </v-list-tile-action>
+
+
+                  </v-list-tile>
+                  <v-divider v-if="index + 1 < mainList.items.length" :key="index"></v-divider>
+                </template>
+              </v-list>
+            </v-card>
+          </v-flex>
+        </v-layout>
+
+      </v-content>
+
+      <v-layout row>
+        <v-flex xs12 sm6 offset-sm3>
+          <v-card>
+
+
+
+          </v-card>
+        </v-flex>
+      </v-layout>
 
       <v-footer :inset="footer.inset">
 
@@ -192,6 +294,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
   crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
+<script src="js/searchShimo.js"></script>
 <script src="js/index.js"></script>
+<script src="js/leanCloudInit.js"></script>
 
 </html>

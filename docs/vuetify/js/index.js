@@ -1,13 +1,69 @@
+
+
+
 var app = new Vue({
   el: '#app',
   data: () => ({
     dark: false,
-
+    mainList: {
+      selected: [],
+      items: [
+        {
+          icon: 'video_library',
+          iconClass: 'green lighten-1 white--text',
+          action: '15 min',
+          headline: 'Brunch this weekend?',
+          name: 'Ali Connors',
+          subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+        },
+        {
+          icon: 'library_music',
+          iconClass: 'grey lighten-1 white--text',
+          action: '2 hr',
+          headline: 'Summer BBQ',
+          name: 'me, Scrott, Jennifer',
+          subtitle: "Wish I could come, but I'm out of town this weekend."
+        },
+        {
+          icon: 'assignment',
+          iconClass: 'blue white--text',
+          action: '6 hr',
+          headline: 'Oui oui',
+          name: 'Sandra Adams',
+          subtitle: 'Do you have Paris recommendations? Have you ever been?'
+        },
+        {
+          icon: 'call_to_action',
+          iconClass: 'amber white--text',
+          action: '12 hr',
+          headline: 'Birthday gift',
+          name: 'Trevor Hansen',
+          subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
+        },
+        {
+          icon: 'picture_as_pdf',
+          iconClass: 'grey lighten-1 white--text',
+          action: '18hr',
+          headline: 'Recipe to try',
+          name: 'Britta Holt',
+          subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
+        }
+      ]
+    }
+    ,
     drawers: ['Default (no property)', 'Permanent', 'Temporary'],
+    searchType: {
+      items: ['视频', '音频', '图片', '文档', '压缩包', '软件', '幻灯片'],
+      value: []
+    },
+    snackbar: {
+
+
+    },
     primaryDrawer: {
-      model: null,
+      model: false,//决定一开始是展开状态还是折叠状态
       type: 'default (no property)',
-      clipped: true,
+      clipped: false,
       floating: false,
       mini: false
     },
@@ -25,6 +81,7 @@ var app = new Vue({
     alert: true,
     scrollStyle: "",
     paste: true,
+    videoImage: {},
     rules: {
       required: value => !!value || '必填信息',
       counter: value => (value == null ? 0 : value.length) <= 20 || '最多只能填写20个字符',
@@ -48,7 +105,14 @@ var app = new Vue({
     color() {
       return ['error', 'warning', 'success'][Math.floor(this.progress / 40)]
     },
+    searchRange() {
+      var all = this.searchType.value.join('|');
 
+      if (all.length > 4) {
+        all = all.slice(0, 4) + '...'
+      }
+      return all;
+    }
   },
   mounted() {
     this.getScrollStyle();
@@ -66,6 +130,16 @@ var app = new Vue({
     }
   },
   methods: {
+    toggle(index) {
+      const i = this.mainList.selected.indexOf(index)
+
+      if (i > -1) {
+        this.mainList.selected.splice(i, 1)
+      } else {
+        this.mainList.selected.push(index)
+      }
+    },
+
     pasteFromClipboard() {
       this.paste = !this.paste
     },
@@ -90,10 +164,10 @@ var app = new Vue({
       var target = this;
       if (target.keywordLasttime != target.keyword) {
         if (target.lastTime == 0) {
-          searchLC(target, delay);
+          searchDelay(target, delay);
         } else {
           clearTimeout(target.lastTime);
-          searchLC(target, delay);
+          searchDelay(target, delay);
         }
       }
     },
@@ -185,39 +259,17 @@ var floatBTN = new Vue({
   }
 })
 
-var snackbar = new Vue({
-  el: '#snackbar',
-  data: () => ({
-    snackbar: true,
-    color: 'error',
-    mode: '',
-    timeout: 6000,
-    snackbarText: '这是一个小测试',
-    snackbarIcon: 'info',
 
-  }),
-  methods: {
-
-    snackbarAction: () => {
-      
-      snackbar.color='success';
-      snackbar.snackbarText='你成功啦!';
-      snackbar.snackbarIcon='done';
-    },
-
-  }
-
-})
-
-function searchLC(target, delay) {
+function searchDelay(target, delay) {
 
   target.lastTime = setTimeout(() => {
     var key = target.keyword;
     showLoading(target);
     target.keywordLasttime = key;
-    window.location.href = `?q=${key}`
+    // window.location.href = `?q=${key}`
     console.log('关键词为:' + key);
     // bingDic(key);
+    searchShimo(key);
   }, delay)
 }
 
@@ -308,6 +360,83 @@ function getUrlVars() {
   });
   return vars;
 }
+
+function showTop20(){
+  app.snackbar = {
+    show: true,
+    color: 'info',
+    ripple: false,
+    snackbarText: '已为你搜索最近20条项目',
+    snackbarIcon: 'update',
+    action: () => {
+
+    }
+  }
+}
+
+
+async function searchShimo(key) {
+  var result = "";
+
+  if (!key) {
+    var data = await AV.Cloud.run('updateShimo');
+    console.log(data);
+
+    if (data > 0) {
+      showUpdate(data);
+    } else {
+      showTop20();
+
+    }
+
+    var query = new AV.Query('ShimoBed');
+    query.descending("updatedAt");
+    query.limit(20);//请求数量上限为1000条
+    var every = await query.find();
+
+    console.log(every);
+
+    result = makeAList(every);
+    // console.log(result);
+  } else {
+
+    var result = await searchLC(key);
+    // alert(JSON.stringify(this.todos[0]));
+    if (result == "") {
+
+      // Vue.toasted.show(`找不到关于“${key}”的项目`, {
+      //   position: 'top-center',
+      //   theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+      //   duration: 3000,
+      //   icon: { name: "search" },
+      //   iconPack: 'fontawesome',
+      //   fitToScreen: "true",
+      //   type: "error"//Type of the Toast ['success', 'info', 'error']
+      //   // fullWidth:"true",
+      // });
+
+      app.snackbar = {
+        show: true,
+        color: 'error',
+        ripple: false,
+        snackbarText: `找不到关于“${key}”的项目`,
+        snackbarIcon: 'report_problem',
+        action: () => {
+
+        }
+      }
+      return
+    }
+  }
+  console.log(app.mainList.items);
+  console.log(result);
+  app.mainList.items = result;
+
+
+
+}
+
+
 
 
 //paste事件监听
@@ -410,6 +539,7 @@ var log = function (content) {
 
 var pipWindow, currentVideo;
 
+currentVideo = dplayerContainer.getElementsByTagName('video')[0];
 /*
 // console.log(dplayerContainer);
 // console.log(dplayerContainer.getElementsByTagName('video')[0]);
@@ -467,3 +597,10 @@ console.log($(".dplayer-menu-item:contains('关于作者')").remove());//移除�
 console.log($(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove());//移除DPlayer版本号的右键按钮
 
 window.dpFloat.fullScreen.request('web');//全屏观看 */
+
+
+
+
+console.log($(".dplayer-menu-item:contains('关于作者')").remove());//移除关于作者的右键按钮
+console.log($(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove());//移除DPlayer版本号的右键按钮
+
