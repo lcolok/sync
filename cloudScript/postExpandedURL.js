@@ -81,8 +81,6 @@ async function unshorten(shortURL){
     return new Promise((resolve)=>{
         request.get({
             url:`https://unshorten.me/s/${shortURL}`,
-            'user-agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36',
-            'cookie': '__cfduid=da3a2b34f9d15beae3e0a4d14940ef1271550241931'
         },(error, response, body)=>{
             var expandedURL = body.replace('\n','');
             resolve(expandedURL);
@@ -100,7 +98,7 @@ async function getR(url) {
 async function postR() {
     var query = new AV.Query('ShimoBed');
     query.doesNotExist("expandedURL");//空值查询
-    query.limit(1000);//请求数量上限为1000条
+    query.limit(1);//请求数量上限为1000条
     query.find().then(function (every) {
         console.log("总数:" + every.length);
         every.forEach(function (each) {//each.attributes
