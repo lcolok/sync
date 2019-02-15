@@ -136,7 +136,7 @@ function getTokenShimo() {
 
 
 
-require('../toolScript/identifier').run('vscode||local', () => {
+require('../toolScript/identifier').run('!vscode||local', () => {
     var resp = downloadBlob({
         params: {
             url: 'https://baobao-3d.bj.bcebos.com/16-0-205.shuimian.mp4'
