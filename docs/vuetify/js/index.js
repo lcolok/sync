@@ -6,6 +6,7 @@ var app = new Vue({
   data: () => ({
     dark: false,
     bottomSheet: false,
+    floatPlayBTN_Occur:false,
     currentVideoTitle: '',
     currentVideoSubheading: '',
     mainList: {
@@ -124,6 +125,15 @@ var app = new Vue({
     this.getQ()
   },
   watch: {
+    bottomSheet(){
+      if(this.bottomSheet==false){
+        dpFloat.pause();
+      }else{
+        this.floatPlayBTN_Occur=true;
+        dpFloat.play();
+      }
+
+    },
     loader() {
       var _this = this;
       var l = this.loader;
@@ -135,6 +145,11 @@ var app = new Vue({
     }
   },
   methods: {
+    closeDpFloat() {
+      if (this.bottomSheet == true) {
+        this.bottomSheet = false;
+      }
+    },
     renderSize(value) {
       if (null == value || value == '') {
         return "0 Bytes";
@@ -154,23 +169,26 @@ var app = new Vue({
         case 'mov':
         case 'mp4':
           // document.getElementById('dplayer').setAttribute("src", item.shortURL);
-          this.currentVideoTitle = item.name;
-
-          if (item.name !== item.name_trans) {
-            this.currentVideoSubheading = item.name_trans;
-          } else {
-            this.currentVideoSubheading = (item.size / 1048576).toFixed(2) + 'MB'
+          if(this.currentVideoTitle!==item.name){//标题跟之前的不同才会切换新视频进行播放
+            this.currentVideoTitle = item.name;
+            if (item.name !== item.name_trans) {
+              this.currentVideoSubheading = item.name_trans;
+            } else {
+              this.currentVideoSubheading = (item.size / 1048576).toFixed(2) + 'MB'
+            }
+            var url = item.expandedURL ? item.expandedURL : item.uploaderURL;
+            dpFloat.notice(`正在加载:${item.name}`, 0, 0.8);
+            dpFloat.switchVideo({
+              url: url,
+            });
           }
 
-          var url = item.expandedURL ? item.expandedURL : item.uploaderURL;
-
-          dpFloat.notice(`正在加载:${item.name}`, 0, 0.8);
-          dpFloat.switchVideo({
-            url: url,
-          });
           dpFloat.play();
           this.bottomSheet = true;
+
+
           dpFloat.on('playing', function () {
+      
             if (dpFloat.video.currentTime == 0) {
               dpFloat.notice(`成功加载!`, 1000, 0.8);
             }
@@ -293,6 +311,7 @@ var floatBTN = new Vue({
         this.hover = true;
       }, 800);
     },
+
     occurFab() {
       var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
       console.log(scrollTop);

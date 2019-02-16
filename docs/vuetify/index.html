@@ -48,7 +48,7 @@
           @click.stop="primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
         <v-toolbar-title>石墨床VUE</v-toolbar-title>
       </v-toolbar> -->
-      <form action="javascript:return true"></form>
+
       <v-toolbar color="primary" :dark="!dark" dense extension-height=80 app scroll-toolbar-off-screen fixed>
         <v-toolbar-side-icon v-if="primaryDrawer.type !== 'permanent'"
           @click.stop="primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
@@ -106,30 +106,35 @@
         </v-flex>
 
         <v-flex>
-          <v-text-field solo-inverted ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
-            prepend-inner-icon="search" :append-icon="paste ? 'file_copy' : undefined"
-            @click:append="pasteFromClipboard" clearable autofocus @input="searchByKeyword({delay:500})"
-            @keydown="submit($event)" loading hint="随便搜点什么吧..." :rules="[]">
-            <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
+          <form action="javascript:return true">
+            <v-text-field solo-inverted ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
+              prepend-inner-icon="search" :append-icon="paste ? 'file_copy' : undefined"
+              @click:append="pasteFromClipboard" clearable autofocus @input="searchByKeyword({delay:500})"
+              @keydown="submit($event)" loading hint="随便搜点什么吧..." :rules="[]">
+              <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
 
-          </v-text-field>
-
+            </v-text-field>
+          </form>
         </v-flex>
 
         </v-layout>
       </v-toolbar>
       </form>
 
-
-      <v-bottom-sheet v-model='bottomSheet' ref='bottomSheet' inset>
-        <v-btn slot="activator" color="white" dark fab fixed bottom left tile>
+      <v-fab-transition>
+        <v-btn color="white" dark fab fixed bottom left tile v-show='floatPlayBTN_Occur' @click="bottomSheet=true">
           <!-- <v-icon>keyboard_arrow_up</v-icon> -->
           <img src='https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png' width='40' height='40'>
-
         </v-btn>
+      </v-fab-transition>
+
+      <v-bottom-sheet v-model='bottomSheet' ref='bottomSheet' inset>
+
         <v-card tile>
           <v-img id="dplayer" src="" poster="" controls="" playsinline="" loop="" x5-video-player-type="h5"
-            x5-video-player-fullscreen="true" :height="innerHeight"></v-img>
+            x5-video-player-fullscreen="true" :height="innerHeight" v-touch="{
+              down:()=>closeDpFloat(),
+            }"></v-img>
 
 
           <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear>
