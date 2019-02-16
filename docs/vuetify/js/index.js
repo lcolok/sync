@@ -100,7 +100,9 @@ var app = new Vue({
     },
   }),
   computed: {
-
+    innerHeight() {
+      return window.innerHeight*0.8;
+    },
     progress() {
       var num = this.keyword == null ? 0 : this.keyword.length;
       return Math.min(100, num * 10)
@@ -151,7 +153,7 @@ var app = new Vue({
       switch (item.type) {
         case 'mov':
         case 'mp4':
-          // document.getElementById('dplayerContainer').setAttribute("src", item.shortURL);
+          // document.getElementById('dplayer').setAttribute("src", item.shortURL);
           this.currentVideoTitle = item.name;
 
           if (item.name !== item.name_trans) {
@@ -159,14 +161,18 @@ var app = new Vue({
           } else {
             this.currentVideoSubheading = (item.size / 1048576).toFixed(2) + 'MB'
           }
-          window.dpFloat.notice(`正在加载:${item.name}`, 2000, 0.8);
 
-          var url = item.uploaderURL ? item.uploaderURL : item.longURL;
-          window.dpFloat.switchVideo({
+          var url = item.expandedURL ? item.expandedURL : item.uploaderURL;
+
+          dpFloat.notice(`正在加载:${item.name}`, 0, 0.8);
+          dpFloat.switchVideo({
             url: url,
           });
-          window.dpFloat.play();
+          dpFloat.play();
           this.bottomSheet = true;
+          dpFloat.on('playing', function () {
+            dpFloat.notice(`成功加载!`, 1000, 0.8);
+          });
           break;
         default:
           return;
@@ -532,11 +538,11 @@ if (!v) {
 } else {
   console.log('正在加载该视频:' + v);
 }
-document.getElementById('dplayerContainer').setAttribute("src", v);
+document.getElementById('dplayer').setAttribute("src", v);
 
 
 document.addEventListener("WeixinJSBridgeReady", function () {
-  document.getElementById('dplayerContainer').play();
+  document.getElementById('dplayer').play();
 }, false);
 
 
@@ -544,8 +550,8 @@ initPlayers();
 
 function initPlayers() {
   // dplayer-float
-  window.dpFloat = new DPlayer({
-    container: document.getElementById('dplayerContainer'),
+  dpFloat = new DPlayer({
+    container: document.getElementById('dplayer'),
     preload: 'auto',
     autoplay: false,
     screenshot: true,
@@ -581,11 +587,11 @@ var log = function (content) {
 
 var pipWindow, currentVideo;
 
-currentVideo = dplayerContainer.getElementsByTagName('video')[0];
+currentVideo = dplayer.getElementsByTagName('video')[0];
 /*
-// console.log(dplayerContainer);
-// console.log(dplayerContainer.getElementsByTagName('video')[0]);
-currentVideo = dplayerContainer.getElementsByTagName('video')[0];
+// console.log(dplayer);
+// console.log(dplayer.getElementsByTagName('video')[0]);
+currentVideo = dplayer.getElementsByTagName('video')[0];
 pipBtn.addEventListener('click', function (event) {
   log('切换Picture-in-Picture模式...');
   // 禁用按钮，防止二次点击
@@ -638,7 +644,7 @@ if ('pictureInPictureEnabled' in document == false) {
 console.log($(".dplayer-menu-item:contains('关于作者')").remove());//移除关于作者的右键按钮
 console.log($(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove());//移除DPlayer版本号的右键按钮
 
-window.dpFloat.fullScreen.request('web');//全屏观看 */
+dpFloat.fullScreen.request('web');//全屏观看 */
 
 
 

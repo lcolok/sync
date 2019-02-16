@@ -6,7 +6,7 @@ AV.Cloud.define('expandShortURL', function (request) {
     return expand(request.params.shortURL);
 })
 
-require('../toolScript/identifier').run('vscode||local', async () => {
+require('./identifier').run('vscode||local', async () => {
     var uri = 'https://t.cn/E2dpm9R';
     var resp = await expand(uri);
     console.log(resp)

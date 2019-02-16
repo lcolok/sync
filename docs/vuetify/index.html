@@ -128,8 +128,10 @@
 
         </v-btn>
         <v-card tile>
-          <div id="dplayerContainer" class="dplayerContainer" src="" poster="" controls="" playsinline="" loop=""
-            x5-video-player-type="h5" x5-video-player-fullscreen="true"></div>
+          <v-img id="dplayer" src="" poster="" controls="" playsinline="" loop="" x5-video-player-type="h5"
+            x5-video-player-fullscreen="true" :height="innerHeight"></v-img>
+
+
           <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear>
 
           <v-list>

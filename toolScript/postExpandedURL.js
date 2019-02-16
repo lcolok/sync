@@ -20,12 +20,9 @@ try {
 async function unshorten(uri) {
     return new Promise((resolve, reject) => {
         uri = uri.match(/((http|ftp|https):\/\/)?[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?/gm)[0];
-        var uploaderURL, longURL;
         if (!uri.match('http')) {
             uri = 'https://' + uri;
         }
-
-
         axios({
             method: 'post',
             url: `http://bitly.co/`,
@@ -44,16 +41,15 @@ async function unshorten(uri) {
 
 
 
-async function postExpandedURL() {
+async function postExpandedURL(n) {
     var query = new AV.Query('ShimoBed');
     query.doesNotExist("expandedURL");//空值查询
     query.limit(1000);//请求数量上限为1000条
     query.find().then(async (every) => {
-        console.log("总数:" + every.length);
+        var len = every.length;
+        console.log("总数:" + len);
 
-
-
-        for (let i = 0, len = every.length; i < len; i++) {
+        for (let i = 0; i < len; i++) {
             var each = every[i];
             var shortURL = each.attributes.shortURL;
             var expandedURL = await unshorten(shortURL);
@@ -68,27 +64,6 @@ async function postExpandedURL() {
 
         }
 
-
-
-
-        /* 
-                every.forEach(async function (each) {
-        
-        
-                    var shortURL = each.attributes.shortURL;
-                    var expandedURL = await unshorten(shortURL);
-                    console.log(expandedURL);
-                    if (!expandedURL.match('http')) { return }
-                    each.set('expandedURL', expandedURL);
-                    each.save().then(function () {
-                        console.log("expandedURL值已上传到LeanCloud");
-                    }, function (error) {
-                        console.log(JSON.stringify(error));
-                    });
-        
-        
-                }); */
-
     }).then(function () {
         // 更新成功
     }, function (error) {
@@ -98,6 +73,7 @@ async function postExpandedURL() {
 }
 
 void (async () => {
-    await postExpandedURL();
+    await postExpandedURL(2);//数字为线程数
+
     // console.log(await getR('t.cn/EtQui0H'));
 })();
