@@ -12,6 +12,13 @@ require('../toolScript/identifier').run('vscode||local', async () => {
     console.log(resp)
 })
 
+axios.interceptors.request.use(function (request) {
+    request['headers']['common']['Accept'] = 'application/json;charset=gb2312;';
+    return request;
+  }, function (error) {
+    return Promise.reject(error);
+  });
+
 
 async function expand(uri) {
     return new Promise((resolve, reject) => {
@@ -26,10 +33,10 @@ async function expand(uri) {
             method: 'get',
             url: uri,
             maxRedirects: 0,
-            gzip:true
+            gzip:false
         }).catch(function (error) {
             uploaderURL = error.response.headers.location;
-            console.log(error.response);
+         
             if (uploaderURL.match(/uploader\.shimo\.im/)) {
                 axios({
                     method: 'get',

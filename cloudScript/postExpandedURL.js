@@ -2,6 +2,7 @@ var AV = require('leancloud-storage');
 var axios = require('axios');
 var request = require('request');
 const Qs = require("qs");
+var cheerio = require('cheerio');
 
 "use strict";
 try {
@@ -15,113 +16,78 @@ try {
 
 }
 
-async function tryCatch(promise) {
-    try {
-        const ret = await promise
-        return [ret, null]
-    } catch (e) {
-        return [null, e]
-    }
-}
 
-function httpRedirect(config) {
-    return tryCatch(
-        axios.create({
-            // timeout: 1500,
-            maxRedirects: 0,
-            // headers: {
-            //     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            //     "Accept-Encoding": "gzip, deflate",
-            //     "Accept-Language": "zh-cn",
-            //     "Connection": "close",
-            //     "Host": "t.cn",
-            //     "Upgrade-Insecure-Requests": "1",
-            //     "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/72.0.3626.73 Mobile/15E148 Safari/605.1",
-            // },
-            transformRequest: [data => Qs.stringify(data)]
-        })(config)
-    )
-}
-
-function http(config) {
-    return tryCatch(
-        axios.create({
-            // timeout: 1500,
-            transformRequest: [data => Qs.stringify(data)]
-        })(config)
-    )
-}
+async function unshorten(uri) {
+    return new Promise((resolve, reject) => {
+        uri = uri.match(/((http|ftp|https):\/\/)?[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?/gm)[0];
+        var uploaderURL, longURL;
+        if (!uri.match('http')) {
+            uri = 'https://' + uri;
+        }
 
 
-async function expand(url) {
-    if (!url.match('http')) {
-        url = 'https://' + url;
-    }
-    const [res, error] = await httpRedirect({
-        method: "get",
-        url: url,
-    })
-    if (error) {
-        var longURL = error.response.headers.location;
-        console.log(error.response.headers);
-        console.log(longURL);
-        return longURL
-    };
-}
+        axios({
+            method: 'post',
+            url: `http://bitly.co/`,
+            data: `turl=${uri}&url_done=done`
 
-function getUrlVars(url) {
-    var vars = {};
-    var parts = url.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-        vars[key] = value;
-    });
-    return vars;
-}
-
-async function unshorten(shortURL){
-    return new Promise((resolve)=>{
-        request.get({
-            url:`https://unshorten.me/s/${shortURL}`,
-        },(error, response, body)=>{
-            var expandedURL = body.replace('\n','');
+        }).then(function (resp) {
+            var html = resp.data;
+            $ = cheerio.load(html);
+            var url = $('#trurl').find('a');
+            var expandedURL = url[0].attribs.href;
             resolve(expandedURL);
-        })
-    })
+        });
+    });
 }
 
 
-async function getR(url) {
-    var longURL = await expand(url);
-    var r = getUrlVars(longURL)['r'];
-    return r;
-}
 
-async function postR() {
+
+async function postExpandedURL() {
     var query = new AV.Query('ShimoBed');
     query.doesNotExist("expandedURL");//空值查询
-    query.limit(1);//请求数量上限为1000条
-    query.find().then(function (every) {
+    query.limit(1000);//请求数量上限为1000条
+    query.find().then(async (every) => {
         console.log("总数:" + every.length);
-        every.forEach(function (each) {//each.attributes
-            // console.log(each.attributes.r);
 
-            query.get(each.id).then(async function (data) {
-                // 成功获得实例
-                // console.info(data);
-                var shortURL = each.attributes.shortURL;
-                var expandedURL = await unshorten(shortURL);
-                console.log(expandedURL);
-                if(!expandedURL.match('http')){return}
-                each.set('expandedURL', expandedURL);
-                each.save().then(function () {
-                    console.log("expandedURL值已上传到LeanCloud");
-                }, function (error) {
-                    console.log(JSON.stringify(error));
-                });
+
+
+        for (let i = 0, len = every.length; i < len; i++) {
+            var each = every[i];
+            var shortURL = each.attributes.shortURL;
+            var expandedURL = await unshorten(shortURL);
+            console.log(expandedURL);
+            if (!expandedURL.match('http')) { continue }
+            each.set('expandedURL', expandedURL);
+            each.save().then(function () {
+                console.log("expandedURL值已上传到LeanCloud");
             }, function (error) {
-                // 异常处理
+                console.log(JSON.stringify(error));
             });
 
-        });
+        }
+
+
+
+
+        /* 
+                every.forEach(async function (each) {
+        
+        
+                    var shortURL = each.attributes.shortURL;
+                    var expandedURL = await unshorten(shortURL);
+                    console.log(expandedURL);
+                    if (!expandedURL.match('http')) { return }
+                    each.set('expandedURL', expandedURL);
+                    each.save().then(function () {
+                        console.log("expandedURL值已上传到LeanCloud");
+                    }, function (error) {
+                        console.log(JSON.stringify(error));
+                    });
+        
+        
+                }); */
 
     }).then(function () {
         // 更新成功
@@ -132,6 +98,6 @@ async function postR() {
 }
 
 void (async () => {
-    await postR();
+    await postExpandedURL();
     // console.log(await getR('t.cn/EtQui0H'));
 })();
