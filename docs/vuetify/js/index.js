@@ -101,7 +101,7 @@ var app = new Vue({
   }),
   computed: {
     innerHeight() {
-      return window.innerHeight*0.8;
+      return window.innerHeight * 0.8;
     },
     progress() {
       var num = this.keyword == null ? 0 : this.keyword.length;
@@ -171,7 +171,10 @@ var app = new Vue({
           dpFloat.play();
           this.bottomSheet = true;
           dpFloat.on('playing', function () {
-            dpFloat.notice(`成功加载!`, 1000, 0.8);
+            if (dpFloat.video.currentTime == 0) {
+              dpFloat.notice(`成功加载!`, 1000, 0.8);
+            }
+
           });
           break;
         default:
