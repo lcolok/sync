@@ -165,7 +165,7 @@ var app = new Vue({
     },
     howToPlay(item) {
       console.log(item.type);
-      switch (item.type) {
+      switch ((item.type).toLowerCase()) {
         case 'mov':
         case 'mp4':
           // document.getElementById('dplayer').setAttribute("src", item.shortURL);
