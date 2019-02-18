@@ -13,7 +13,7 @@ id.run({
             appKey: 'g7G4uPGRbJc5GaK4yn36FqkC',
         });
 
-        var src = '/Users/seisakubu/Desktop/移动城市demo.mov';
+        var src = '/Users/seisakubu/Downie/Mind-Blowing Magic Magnets - Smarter Every Day 153.mp4';
         var data = fs.createReadStream(src);
         var size = fs.lstatSync(src).size;
         // console.log(data);

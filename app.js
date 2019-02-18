@@ -42,7 +42,7 @@ app.enable('trust proxy');
 // 需要重定向到 HTTPS 可去除下一行的注释。
 app.use(AV.Cloud.HttpsRedirect());
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '1000gb'}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
@@ -59,6 +59,8 @@ app.get('/aaa', function (req, res) {
 //只能以Form形式上传name为mFile的文件
 //var upload = multer({ dest: 'upload/'}).single('mFile');
 var upload = multer({ dest: 'upload/' }).any();
+
+
 
 app.post('/upload', function (req, res) {
   console.log("---------访问上传路径-------------");
