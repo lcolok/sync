@@ -8,7 +8,7 @@ AV.Cloud.define('expandShortURL', function (request) {
     return expand(request.params.shortURL);
 })
 
-require('../toolScript/identifier').run('vscode||local', async () => {
+require('../toolScript/identifier').run('!vscode||local', async () => {
     var uri = 'https://t.cn/EULom6v';
     var resp = await expand(uri);
     console.log(resp)
@@ -34,7 +34,7 @@ async function expand(uri) {
             $ = cheerio.load(html);
             var url = $('#trurl').find('a');
             var expandedURL = url[0].attribs.href
-            console.log(expandedURL);
+            // console.log(expandedURL);
             resolve(expandedURL)
         });
     });

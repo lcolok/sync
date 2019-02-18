@@ -6,6 +6,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var AV = require('leanengine');
+var multer = require('multer');
+var request = require('request');
+var fs = require('fs');
 
 // 加载云函数定义，你可以将云函数拆分到多个文件方便管理，但需要在主文件中加载它们
 // require('./cloudScript/alive');
@@ -27,7 +30,7 @@ var ejs = require('ejs');  //我是新引入的ejs插件,让express也能够加�
 app.engine('html', ejs.__express);
 app.set('view engine', 'html');
 
-app.use(express.static(path.join(__dirname,'docs')));//利用 Express 托管静态文件
+app.use(express.static(path.join(__dirname, 'docs')));//利用 Express 托管静态文件
 
 // 设置默认超时时间
 app.use(timeout('240s'));
@@ -46,6 +49,124 @@ app.use(cookieParser());
 app.get('/', function (req, res) {
   res.render('index', { currentTime: new Date() });
 });
+
+app.get('/aaa', function (req, res) {
+  res.redirect('http://www.baidu.com')
+});
+
+
+
+//只能以Form形式上传name为mFile的文件
+//var upload = multer({ dest: 'upload/'}).single('mFile');
+var upload = multer({ dest: 'upload/' }).any();
+
+app.post('/upload', function (req, res) {
+  console.log("---------访问上传路径-------------");
+
+  /** When using the "single"
+      data come in "req.file" regardless of the attribute "name". **/
+  upload(req, res, function (err) {
+    //添加错误处理
+    if (err) {
+      console.log(err);
+      return;
+    }
+
+
+
+    uploadShimo(req, res);
+
+    /*     var src = fs.createReadStream(tmp_path);
+        var dest = fs.createWriteStream(target_path);
+        src.pipe(dest);
+        src.on('end', function () {
+          res.end();
+        });
+        src.on('error', function (err) {
+    
+          res.end();
+          console.log(err);
+        });
+     */
+  });
+
+  async function uploadShimo(req, res) {
+
+    req.file = req.files[0];
+    var src = req.file.path;
+    console.log(src);//临时路径
+
+    /** The original name of the uploaded file
+        stored in the variable "originalname". **/
+    var filename = req.file.originalname;//文件原始名字
+
+    /** A better way to copy the uploaded file. **/
+    console.log(filename);
+
+    var token = await getTokenShimo();
+    console.log("拿到石墨评论中的Token:  " + token);
+
+    var data = fs.createReadStream(src);
+    var size = fs.lstatSync(src).size;
+    console.info(size);
+
+    const r = request.post({
+      url: 'https://uploader.shimo.im/upload2',
+      // header: headers,
+    }, function optionalCallback(err, httpResponse, body) {
+      console.log(body);
+      res.send(body);//返回消息
+    })
+    const form = r.form();
+    form.append('server', 'qiniu');
+    form.append('type', 'attachments');
+    form.append('accessToken', token);
+    // form.append('file', fs.createReadStream('demo/demo.jpg'), {filename: 'unicycle.jpg'});//这个可以强制改名字
+    form.append('file', data, { filename: filename });
+
+    var start = new Date();
+    var interval = setInterval(() => {
+
+      var uploaded = r.req.connection._bytesDispatched;
+      var mb = uploaded / (1024 * 1024);
+      var percent = (uploaded / size * 100).toFixed(0);
+      if (percent == 100) {
+        clearInterval(interval);
+      }
+
+      prev = percent;
+      var end = new Date();
+      var duration = (end - start) / 1000;
+      var speed = mb / duration;
+      console.log(`Uploaded: ${mb.toFixed(2)} MB; Progress: ${percent}%; Upload_Speed: ${speed.toFixed(2)} MB/s`);
+
+    }, 500);
+  }
+
+
+  function getTokenShimo() {
+    return new Promise((resolve, reject) => {
+      request.post('https://shimo.im/api/upload/token', {
+        json: true,
+        headers: {
+          'Cookie': process.env.shimoCookie,
+        }
+      }, (err, httpResponse, body) => {
+        if (!err) {
+          var token = body.data.accessToken.toString();
+          // console.log(token);
+          resolve(token)
+        } else {
+          reject(false);
+        }
+      })
+    })
+  }
+
+
+});
+
+
 
 // 可以将一类的路由单独保存在一个文件中
 app.use('/todos', require('./routes/todos'));

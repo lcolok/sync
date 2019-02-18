@@ -11,7 +11,8 @@ AV.Cloud.define('recipient', function (request) {
 
 
 async function recipient(input) {
-    console.log(input);
+
+    console.log(input.params);
 
     return
     var data = input.params.data;
@@ -49,7 +50,7 @@ async function recipient(input) {
         var speed = chunk / (duration / 1000);
         console.log(`Uploaded: ${KB2MB(uploaded).toFixed(2)} MB; Progress: ${percent}%; Upload_Speed: ${speed.toFixed(2)} MB/s`);
         prevUploaded = uploaded;
-        if ((percent >= 100)||(percent == 0)) {
+        if ((percent >= 100) || (percent == 0)) {
             clearInterval(interval);
             var end = new Date();
             var averageSpeed = (KB2MB(size) / ((end - start) / 1000));
