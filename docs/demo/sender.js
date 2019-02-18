@@ -13,7 +13,7 @@ id.run({
             appKey: 'g7G4uPGRbJc5GaK4yn36FqkC',
         });
 
-        var src = '/Users/seisakubu/Desktop/ch.mp4';
+        var src = '/Users/seisakubu/Desktop/移动城市demo.mov';
         var data = fs.createReadStream(src);
         var size = fs.lstatSync(src).size;
         // console.log(data);
@@ -22,6 +22,7 @@ id.run({
         const r = request.post({
             url: 'https://sync.leanapp.cn/upload',
             // url: '127.0.0.1:3000/1.1/functions/recipient',
+            /* 仍没有确认是否能进行跨域上传 */
             /* 后端必须补充用户验证才能保证该接口不会被人利用? */
             headers: {
                 "X-LC-Id": "1oHwyqv3qyzH6hFsjCJULJ31-gzGzoHsz",

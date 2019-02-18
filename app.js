@@ -125,6 +125,7 @@ app.post('/upload', function (req, res) {
     form.append('file', data, { filename: filename });
 
     var start = new Date();
+    var prev;
     var interval = setInterval(() => {
 
       var uploaded = r.req.connection._bytesDispatched;
