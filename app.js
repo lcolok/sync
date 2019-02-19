@@ -10,14 +10,8 @@ var multer = require('multer');
 var request = require('request');
 var fs = require('fs');
 
-// 加载云函数定义，你可以将云函数拆分到多个文件方便管理，但需要在主文件中加载它们
-// require('./cloudScript/alive');
-// require('./cloudScript/deleteContent');
-// require('./cloudScript/randomTCN');
-// require('./cloudScript/search');
-// require('./cloudScript/updateShimo');
-// require('./cloudScript/webClipper');
 
+// 加载云函数定义，你可以将云函数拆分到多个文件方便管理，但需要在主文件中加载它们
 require('require-all')({
   dirname: __dirname + '/cloudScript',
 })
@@ -42,28 +36,67 @@ app.enable('trust proxy');
 // 需要重定向到 HTTPS 可去除下一行的注释。
 app.use(AV.Cloud.HttpsRedirect());
 
-app.use(bodyParser.json({limit: '1000gb'}));
+app.use(bodyParser.json({ limit: '1000gb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.get('/', function (req, res) {
-  res.render('index', { currentTime: new Date() });
+
+app.get('/', async function (req, res) {
+
+  var r = req.query.r;
+  if (r) {
+    var query = new AV.Query('randomTCN');
+    var redirectURL = await new Promise((resolve) => {
+      query.equalTo('r', r).find().then(e => {
+        // console.log(e);
+        if (e.length != 0) {
+          if (e.length > 1) { alert(`该r出现了${e.length}次,如果出现重定向网址不正确,请删除重复项`) };
+          var redirectURL = e[0].attributes.redirectURL;
+          if (redirectURL) {
+
+            if (!redirectURL.toLowerCase().match('http')) {
+              redirectURL = 'https://' + redirectURL;
+            };
+            console.log(redirectURL);
+            resolve(redirectURL);
+          } else {
+            console.log(`${r}并没有对应的redirectURL`);
+          }
+        } else {
+          console.log(`不存在此r:${r}`);
+        }
+      });
+    })
+    res.redirect(302, redirectURL);
+    return
+  }
+
+
+  res.render('oldVer', { currentTime: new Date() });
 });
+
 
 app.get('/aaa', function (req, res) {
   res.redirect('http://www.baidu.com')
 });
 
+app.get('/v', function (req, res) {
+  res.redirect('/vuetify/')
+});
 
+app.get('/vuetify', function (req, res) {
+  res.render('./vuetify/vuetify', { currentTime: new Date() });
+});
 
 //只能以Form形式上传name为mFile的文件
-//var upload = multer({ dest: 'upload/'}).single('mFile');
-var upload = multer({ dest: 'upload/' }).any();
 
 
 
 app.post('/upload', function (req, res) {
   console.log("---------访问上传路径-------------");
+
+  //var upload = multer({ dest: 'upload/'}).single('mFile');
+  var upload = multer({ dest: 'upload/' }).any();
 
   /** When using the "single"
       data come in "req.file" regardless of the attribute "name". **/
@@ -73,8 +106,6 @@ app.post('/upload', function (req, res) {
       console.log(err);
       return;
     }
-
-
 
     uploadShimo(req, res);
 

@@ -4,11 +4,22 @@
 var app = new Vue({
   el: '#app',
   data: () => ({
+    tabs: null,
+
     dark: false,
     bottomSheet: false,
-    floatPlayBTN_Occur:false,
+    floatPlayBTN_Occur: false,
     currentVideoTitle: '',
     currentVideoSubheading: '',
+    searchDuration: 0,
+    keywordLasttime: '',
+    typeList: [
+      { size:'',icon: 'mdi-movie', text: '视频' },
+      { size:'',icon: 'mdi-music', text: '音乐' },
+      { size:'',icon: 'mdi-image-area', text: '图片' },
+      { size:'',icon: 'mdi-file-pdf', text: 'PDF' },
+      { size:'20',icon: 'fas fa-file-archive fa-xs', text: '压缩包' },
+    ],
     mainList: {
       selected: [],
       items: [
@@ -118,18 +129,23 @@ var app = new Vue({
         all = all.slice(0, 4) + '...'
       }
       return all;
-    }
+    },
+    isMobile() {
+      let flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
+      // console.log(flag);
+      if (flag) { return false } else { return true }
+    },
   },
   mounted() {
     this.getScrollStyle();
     this.getQ()
   },
   watch: {
-    bottomSheet(){
-      if(this.bottomSheet==false){
+    bottomSheet() {
+      if (this.bottomSheet == false) {
         dpFloat.pause();
-      }else{
-        this.floatPlayBTN_Occur=true;
+      } else {
+        this.floatPlayBTN_Occur = true;
         dpFloat.play();
       }
 
@@ -145,6 +161,7 @@ var app = new Vue({
     }
   },
   methods: {
+
     closeDpFloat() {
       if (this.bottomSheet == true) {
         this.bottomSheet = false;
@@ -169,7 +186,7 @@ var app = new Vue({
         case 'mov':
         case 'mp4':
           // document.getElementById('dplayer').setAttribute("src", item.shortURL);
-          if(this.currentVideoTitle!==item.name){//标题跟之前的不同才会切换新视频进行播放
+          if (this.currentVideoTitle !== item.name) {//标题跟之前的不同才会切换新视频进行播放
             this.currentVideoTitle = item.name;
             if (item.name !== item.name_trans) {
               this.currentVideoSubheading = item.name_trans;
@@ -188,7 +205,7 @@ var app = new Vue({
 
 
           dpFloat.on('playing', function () {
-      
+
             if (dpFloat.video.currentTime == 0) {
               dpFloat.notice(`成功加载!`, 1000, 0.8);
             }
@@ -221,6 +238,7 @@ var app = new Vue({
       // key.Code === 13表示回车键 
       if (e.keyCode === 13) {
         //逻辑处理
+        this.searchByKeyword({ delay: 0 })
         this.$refs.searchBar.blur();
       }
     },
@@ -335,7 +353,6 @@ function searchDelay(target, delay) {
   target.lastTime = setTimeout(() => {
     var key = target.keyword;
     showLoading(target);
-    target.keywordLasttime = key;
     // window.location.href = `?q=${key}`
     console.log('关键词为:' + key);
     // bingDic(key);
@@ -446,6 +463,7 @@ function showTop20() {
 
 
 async function searchShimo(key) {
+  var startTime = new Date();
   var result = "";
 
   if (!key) {
@@ -498,10 +516,12 @@ async function searchShimo(key) {
       return
     }
   }
+  app.keywordLasttime = key;
   console.log(app.mainList.items);
   console.log(result);
   app.mainList.items = result;
-
+  var endTime = new Date();
+  app.searchDuration = (endTime - startTime) / 1000;//毫秒转成秒
 
 
 }
@@ -671,6 +691,6 @@ dpFloat.fullScreen.request('web');//全屏观看 */
 
 
 
-console.log($(".dplayer-menu-item:contains('关于作者')").remove());//移除关于作者的右键按钮
-console.log($(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove());//移除DPlayer版本号的右键按钮
+$(".dplayer-menu-item:contains('关于作者')").remove();//移除关于作者的右键按钮
+$(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove();//移除DPlayer版本号的右键按钮
 
