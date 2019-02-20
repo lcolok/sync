@@ -72,7 +72,7 @@ app.get('/', async function (req, res) {
   }
 
 
-  res.render('oldVer', { currentTime: new Date() });
+  res.render('index', { currentTime: new Date() });
 });
 
 
@@ -80,12 +80,12 @@ app.get('/aaa', function (req, res) {
   res.redirect('http://www.baidu.com')
 });
 
-app.get('/v', function (req, res) {
-  res.redirect('/vuetify/')
+app.get('/o', function (req, res) {
+  res.redirect('./oldver/')
 });
 
-app.get('/vuetify', function (req, res) {
-  res.render('./vuetify/vuetify', { currentTime: new Date() });
+app.get('/oldver', function (req, res) {
+  res.render('./oldver/', { currentTime: new Date() });
 });
 
 //只能以Form形式上传name为mFile的文件
