@@ -1,65 +1,70 @@
+Vue.config.productionTip = false;//关掉那句vue开发模式提醒的话
+
 var app = new Vue({
   el: '#app',
   data: () => ({
     tabs: null,
-
+    mainView: true,
     dark: false,
     bottomSheet: false,
     floatPlayBTN_Occur: false,
     currentVideoTitle: '',
     currentVideoSubheading: '',
+    currentVideoSize: '',
     searchDuration: 0,
     keywordLasttime: '',
     typeList: [
-      { size:'',icon: 'mdi-movie', text: '视频' },
-      { size:'',icon: 'mdi-music', text: '音乐' },
-      { size:'',icon: 'mdi-image-area', text: '图片' },
-      { size:'',icon: 'mdi-file-pdf', text: 'PDF' },
-      { size:'20',icon: 'fas fa-file-archive fa-xs', text: '压缩包' },
+
+      { size: '20', icon: 'fas fa-globe-americas', text: '全部' },
+      { size: '', icon: 'mdi-movie', text: '视频' },
+      { size: '', icon: 'mdi-music', text: '音乐' },
+      { size: '', icon: 'mdi-image-area', text: '图片' },
+      { size: '', icon: 'mdi-file-pdf', text: 'PDF' },
+      { size: '20', icon: 'fas fa-file-archive fa-xs', text: '压缩包' },
     ],
     mainList: {
       selected: [],
       items: [
-        {
-          icon: 'video_library',
-          iconClass: 'green lighten-1 white--text',
-          action: '15 min',
-          headline: 'Brunch this weekend?',
-          name: 'Ali Connors',
-          subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
-        },
-        {
-          icon: 'library_music',
-          iconClass: 'grey lighten-1 white--text',
-          action: '2 hr',
-          headline: 'Summer BBQ',
-          name: 'me, Scrott, Jennifer',
-          subtitle: "Wish I could come, but I'm out of town this weekend."
-        },
-        {
-          icon: 'assignment',
-          iconClass: 'blue white--text',
-          action: '6 hr',
-          headline: 'Oui oui',
-          name: 'Sandra Adams',
-          subtitle: 'Do you have Paris recommendations? Have you ever been?'
-        },
-        {
-          icon: 'call_to_action',
-          iconClass: 'amber white--text',
-          action: '12 hr',
-          headline: 'Birthday gift',
-          name: 'Trevor Hansen',
-          subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
-        },
-        {
-          icon: 'picture_as_pdf',
-          iconClass: 'grey lighten-1 white--text',
-          action: '18hr',
-          headline: 'Recipe to try',
-          name: 'Britta Holt',
-          subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
-        }
+        /*         {
+                  icon: 'video_library',
+                  iconClass: 'green lighten-1 white--text',
+                  action: '15 min',
+                  headline: 'Brunch this weekend?',
+                  name: 'Ali Connors',
+                  subtitle: "I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+                },
+                {
+                  icon: 'library_music',
+                  iconClass: 'grey lighten-1 white--text',
+                  action: '2 hr',
+                  headline: 'Summer BBQ',
+                  name: 'me, Scrott, Jennifer',
+                  subtitle: "Wish I could come, but I'm out of town this weekend."
+                },
+                {
+                  icon: 'assignment',
+                  iconClass: 'blue white--text',
+                  action: '6 hr',
+                  headline: 'Oui oui',
+                  name: 'Sandra Adams',
+                  subtitle: 'Do you have Paris recommendations? Have you ever been?'
+                },
+                {
+                  icon: 'call_to_action',
+                  iconClass: 'amber white--text',
+                  action: '12 hr',
+                  headline: 'Birthday gift',
+                  name: 'Trevor Hansen',
+                  subtitle: 'Have any ideas about what we should get Heidi for her birthday?'
+                },
+                {
+                  icon: 'picture_as_pdf',
+                  iconClass: 'grey lighten-1 white--text',
+                  action: '18hr',
+                  headline: 'Recipe to try',
+                  name: 'Britta Holt',
+                  subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
+                } */
       ]
     }
     ,
@@ -135,7 +140,12 @@ var app = new Vue({
   },
   mounted() {
     this.getScrollStyle();
-    this.getQ()
+    this.getQ();
+    this.initPlayers();
+    this.getV();
+    this.getID();
+
+
   },
   watch: {
     bottomSheet() {
@@ -158,7 +168,15 @@ var app = new Vue({
     }
   },
   methods: {
-
+    keyboardEvent(e) {
+      // key.Code === 13表示回车键 
+      console.log(e);
+      // if (e.keyCode === 13) {
+      //   //逻辑处理
+      //   this.searchByKeyword({ delay: 0 })
+      //   this.$refs.searchBar.blur();
+      // }
+    },
     closeDpFloat() {
       if (this.bottomSheet == true) {
         this.bottomSheet = false;
@@ -180,16 +198,17 @@ var app = new Vue({
     howToPlay(item) {
       console.log(item.type);
       switch ((item.type).toLowerCase()) {
+        case 'webm':
         case 'mov':
         case 'mp4':
           // document.getElementById('dplayer').setAttribute("src", item.shortURL);
           if (this.currentVideoTitle !== item.name) {//标题跟之前的不同才会切换新视频进行播放
             this.currentVideoTitle = item.name;
-            if (item.name !== item.name_trans) {
-              this.currentVideoSubheading = item.name_trans;
-            } else {
-              this.currentVideoSubheading = (item.size / 1048576).toFixed(2) + 'MB'
-            }
+
+            this.currentVideoSubheading = item.name_trans;
+
+            this.currentVideoSize = this.renderSize(item.size);
+
             var url = item.expandedURL ? item.expandedURL : item.uploaderURL;
             dpFloat.notice(`正在加载:${item.name}`, 0, 0.8);
             dpFloat.switchVideo({
@@ -203,7 +222,7 @@ var app = new Vue({
 
           dpFloat.on('playing', function () {
 
-            if (dpFloat.video.currentTime == 0) {
+            if (dpFloat.video.currentTime < 1) {
               dpFloat.notice(`成功加载!`, 1000, 0.8);
             }
 
@@ -226,13 +245,76 @@ var app = new Vue({
     pasteFromClipboard() {
       this.paste = !this.paste
     },
+    initPlayers() {
+      // dplayer-float
+      dpFloat = new DPlayer({
+        container: document.getElementById('dplayer'),
+        preload: 'auto',
+        autoplay: false,
+        screenshot: true,
+        video: {
+          url: this.v,
+        },
+        contextmenu: [
+
+          {
+            text: '画中画',
+            click: (player) => {
+              console.log(player);
+              currentVideo.requestPictureInPicture();
+            }
+          },
+          {
+            text: '去石墨床看看',
+            link: ''
+          }
+        ],
+      });
+    },
+    getID() {
+      var id = getUrlVars().id;
+      if (id) {
+
+        let query = new AV.Query('ShimoBed');
+        query.get(id).then(function (item) {
+
+          var uploaderURL = item.get('uploaderURL');
+          var expandedURL = item.get('expandedURL');
+          console.log(expandedURL);
+          var v = expandedURL ? expandedURL : uploaderURL;
+          dpFloat.switchVideo({
+            url: v,
+          });
+
+        }, function (error) {
+          // 异常处理
+          console.error(error);
+        });
+
+        this.bottomSheet = true;
+      }
+
+    },
+    getV() {
+      var v = getUrlVars().v;
+      if (v) {
+        console.log('正在加载该视频:' + v);
+        this.bottomSheet = true;
+        // this.v = v;
+        // document.getElementById('dplayer').setAttribute("src", v);
+        dpFloat.switchVideo({
+          url: v,
+        });
+      }
+    },
     getQ() {
       var keyword = getUrlVars().q;
       if (!keyword) { return this.keyword = '' }
-      else { return this.keyword = decodeURIComponent(keyword); }
+      else { this.keyword = decodeURIComponent(keyword); this.searchByKeyword(); return }
     },
     submit(e) {
       // key.Code === 13表示回车键 
+      // console.log(e);
       if (e.keyCode === 13) {
         //逻辑处理
         this.searchByKeyword({ delay: 0 })
@@ -244,9 +326,11 @@ var app = new Vue({
       return this.scrollStyle = `max-height: ${window.innerHeight - 120}px`
     },
     searchByKeyword(request) {
-      var delay = request.delay;
+      var delay = request ? request.delay : 0;
       var target = this;
       if (target.keywordLasttime != target.keyword) {
+        target.mainList.items = [];
+        target.keywordLasttime = '';
         if (target.lastTime == 0) {
           searchDelay(target, delay);
         } else {
@@ -289,7 +373,7 @@ var floatBTN = new Vue({
       }
     },
     backToSearchTarget() {
-      return app.$refs.searchBar
+      return app.$refs.searchBar.focus();
     },
     backToSearchOptions() {
       return {
@@ -329,7 +413,7 @@ var floatBTN = new Vue({
 
     occurFab() {
       var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
-      console.log(scrollTop);
+      // console.log(scrollTop);
       this.windowSize = { x: window.innerWidth, y: window.innerHeight }
       if (scrollTop > this.windowSize.y * 0.1) {
         this.floatBTN_Occur = 1;
@@ -514,7 +598,7 @@ async function searchShimo(key) {
     }
   }
   app.keywordLasttime = key;
-  console.log(app.mainList.items);
+  // console.log(app.mainList.items);
   console.log(result);
   app.mainList.items = result;
   var endTime = new Date();
@@ -569,64 +653,22 @@ document.addEventListener("paste", function (e) {
 
 
 
-var v = getUrlVars()['v'];
-
-if (!v) {
-  console.log('没有url参数,播放默认视频');
-  v = 'https://uploader.shimo.im/f/5Xl8MXleYAwTWkZV.mp4'
-} else {
-  console.log('正在加载该视频:' + v);
-}
-document.getElementById('dplayer').setAttribute("src", v);
 
 
-document.addEventListener("WeixinJSBridgeReady", function () {
-  document.getElementById('dplayer').play();
-}, false);
 
 
-initPlayers();
+// var log = function (content) {
+//   if (!output.innerHTML) {
+//     output.innerHTML = content;
+//   } else {
+//     output.innerHTML += '<br>' + content;
+//   }
+//   output.scrollTop = 99999;
+// };
 
-function initPlayers() {
-  // dplayer-float
-  dpFloat = new DPlayer({
-    container: document.getElementById('dplayer'),
-    preload: 'auto',
-    autoplay: false,
-    screenshot: true,
-    video: {
-      url: v,
-    },
-    contextmenu: [
+// var pipWindow, currentVideo;
 
-      {
-        text: '画中画',
-        click: (player) => {
-          console.log(player);
-          currentVideo.requestPictureInPicture();
-        }
-      },
-      {
-        text: '去石墨床看看',
-        link: ''
-      }
-    ],
-  });
-};
-
-
-var log = function (content) {
-  if (!output.innerHTML) {
-    output.innerHTML = content;
-  } else {
-    output.innerHTML += '<br>' + content;
-  }
-  output.scrollTop = 99999;
-};
-
-var pipWindow, currentVideo;
-
-currentVideo = dplayer.getElementsByTagName('video')[0];
+// currentVideo = dplayer.getElementsByTagName('video')[0];
 /*
 // console.log(dplayer);
 // console.log(dplayer.getElementsByTagName('video')[0]);

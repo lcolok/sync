@@ -28,11 +28,13 @@ try {
 
 
 
+
+
 async function searchLC(key) {
     var query = new AV.SearchQuery('ShimoBed');//class名
     query.queryString(key);//要搜索的关键词
     var resp = await query.find();
-    console.info(resp);
+    // console.info(resp);
     //    console.log("找到了 " + query.hits() + " 个文件.");
     return makeAList(resp);
 }

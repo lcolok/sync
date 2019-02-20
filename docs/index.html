@@ -25,7 +25,7 @@
 
 
 
-  <div id="app" v-cloak>
+  <div id="app" v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true'>
 
 
     <v-app id="sandbox" :dark="dark">
@@ -53,10 +53,11 @@
         <v-toolbar-title>石墨床VUE</v-toolbar-title>
       </v-toolbar> -->
 
-      <v-toolbar color="primary" :dark="!dark" dense extension-height=60 app scroll-toolbar-off-screen fixed>
+      <v-toolbar color="primary" :dark="!dark" dense extension-height=70 app scroll-off-screen fixed>
         <v-toolbar-side-icon v-if="primaryDrawer.type !== 'permanent'"
           @click.stop="primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
         <v-toolbar-title>石墨床VUE</v-toolbar-title>
+
         <v-spacer></v-spacer>
 
         <v-btn icon>
@@ -110,6 +111,7 @@
 
         <v-flex>
           <form action="javascript:return true">
+
             <v-text-field solo-inverted ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
               prepend-inner-icon="search" :append-icon="paste ? 'file_copy' : undefined"
               @click:append="pasteFromClipboard" clearable autofocus @keydown="submit($event)" loading hint="随便搜点什么吧..."
@@ -137,7 +139,7 @@
         </v-btn>
       </v-fab-transition>
 
-      <v-bottom-sheet v-model='bottomSheet' ref='bottomSheet' inset>
+      <!--   <v-bottom-sheet v-model='bottomSheet' ref='bottomSheet' inset>
 
         <v-card tile>
           <v-img id="dplayer" src="" poster="" controls="" playsinline="" loop="" x5-video-player-type="h5"
@@ -178,70 +180,138 @@
           </v-list>
         </v-card>
       </v-bottom-sheet>
+ -->
 
+      <v-dialog v-model='bottomSheet' ref='bottomSheet' fullscreen hide-overlay transition="dialog-bottom-transition"
+        scrollable>
+        <v-card tile>
+          <v-toolbar dense card dark color="primary">
+            <v-btn icon dark @click="bottomSheet = false;">
+              <v-icon>close</v-icon>
+            </v-btn>
+            <v-toolbar-title>Settings</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items>
+              <v-btn dark flat @click="bottomSheet = false">Save</v-btn>
+            </v-toolbar-items>
+            <v-menu bottom right offset-y>
+              <v-btn slot="activator" dark icon>
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+              <v-list>
+                <!-- <v-list-tile v-for="(item, i) in items" :key="i" @click="">
+              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+            </v-list-tile> -->
+              </v-list>
+            </v-menu>
+          </v-toolbar>
+
+          <div id="dplayer" src="" poster="" controls="" playsinline="" loop="" x5-video-player-type="h5"
+            x5-video-player-fullscreen="true" height=30 v-touch="{
+              down:()=>{bottomSheet=false},
+            }"></div>
+
+
+          <!-- <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear> -->
+
+          <v-list three-line>
+            <v-list-group>
+
+
+              <v-list-tile slot="activator">
+                <v-list-tile-content>
+                  <v-list-tile-title class="font-weight-bold subheading">{{ currentVideoTitle}}</v-list-tile-title>
+                  <v-list-tile-sub-title class="caption font-weight-regular text--gray">{{ currentVideoSubheading }}
+                  </v-list-tile-sub-title>
+                  <v-list-tile-sub-title class="caption font-weight-light">
+                    {{ currentVideoSize }}</v-list-tile-sub-title>
+
+                </v-list-tile-content>
+
+                <v-spacer></v-spacer>
+
+              </v-list-tile>
+
+              <v-list-tile>
+                <v-list-tile-content>
+                  上传时间：
+                </v-list-tile-content>
+              </v-list-tile>
+
+            </v-list-group>
+          </v-list>
+
+        </v-card>
+
+      </v-dialog>
 
 
 
       <v-content>
-        <v-tabs v-model="tabs" centered color="transparent" slider-color="primary" :show-arrows='isMobile' fixed-tabs>
-
-          <v-tab v-for="n in typeList" :key='typeList.text'>
-            <v-badge overlap>
-              <!-- <span slot="badge" class="caption">38</span> -->
-              <v-chip>
 
 
-                <v-icon :size='n.size'>{{n.icon}}</v-icon>
 
+        <v-expand-transition>
+          <v-tabs v-model="tabs" v-if='mainList.items.length!=0' centered color="transparent" slider-color="primary"
+            :show-arrows='isMobile'>
 
-                {{n.text}}
-              </v-chip>
-            </v-badge>
-          </v-tab>
+            <v-tab v-for="n in typeList" :key='typeList.text'>
+              <v-badge overlap>
+                <span slot="badge" class="caption">38</span>
+                <v-chip>
+                  <v-flex>
+                    <v-icon :size='n.size'>{{n.icon}}</v-icon>
+                  </v-flex>
+                  <v-flex ml-1>{{n.text}}</v-flex>
+                </v-chip>
+              </v-badge>
+            </v-tab>
 
-        </v-tabs>
+          </v-tabs>
+        </v-expand-transition>
 
         <v-slide-y-transition>
-          <v-subheader v-if='keywordLasttime'>
+          <v-subheader class='caption' v-if='mainList.items.length!=0'>
             找到有关『{{keywordLasttime}}』的{{mainList.items.length}}条结果（用时{{searchDuration}}秒）
           </v-subheader>
         </v-slide-y-transition>
 
-        <v-layout align-center justify-center>
-          <v-flex xs12 mb-5>
-            <v-card>
-              <v-list two-line>
+        <v-slide-y-transition>
+          <v-layout align-center justify-center v-if='mainList.items.length!=0'>
+            <v-flex xs12 mb-5>
+              <v-card>
+                <v-list two-line>
 
-                <template v-for="(item, index) in mainList.items">
+                  <template v-for="(item, index) in mainList.items">
 
-                  <v-list-tile :key="item.title" avatar ripple>
-
-
-
-
-                    <v-list-tile-avatar ripple @click="howToPlay(item)">
-                      <v-btn v-if='item.icon!=undefined' :class="item.iconClass" icon>
-                        <v-icon>{{ item.icon }}</v-icon>
-                      </v-btn>
-                      <v-btn v-else class="grey lighten-1 white--text" icon>
-                        <div>{{item.type}}</div>
-                      </v-btn>
-
-                    </v-list-tile-avatar>
+                    <v-list-tile :key="item.title" avatar ripple @click="">
 
 
-                    <v-list-tile-content ripple>
-
-                      <v-list-tile-title class="font-weight-bold subheading">{{ item.name }}</v-list-tile-title>
-                      <v-list-tile-sub-title class="body-2 font-weight-regular text--gray"
-                        v-if="item.name !== item.name_trans">{{ item.name_trans }}</v-list-tile-sub-title>
-                      <v-list-tile-sub-title class="caption font-weight-light" v-if="item.size">
-                        {{ renderSize(item.size) }}</v-list-tile-sub-title>
 
 
-                    </v-list-tile-content>
+                      <v-list-tile-avatar ripple @click="howToPlay(item)">
+                        <v-btn v-if='item.icon!=undefined' :class="item.iconClass" icon>
+                          <v-icon>{{ item.icon }}</v-icon>
+                        </v-btn>
+                        <v-btn v-else class="grey lighten-1 white--text" icon>
+                          <div>{{item.type}}</div>
+                        </v-btn>
 
-                    <!-- <v-list-tile-action @click="toggle(index)">
+                      </v-list-tile-avatar>
+
+
+                      <v-list-tile-content>
+
+                        <v-list-tile-title class="font-weight-bold subheading">{{ item.name }}</v-list-tile-title>
+                        <v-list-tile-sub-title class="body-2 font-weight-regular text--gray"
+                          v-if="item.name !== item.name_trans">{{ item.name_trans }}</v-list-tile-sub-title>
+                        <v-list-tile-sub-title class="caption font-weight-light" v-if="item.size">
+                          {{ renderSize(item.size) }}</v-list-tile-sub-title>
+
+
+                      </v-list-tile-content>
+
+                      <!-- <v-list-tile-action @click="toggle(index)">
 
                       <v-btn icon v-if="mainList.selected.indexOf(index) < 0">
                         <v-icon color="grey lighten-1">
@@ -255,20 +325,22 @@
                       </v-btn>
                     </v-list-tile-action> -->
 
-                    <v-list-tile-action>
-                      <v-btn icon ripple>
-                        <v-icon color="grey lighten-1">more_vert</v-icon>
-                      </v-btn>
-                    </v-list-tile-action>
+                      <v-list-tile-action>
+                        <v-btn icon ripple>
+                          <v-icon color="grey lighten-1">more_vert</v-icon>
+                        </v-btn>
+                      </v-list-tile-action>
 
 
-                  </v-list-tile>
-                  <v-divider v-if="index + 1 < mainList.items.length" :key="index"></v-divider>
-                </template>
-              </v-list>
-            </v-card>
-          </v-flex>
-        </v-layout>
+                    </v-list-tile>
+                    <v-divider v-if="index + 1 < mainList.items.length" :key="index" inset></v-divider>
+                  </template>
+                </v-list>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-slide-y-transition>
+
 
       </v-content>
 
@@ -311,7 +383,7 @@
         <v-btn fab dark small color="indigo">
           <v-icon>add</v-icon>
         </v-btn>
-        <v-btn fab dark small color="green" @click="hoverOrNot;backToSearchTarget.focus();">
+        <v-btn fab dark small color="green" @click="hoverOrNot;backToSearchTarget;">
           <v-icon>search</v-icon>
         </v-btn>
       </v-speed-dial>
@@ -330,15 +402,17 @@
 
 </body>
 
-<script src='https://unpkg.com/vue/dist/vue.js'></script>
-<script src='https://unpkg.com/vuetify/dist/vuetify.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js'></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/flv.js/1.5.0/flv.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
   crossorigin="anonymous"></script>
-<script src="https://unpkg.com/leancloud-storage@^3.0.0-beta.3/dist/av-live-query-min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js"></script>
+<script src="js/leanCloudInit.js"></script>
 <script src="js/searchShimo.js"></script>
 <script src="js/index.js"></script>
-<script src="js/leanCloudInit.js"></script>
+
 
 </html>
