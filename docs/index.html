@@ -25,7 +25,7 @@
 
 
 
-  <div id="app" v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true'>
+  <div id="app" v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true' v-resize="onResize">
 
 
     <v-app id="sandbox" :dark="dark">
@@ -60,21 +60,27 @@
 
         <v-spacer></v-spacer>
 
-        <v-btn icon>
-          <v-icon>search</v-icon>
-        </v-btn>
-
-        <v-btn icon>
-          <v-icon>apps</v-icon>
-        </v-btn>
 
         <v-btn icon>
           <v-icon>refresh</v-icon>
         </v-btn>
 
-        <v-btn icon>
-          <v-icon>more_vert</v-icon>
-        </v-btn>
+        <v-menu bottom left transition="slide-y-transition">
+          <v-btn slot="activator" dark icon>
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+
+          <v-list>
+            <v-list-tile v-for="(item, i) in generalMenu" :key="i" @click="item.action">
+              <v-list-tile-avatar>
+                <v-icon>{{ item.icon }}</v-icon>
+              </v-list-tile-avatar>
+              <v-list-tile-title>
+                {{ item.text }}
+              </v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
 
         <!-- <v-toolbar color="primary" :dark="!dark" slot="extension" flat>
 
@@ -153,8 +159,8 @@
           <v-list>
             <v-list-tile>
               <v-list-tile-content>
-                <v-list-tile-title>{{currentVideoTitle}}</v-list-tile-title>
-                <v-list-tile-sub-title>{{currentVideoSubheading}}</v-list-tile-sub-title>
+                <v-list-tile-title>{{currentVideo.name}}</v-list-tile-title>
+                <v-list-tile-sub-title>{{currentVideo.name_trans}}</v-list-tile-sub-title>
               </v-list-tile-content>
 
               <v-spacer></v-spacer>
@@ -189,57 +195,109 @@
             <v-btn icon dark @click="bottomSheet = false;">
               <v-icon>close</v-icon>
             </v-btn>
-            <v-toolbar-title>Settings</v-toolbar-title>
+            <v-toolbar-title>预览</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-btn dark flat @click="bottomSheet = false">Save</v-btn>
+              <!-- <v-btn dark flat @click="bottomSheet = false">Save</v-btn> -->
             </v-toolbar-items>
             <v-menu bottom right offset-y>
               <v-btn slot="activator" dark icon>
                 <v-icon>more_vert</v-icon>
               </v-btn>
               <v-list>
-                <!-- <v-list-tile v-for="(item, i) in items" :key="i" @click="">
-              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-            </v-list-tile> -->
+                <v-list-tile v-for="(item, i) in generalMenu" :key="i" @click="item.action">
+                  <v-list-tile-avatar>
+                    <v-icon>{{ item.icon }}</v-icon>
+                  </v-list-tile-avatar>
+                  <v-list-tile-title>
+                    {{ item.text }}
+                  </v-list-tile-title>
+                </v-list-tile>
               </v-list>
             </v-menu>
           </v-toolbar>
 
-          <div id="dplayer" src="" poster="" controls="" playsinline="" loop="" x5-video-player-type="h5"
-            x5-video-player-fullscreen="true" height=30 v-touch="{
+          <v-img id="dplayer" src="" poster="" controls="" playsinline="" loop="" :max-height='videoView.height'
+            :max-width='videoView.width' x5-video-player-type="h5" x5-video-player-fullscreen="true" v-touch="{
               down:()=>{bottomSheet=false},
-            }"></div>
+            }"></v-img>
 
 
           <!-- <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear> -->
 
-          <v-list three-line>
-            <v-list-group>
+
+          <v-list dense two-line>
+
+            <v-list-tile ripple @click='expandPanel'>
+              <v-list-tile-content>
+
+                <v-list-tile-title class="font-weight-bold subheading">{{ currentVideo.name }}</v-list-tile-title>
+
+                <v-list-tile-sub-title class="caption font-weight-regular text--gray">{{ currentVideo.name_trans }}
+                </v-list-tile-sub-title>
+                <v-list-tile-sub-title class="caption font-weight-light">
+                  {{ this.renderSize(currentVideo.size) }}</v-list-tile-sub-title>
+                <v-divider></v-divider>
+
+              </v-list-tile-content>
 
 
-              <v-list-tile slot="activator">
+
+
+              <v-list-tile-action>
+                <v-btn icon flat :ripple='false'>
+                  <v-icon :style="style" color="grey darken-2">keyboard_arrow_up</v-icon>
+                </v-btn>
+              </v-list-tile-action>
+            </v-list-tile>
+
+
+            <v-list-tile>
+              <v-toolbar flat class='transparent'>
+                <v-layout align-space-around justify-space-around row />
+
+                <div class="text-xs-center" v-for="x in bottomSheetToolbar" :key='bottomSheetToolbar.text'>
+                  <v-btn flat fab @click="x.action($event);">
+
+                    <v-flex class='caption'>
+                      <v-layout align-center justify-center column fill-height />
+                      <v-icon size=20>{{x.icon}}</v-icon>
+                      {{x.text}}
+                    </v-flex>
+                  </v-btn>
+
+                </div>
+              </v-toolbar>
+            </v-list-tile>
+
+            <v-divider></v-divider>
+
+            <v-expand-transition>
+
+              <v-list-tile v-if='infoPanel'>
                 <v-list-tile-content>
-                  <v-list-tile-title class="font-weight-bold subheading">{{ currentVideoTitle}}</v-list-tile-title>
-                  <v-list-tile-sub-title class="caption font-weight-regular text--gray">{{ currentVideoSubheading }}
-                  </v-list-tile-sub-title>
-                  <v-list-tile-sub-title class="caption font-weight-light">
-                    {{ currentVideoSize }}</v-list-tile-sub-title>
-
-                </v-list-tile-content>
-
-                <v-spacer></v-spacer>
-
-              </v-list-tile>
-
-              <v-list-tile>
-                <v-list-tile-content>
-                  上传时间：
+                  上传时间：一堆无意义的文字
                 </v-list-tile-content>
               </v-list-tile>
+            </v-expand-transition>
 
-            </v-list-group>
+            <v-fade-transition>
+              <v-divider v-if='infoPanel'></v-divider>
+            </v-fade-transition>
+
           </v-list>
+
+
+
+
+
+          <v-container id="scroll-target" class="scrollContainer">
+            <v-layout v-scroll:#scroll-target="" mx-2 column align-center justify-center>
+              一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字
+            </v-layout>
+          </v-container>
+
+
 
         </v-card>
 
@@ -253,7 +311,7 @@
 
         <v-expand-transition>
           <v-tabs v-model="tabs" v-if='mainList.items.length!=0' centered color="transparent" slider-color="primary"
-            :show-arrows='isMobile'>
+            :show-arrows='showArrow'>
 
             <v-tab v-for="n in typeList" :key='typeList.text'>
               <v-badge overlap>
@@ -404,12 +462,15 @@
 
 <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js'></script>
+<script>Vue.config.productionTip = false;</script>
+<!-- 关掉那句vue开发模式提醒的话 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/flv.js/1.5.0/flv.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
   crossorigin="anonymous"></script>
 <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
 <script src="js/leanCloudInit.js"></script>
 <script src="js/searchShimo.js"></script>
 <script src="js/index.js"></script>

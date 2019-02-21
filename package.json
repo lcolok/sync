@@ -26,7 +26,8 @@
     "require-all": "^3.0.0",
     "stream": "0.0.2",
     "turndown": "^5.0.3",
-    "vue": "^2.6.4"
+    "vue": "^2.6.4",
+    "vue-clipboard2": "^0.3.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.7"
