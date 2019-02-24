@@ -145,48 +145,6 @@
         </v-btn>
       </v-fab-transition>
 
-      <!--   <v-bottom-sheet v-model='bottomSheet' ref='bottomSheet' inset>
-
-        <v-card tile>
-          <v-img id="dplayer" src="" poster="" controls="" playsinline="" loop="" x5-video-player-type="h5"
-            x5-video-player-fullscreen="true" :height="innerHeight" v-touch="{
-              down:()=>closeDpFloat(),
-            }"></v-img>
-
-
-          <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear>
-
-          <v-list>
-            <v-list-tile>
-              <v-list-tile-content>
-                <v-list-tile-title>{{currentVideo.name}}</v-list-tile-title>
-                <v-list-tile-sub-title>{{currentVideo.name_trans}}</v-list-tile-sub-title>
-              </v-list-tile-content>
-
-              <v-spacer></v-spacer>
-
-              <v-list-tile-action>
-                <v-btn icon>
-                  <v-icon>fast_rewind</v-icon>
-                </v-btn>
-              </v-list-tile-action>
-
-              <v-list-tile-action :class="{ 'mx-5': $vuetify.breakpoint.mdAndUp }">
-                <v-btn icon>
-                  <v-icon>pause</v-icon>
-                </v-btn>
-              </v-list-tile-action>
-
-              <v-list-tile-action :class="{ 'mr-3': $vuetify.breakpoint.mdAndUp }">
-                <v-btn icon>
-                  <v-icon>fast_forward</v-icon>
-                </v-btn>
-              </v-list-tile-action>
-            </v-list-tile>
-          </v-list>
-        </v-card>
-      </v-bottom-sheet>
- -->
 
       <v-dialog v-model='bottomSheet' ref='bottomSheet' fullscreen hide-overlay transition="dialog-bottom-transition"
         scrollable>
@@ -462,27 +420,27 @@
 
 
       <v-dialog v-model="deleteConfirmDialog" max-width="290">
-           
-          <v-card>
-            <v-card-title class="headline red--text">确定要删除该项?</v-card-title>
 
-            <v-card-text>
-              删除操作不可撤回，请谨慎考虑。
-            </v-card-text>
+        <v-card>
+          <v-card-title class="headline red--text">确定要删除该项?</v-card-title>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
+          <v-card-text>
+            删除操作不可撤回，请谨慎考虑。
+          </v-card-text>
 
-              <v-btn color="primary" flat="flat" @click="deleteConfirmDialog = false">
-                取消
-              </v-btn>
+          <v-card-actions>
+            <v-spacer></v-spacer>
 
-              <v-btn color="error" @click="deleteConfirmDialog = false;deleteContent(deleteOjbect)">
-                删除
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+            <v-btn color="primary" flat="flat" @click="deleteConfirmDialog = false">
+              取消
+            </v-btn>
+
+            <v-btn color="error" @click="deleteConfirmDialog = false;deleteContent(deleteOjbect)">
+              删除
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
 
 

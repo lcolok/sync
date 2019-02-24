@@ -4,6 +4,7 @@
 var app = new Vue({
   el: '#app',
   data: () => ({
+    
     deleteConfirmDialog: false,
     copyBtn: null, //存储初始化复制按钮事件
     mobile: null,
