@@ -27,7 +27,7 @@ try {
 // })();
 
 
-
+/* 
 
 
 async function searchLC(key) {
@@ -43,28 +43,29 @@ function makeAList(resp) {
     var result = [];
 
     resp.forEach(e => {
-
-        var dic = e.attributes;
-
-        var emoji = makeEmoji(dic.type);
-
-        var name = dic.name;
-
-        var shortURL = cutHTTP(dic.shortURL);
-
-        var copyContent = `${emoji} ${name} | ${shortURL}`;
-
-        dic.objectId = e.id;
-
-        dic.copyContent = copyContent;
-
-        dic.content = emoji + name;//在vue的todo里面content代表
-
-        result.push(dic);
+        var newDic = makeNewDic(e);
+        result.push(newDic);
     });
-
-
     return result;
+}
+
+function makeNewDic(e){
+
+    var dic = e.attributes;
+
+    var emoji = makeEmoji(dic.type);
+
+    var name = dic.name;
+
+    var shortURL = cutHTTP(dic.shortURL);
+
+    var copyContent = `${emoji} ${name} | ${shortURL}`;
+
+    e.attributes.copyContent = copyContent;
+
+    e.attributes.content = emoji + name;//在vue的todo里面content代表
+
+    return e;
 }
 
 function makeEmoji(suffix) {
@@ -103,3 +104,4 @@ function cutHTTP(input) {
     return input.replace(/[a-zA-z]+:\/\//g, '');
 }
 
+ */

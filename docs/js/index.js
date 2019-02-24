@@ -1,46 +1,75 @@
-
+'use strict'
 
 
 var app = new Vue({
   el: '#app',
   data: () => ({
+    deleteConfirmDialog: false,
     copyBtn: null, //存储初始化复制按钮事件
     mobile: null,
     infoPanel: false,
     videoHeight: 0,
     videoWidth: 0,
+    moreBTN: {
+      icon: 'mdi-settings', text: '更多操作', moreBTN: true, showInSheet: true, action: () => {
+        clearTimeout(app.moreBTNTimer);
+        app.moreBTN.icon = 'mdi-settings mdi-spin';
+        app.moreBTNTimer = setTimeout(() => {
+          app.moreBTN.icon = 'mdi-settings';
+        }, 360);//齿轮转动
+
+
+      }
+    },
     bottomSheetToolbar: [
       {
-        icon: 'mdi-clipboard-text-outline', text: '复制短链', action: (event) => {
-          console.log('进行复制操作');
-          var clipboard = new ClipboardJS('.layout align-center justify-center column fill-height', {
-            text: function (trigger) {
-              return '哈哈';
-            }
-          });
+        icon: 'mdi-clipboard-text', text: '复制短链', showInSheet: true, name: 'copyBTN', action: (result, e) => {
+          clearTimeout(app.clipboardTimer);
+          app.bottomSheetToolbar[0].icon = 'mdi-clipboard-check';
+          app.clipboardTimer = setTimeout(() => {
+            app.bottomSheetToolbar[0].icon = 'mdi-clipboard-text';
+          }, 1000);
 
-          clipboard.on('success', function (e) {
-            console.log(e);
-
-          });
-
-          clipboard.on('error', function (e) {
-            console.log(e);
-          });
-
+          // console.log(result);
         }
 
       },
       {
-        icon: 'mdi-cloud-upload', text: '上传专用', action: () => {
+        icon: 'mdi-download', text: '直接下载', showInSheet: true, action: (e) => {
+          if (e.attributes) {
+            var url = e.attributes.expandedURL ? e.attributes.expandedURL : e.attributes.uploaderURL;
+            app.downloadStraightly(url);
+            return
+          }
+          console.error('下载失败');
+          // app.downloadStraightly(app.currentVideo.attributes.url);
+        }
+      },
+      /*      {
+             icon: 'mdi-cloud-upload', text: '上传专用', showInSheet: true, action: () => {
+     
+             }
+           },
+      */
+
+      {
+        icon: 'mdi-cloud-upload', text: '测试可删', action: () => {
 
         }
       },
       {
-        icon: 'mdi-database-edit', text: '数据管理', action: () => {
+        icon: 'mdi-cloud-upload', text: '测试可删', action: () => {
 
         }
-      }
+      },
+      {
+        icon: 'mdi-delete', text: '删除该项', subheader: '敏感操作', action: (deleteOjbect) => {
+          app.deleteOjbect = deleteOjbect;
+          app.deleteConfirmDialog = true;
+        }
+      },
+
+
     ],
     generalMenu: [
       {
@@ -68,13 +97,7 @@ var app = new Vue({
     dark: false,
     bottomSheet: false,
     floatPlayBTN_Occur: false,
-    currentVideo: {
-      name: '',
-      name_trans: '',
-      size: 0,
-      type: '',
-      shortURL: '',
-    },
+    currentVideo: { attributes: {} },
     searchDuration: 0,
     keywordLasttime: '',
     typeList: [
@@ -101,7 +124,7 @@ var app = new Vue({
     ],
     mainList: {
       selected: [],
-      items: [
+      results: [
         /*         {
                   icon: 'video_library',
                   iconClass: 'green lighten-1 white--text',
@@ -235,15 +258,16 @@ var app = new Vue({
     this.getQ();
     this.getV();
     this.getID();
+    this.initClipboardJS();
 
   },
   watch: {
     bottomSheet() {
       if (this.bottomSheet == false) {
-        dpFloat.pause();
+        this.dpFloat.pause();
       } else {
         this.floatPlayBTN_Occur = true;
-        dpFloat.play();
+        this.dpFloat.play();
       }
 
     },
@@ -258,8 +282,69 @@ var app = new Vue({
         } */
   },
   methods: {
+    deleteContent: async function (currentVideo) {
+      console.log(currentVideo);
+      if (currentVideo.id) {
+        console.log(currentVideo.attributes.id);
+        AV.Cloud.run('deleteContent', {
+          id: currentVideo.attributes.id,
+        });
+        AV.Object.createWithoutData('ShimoBed', currentVideo.id)
+          .destroy()
+          .then(function () {
+            this.mainList.results.splice(this.mainList.results.indexOf(currentVideo), 1)
+            this.bottomSheet=false;
+          }.bind(this))
+          .catch(alert);
+
+      } else {
+        console.error("没有石墨评论id号,无法删除!");
+      }
+    },
+    downloadStraightly(uploaderURL) {
+      var downloadURL = uploaderURL + '?download';
+      // console.log(app.currentVideo.url);
+      window.location.href = downloadURL;
+    },
+    initClipboardJS() {
+      //bottomSheet里面的复制按钮初始化
+      var btn = document.getElementById('复制短链');
+      var clipboard = new ClipboardJS(btn, {
+        text: function (trigger) {
+          return app.makeNewDic(app.currentVideo).attributes.copyContent;
+        }
+      });
+
+      clipboard.on('success', function (e) {
+        // console.log(e);
+
+      });
+
+      clipboard.on('error', function (e) {
+        console.log(e);
+      });
+
+      //more按钮的复制按钮初始化
+      var btn = document.getElementsByName('copyBTN')
+      if (btn.length == 0) { return }
+      var clipboard = new ClipboardJS(btn, {
+        text: function (trigger) {
+          return trigger.getAttribute('copyContent')
+        }
+
+      });
+
+      clipboard.on('success', function (e) {
+        // console.log(e);
+
+      });
+
+      clipboard.on('error', function (e) {
+        console.log(e);
+      });
+    },
     expandPanel() {
-      this.arrowDegree = this.arrowDegree == 0 ? 180 : 0;
+      this.arrowDegree += 180;
       this.infoPanel = this.infoPanel ? false : true;
     },
     onResize() {
@@ -299,34 +384,39 @@ var app = new Vue({
       return `${size} ${unitArr[index]}`;
     },
     howToPlay(item) {
-      console.log(item.type);
-      switch ((item.type).toLowerCase()) {
+
+      switch ((item.attributes.type).toLowerCase()) {
         case 'webm':
         case 'mov':
         case 'mp4':
           // document.getElementById('dplayer').setAttribute("src", item.shortURL);
-          if (this.currentVideo.name !== item.name) {//标题跟之前的不同才会切换新视频进行播放
-            this.currentVideo.name = item.name;
+          if (this.currentVideo.attributes.name !== item.attributes.name) {//标题跟之前的不同才会切换新视频进行播放
 
-            this.currentVideo.name_trans = item.name_trans;
+            this.currentVideo = item;
+            // this.currentVideo.name = item.name;
+            // this.currentVideo.shortURL = item.shortURL;
+            // this.currentVideo.name_trans = item.name_trans;
 
-            this.currentVideo.size = item.size;
+            // this.currentVideo.size = item.size;
 
-            var url = item.expandedURL ? item.expandedURL : item.uploaderURL;
-            dpFloat.notice(`正在加载:${item.name}`, 0, 0.8);
-            dpFloat.switchVideo({
+            var url = item.attributes.expandedURL ? item.attributes.expandedURL : item.attributes.uploaderURL;
+
+            this.currentVideo.attributes.url = url;
+            this.dpFloat.notice(`正在加载:${item.attributes.name}`, 0, 0.8);
+            this.dpFloat.switchVideo({
               url: url,
             });
           }
 
-          dpFloat.play();
+
           this.bottomSheet = true;
 
 
-          dpFloat.on('playing', function () {
-
-            if (dpFloat.video.currentTime < 1) {
-              dpFloat.notice(`成功加载!`, 1000, 0.8);
+          this.dpFloat.on('canplaythrough', function () {
+            var dp = window.app.dpFloat;
+            if (dp.video.currentTime < 1) {
+              dp.notice(`成功加载!`, 1000, 0.8);
+              dp.play();
             }
 
           });
@@ -350,7 +440,7 @@ var app = new Vue({
     },
     initPlayers() {
       // dplayer-float
-      dpFloat = new DPlayer({
+      this.dpFloat = new DPlayer({
         container: document.getElementById('dplayer'),
         preload: 'auto',
         autoplay: false,
@@ -375,24 +465,25 @@ var app = new Vue({
       });
     },
     getID() {
-      var id = getUrlVars().id;
+      var id = this.getUrlVars().id;
       if (id) {
         let query = new AV.Query('ShimoBed');
         query.get(id).then(function (item) {
-
-          app.currentVideo.name = item.get('name');
-          app.currentVideo.name_trans = item.get('name_trans');
-          app.currentVideo.size = item.get('size');
-          app.currentVideo.shortURL = item.get('shortURL');
-          app.currentVideo.type = item.get('type');
-
-          var uploaderURL = item.get('uploaderURL');
-          var expandedURL = item.get('expandedURL');
-          var v = expandedURL ? expandedURL : uploaderURL;
-          dpFloat.switchVideo({
-            url: v,
-          });
-          app.bottomSheet = true;
+          // console.log(item.attributes);
+          app.howToPlay(item);
+          /*           app.currentVideo.name = item.get('name');
+                    app.currentVideo.name_trans = item.get('name_trans');
+                    app.currentVideo.size = item.get('size');
+                    app.currentVideo.shortURL = item.get('shortURL');
+                    app.currentVideo.type = item.get('type');
+          
+                    var uploaderURL = item.get('uploaderURL');
+                    var expandedURL = item.get('expandedURL');
+                    var v = expandedURL ? expandedURL : uploaderURL;
+                    this.dpFloat.switchVideo({
+                      url: v,
+                    });
+                    app.bottomSheet = true; */
         }, function (error) {
           // 异常处理
           console.error(error);
@@ -404,19 +495,19 @@ var app = new Vue({
       return false;
     },
     getV() {
-      var v = getUrlVars().v;
+      var v = this.getUrlVars().v;
       if (v) {
         console.log('正在加载该视频:' + v);
         this.bottomSheet = true;
         // this.v = v;
         // document.getElementById('dplayer').setAttribute("src", v);
-        dpFloat.switchVideo({
+        this.dpFloat.switchVideo({
           url: v,
         });
       }
     },
     getQ() {
-      var keyword = getUrlVars().q;
+      var keyword = this.getUrlVars().q;
       if (!keyword) { return this.keyword = '' }
       else { this.keyword = decodeURIComponent(keyword); this.searchByKeyword(); return }
     },
@@ -433,21 +524,196 @@ var app = new Vue({
 
       return this.scrollStyle = `max-height: ${window.innerHeight - 120}px`
     },
+    cutHTTP(input) {
+      return input.replace(/[a-zA-z]+:\/\//g, '');
+    },
+    makeEmoji(suffix) {
+      var emoji;
+
+      if (suffix.match(/[a-zA-Z]/g)) {
+        if (suffix.match(/mp4|mov|avi/ig)) {//根据后缀给出emoji
+          emoji = "🎬";//常规视频文件
+        } else if (suffix.match(/webm|mkv|avi/ig)) {
+          emoji = "▶️";//手机无法播放的非常规视频文件
+        } else if (suffix.match(/mp3|ogg|wav|flac|ape|alca|aac/ig)) {
+          emoji = "🎵";//音频文件
+        } else if (suffix.match(/zip|7z|rar/ig)) {
+          emoji = "📦";//压缩包
+        } else if (suffix.match(/dmg|iso/ig)) {
+          emoji = "💽";//光盘映像
+        } else if (suffix.match(/ai|psd|aep/ig)) {
+          emoji = "📐";//工程文件
+        } else if (suffix.match(/ppt|pptx|key/ig)) {
+          emoji = "📽️";//演示文件
+        } else if (suffix.match(/ttf|otf/ig)) {
+          emoji = "🔤️";//字体文件
+        } else if (suffix.match(/doc|pdf/ig)) {
+          emoji = "️📄";//文档
+        } else {
+          emoji = "❓";//未知格式
+        }
+      } else {
+        emoji = suffix;
+      }
+      return emoji;
+    },
+    makeNewDic(e) {
+
+      if (!e.id) { return }
+
+      var dic = e.attributes;
+
+      var emoji = app.makeEmoji(dic.type);
+
+      var name = dic.name;
+
+      var shortURL = app.cutHTTP(dic.shortURL);
+
+      var copyContent = `${emoji} ${name} | ${shortURL}`;
+
+      e.attributes.copyContent = copyContent;
+
+      e.attributes.content = emoji + name;//在vue的todo里面content代表
+
+      return e;
+    },
+    makeAList(resp) {
+      var result = [];
+
+      resp.forEach(e => {
+        var newDic = app.makeNewDic(e);
+        result.push(newDic);
+      });
+      return result;
+    }
+    ,
+    searchLC: async function (key) {
+      var query = new AV.SearchQuery('ShimoBed');//class名
+      query.queryString(key);//要搜索的关键词
+      var resp = await query.find();
+      // console.info(resp);
+      //    console.log("找到了 " + query.hits() + " 个文件.");
+      return app.makeAList(resp);
+    },
+
+    searchShimo: async function (key) {
+      var startTime = new Date();
+      var results = "";
+
+      if (!key) {
+        var data = await AV.Cloud.run('updateShimo');
+        console.log(data);
+
+        if (data > 0) {
+          showUpdate(data);
+        } else {
+          this.showTop20();
+
+        }
+
+        var query = new AV.Query('ShimoBed');
+        query.descending("updatedAt");
+        query.limit(20);//请求数量上限为1000条
+        var every = await query.find();
+
+        console.log(every);
+
+        results = app.makeAList(every);
+        // console.log(results);
+      } else {
+
+        var results = await app.searchLC(key);
+        // alert(JSON.stringify(this.todos[0]));
+        if (results == "") {
+
+          // Vue.toasted.show(`找不到关于“${key}”的项目`, {
+          //   position: 'top-center',
+          //   theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
+          //   duration: 3000,
+          //   icon: { name: "search" },
+          //   iconPack: 'fontawesome',
+          //   fitToScreen: "true",
+          //   type: "error"//Type of the Toast ['success', 'info', 'error']
+          //   // fullWidth:"true",
+          // });
+
+          app.snackbar = {
+            show: true,
+            color: 'error',
+            ripple: false,
+            snackbarText: `找不到关于“${key}”的项目`,
+            snackbarIcon: 'report_problem',
+            action: () => {
+
+            }
+          }
+          return
+        }
+      }
+      app.keywordLasttime = key;
+      // console.log(app.mainList.results);
+      console.log(results);
+      app.mainList.results = results;
+
+      var endTime = new Date();
+      app.searchDuration = (endTime - startTime) / 1000;//毫秒转成秒
+
+      setTimeout(() => {
+        this.initClipboardJS();
+      }, 1)
+    },
+    showLoading(target) {
+      target.custom = false;
+      target.searchLoading = true;
+      setTimeout(() => {
+        target.custom = true;
+        target.searchLoading = false;
+      }, 2000)
+    },
+    searchDelay(target, delay) {
+
+      target.lastTime = setTimeout(() => {
+        var key = target.keyword;
+        this.showLoading(target);
+        // window.location.href = `?q=${key}`
+        console.log('关键词为:' + key);
+        // bingDic(key);
+        app.searchShimo(key);
+      }, delay)
+    },
     searchByKeyword(request) {
       var delay = request ? request.delay : 0;
       var target = this;
       if (target.keywordLasttime != target.keyword) {
-        target.mainList.items = [];
+        target.mainList.results = [];
         target.keywordLasttime = '';
         if (target.lastTime == 0) {
-          searchDelay(target, delay);
+          this.searchDelay(target, delay);
         } else {
           clearTimeout(target.lastTime);
-          searchDelay(target, delay);
+          this.searchDelay(target, delay);
         }
       }
     },
+    getUrlVars() {
+      var vars = {};
+      var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+        vars[key] = decodeURI(value);
+      });
+      return vars;
+    },
+    showTop20() {
+      app.snackbar = {
+        show: true,
+        color: 'info',
+        ripple: false,
+        snackbarText: '已为你搜索最近20条项目',
+        snackbarIcon: 'update',
+        action: () => {
 
+        }
+      }
+    }
 
 
 
@@ -537,27 +803,9 @@ var floatBTN = new Vue({
 })
 
 
-function searchDelay(target, delay) {
-
-  target.lastTime = setTimeout(() => {
-    var key = target.keyword;
-    showLoading(target);
-    // window.location.href = `?q=${key}`
-    console.log('关键词为:' + key);
-    // bingDic(key);
-    searchShimo(key);
-  }, delay)
-}
 
 
-function showLoading(target) {
-  target.custom = false;
-  target.searchLoading = true;
-  setTimeout(() => {
-    target.custom = true;
-    target.searchLoading = false;
-  }, 2000)
-}
+
 
 function process(s, evaluator) {
   var h = Object.create(null), k;
@@ -628,94 +876,6 @@ async function bingDic(word) {
 
 
 }
-
-function getUrlVars() {
-  var vars = {};
-  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-    vars[key] = decodeURI(value);
-  });
-  return vars;
-}
-
-function showTop20() {
-  app.snackbar = {
-    show: true,
-    color: 'info',
-    ripple: false,
-    snackbarText: '已为你搜索最近20条项目',
-    snackbarIcon: 'update',
-    action: () => {
-
-    }
-  }
-}
-
-
-async function searchShimo(key) {
-  var startTime = new Date();
-  var result = "";
-
-  if (!key) {
-    var data = await AV.Cloud.run('updateShimo');
-    console.log(data);
-
-    if (data > 0) {
-      showUpdate(data);
-    } else {
-      showTop20();
-
-    }
-
-    var query = new AV.Query('ShimoBed');
-    query.descending("updatedAt");
-    query.limit(20);//请求数量上限为1000条
-    var every = await query.find();
-
-    console.log(every);
-
-    result = makeAList(every);
-    // console.log(result);
-  } else {
-
-    var result = await searchLC(key);
-    // alert(JSON.stringify(this.todos[0]));
-    if (result == "") {
-
-      // Vue.toasted.show(`找不到关于“${key}”的项目`, {
-      //   position: 'top-center',
-      //   theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
-      //   duration: 3000,
-      //   icon: { name: "search" },
-      //   iconPack: 'fontawesome',
-      //   fitToScreen: "true",
-      //   type: "error"//Type of the Toast ['success', 'info', 'error']
-      //   // fullWidth:"true",
-      // });
-
-      app.snackbar = {
-        show: true,
-        color: 'error',
-        ripple: false,
-        snackbarText: `找不到关于“${key}”的项目`,
-        snackbarIcon: 'report_problem',
-        action: () => {
-
-        }
-      }
-      return
-    }
-  }
-  app.keywordLasttime = key;
-  // console.log(app.mainList.items);
-  console.log(result);
-  app.mainList.items = result;
-  var endTime = new Date();
-  app.searchDuration = (endTime - startTime) / 1000;//毫秒转成秒
-
-
-}
-
-
 
 
 //paste事件监听
@@ -833,11 +993,12 @@ if ('pictureInPictureEnabled' in document == false) {
 console.log($(".dplayer-menu-item:contains('关于作者')").remove());//移除关于作者的右键按钮
 console.log($(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove());//移除DPlayer版本号的右键按钮
 
-dpFloat.fullScreen.request('web');//全屏观看 */
+this.dpFloat.fullScreen.request('web');//全屏观看 */
 
 
 
 
 $(".dplayer-menu-item:contains('关于作者')").remove();//移除关于作者的右键按钮
 $(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove();//移除DPlayer版本号的右键按钮
+
 

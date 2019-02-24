@@ -11,7 +11,7 @@ AV.Cloud.define('deleteContent', function (request) {
         "Referer": "https://shimo.im/docs/K8CWmBMqMtYYpU1f",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.1 Safari/605.1.15",
         "X-CSRF-Token": "JDvV3azC-fmyRaI4kR98csJiXEhmprm78WMw",
-        "Cookie": shimoCookie + "_csrf=q4MNRquXrxATGBLCwExHVcIs;"
+        "Cookie": process.env.shimoCookie + "_csrf=q4MNRquXrxATGBLCwExHVcIs;"
     };
 
 

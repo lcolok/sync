@@ -200,7 +200,7 @@
             <v-toolbar-items>
               <!-- <v-btn dark flat @click="bottomSheet = false">Save</v-btn> -->
             </v-toolbar-items>
-            <v-menu bottom right offset-y>
+            <v-menu bottom right transition="slide-y-transition">
               <v-btn slot="activator" dark icon>
                 <v-icon>more_vert</v-icon>
               </v-btn>
@@ -231,12 +231,14 @@
             <v-list-tile ripple @click='expandPanel'>
               <v-list-tile-content>
 
-                <v-list-tile-title class="font-weight-bold subheading">{{ currentVideo.name }}</v-list-tile-title>
+                <v-list-tile-title class="font-weight-bold subheading">{{ currentVideo.attributes.name }}
+                </v-list-tile-title>
 
-                <v-list-tile-sub-title class="caption font-weight-regular text--gray">{{ currentVideo.name_trans }}
+                <v-list-tile-sub-title class="caption font-weight-regular text--gray">
+                  {{ currentVideo.attributes.name_trans }}
                 </v-list-tile-sub-title>
                 <v-list-tile-sub-title class="caption font-weight-light">
-                  {{ this.renderSize(currentVideo.size) }}</v-list-tile-sub-title>
+                  {{ this.renderSize(currentVideo.attributes.size) }}</v-list-tile-sub-title>
                 <v-divider></v-divider>
 
               </v-list-tile-content>
@@ -246,7 +248,7 @@
 
               <v-list-tile-action>
                 <v-btn icon flat :ripple='false'>
-                  <v-icon :style="style" color="grey darken-2">keyboard_arrow_up</v-icon>
+                  <v-icon :style="style" color="grey darken-2" small>fas fa-caret-down</v-icon>
                 </v-btn>
               </v-list-tile-action>
             </v-list-tile>
@@ -254,19 +256,47 @@
 
             <v-list-tile>
               <v-toolbar flat class='transparent'>
-                <v-layout align-space-around justify-space-around row />
+                <v-layout align-center justify-space-between row fill-height />
 
-                <div class="text-xs-center" v-for="x in bottomSheetToolbar" :key='bottomSheetToolbar.text'>
-                  <v-btn flat fab @click="x.action($event);">
-
+                <div class="text-xs-center" v-for="x in bottomSheetToolbar" v-if='x.showInSheet'
+                  :key='bottomSheetToolbar.text'>
+                  <v-btn flat fab @click="x.action(currentVideo,$event);" :id='x.text'>
                     <v-flex class='caption'>
                       <v-layout align-center justify-center column fill-height />
-                      <v-icon size=20>{{x.icon}}</v-icon>
-                      {{x.text}}
+                      <v-icon size=20>{{x.icon}}</v-icon>{{x.text}}
                     </v-flex>
                   </v-btn>
+                </div>
+
+                <div class="text-xs-center">
+                  <v-menu bottom left offset-y>
+                    <v-btn slot="activator" flat fab @click="moreBTN.action($event);" :id='moreBTN.text'>
+                      <v-flex class='caption'>
+                        <v-layout align-center justify-center column fill-height />
+                        <v-icon size=20>{{moreBTN.icon}}</v-icon>{{moreBTN.text}}
+                      </v-flex>
+                    </v-btn>
+
+
+                    <v-list>
+                      <template v-for="(menuItem, i) in bottomSheetToolbar" v-if='!menuItem.showInSheet'>
+                        <v-subheader v-if='menuItem.subheader' class='caption'>{{ menuItem.subheader}}</v-subheader>
+                        <v-divider v-if='menuItem.subheader' class="mx-3"></v-divider>
+                        <v-list-tile :key="i" @click="menuItem.action(currentVideo,$event)">
+                          <v-list-tile-avatar>
+                            <v-icon>{{ menuItem.icon }}</v-icon>
+                          </v-list-tile-avatar>
+                          <v-list-tile-title>
+                            {{ menuItem.text }}
+                          </v-list-tile-title>
+                        </v-list-tile>
+                      </template>
+                    </v-list>
+                  </v-menu>
 
                 </div>
+
+
               </v-toolbar>
             </v-list-tile>
 
@@ -310,7 +340,7 @@
 
 
         <v-expand-transition>
-          <v-tabs v-model="tabs" v-if='mainList.items.length!=0' centered color="transparent" slider-color="primary"
+          <v-tabs v-model="tabs" v-if='mainList.results.length!=0' centered color="transparent" slider-color="primary"
             :show-arrows='showArrow'>
 
             <v-tab v-for="n in typeList" :key='typeList.text'>
@@ -329,30 +359,30 @@
         </v-expand-transition>
 
         <v-slide-y-transition>
-          <v-subheader class='caption' v-if='mainList.items.length!=0'>
-            找到有关『{{keywordLasttime}}』的{{mainList.items.length}}条结果（用时{{searchDuration}}秒）
+          <v-subheader class='caption' v-if='mainList.results.length!=0'>
+            找到有关『{{keywordLasttime}}』的{{mainList.results.length}}条结果（用时{{searchDuration}}秒）
           </v-subheader>
         </v-slide-y-transition>
 
         <v-slide-y-transition>
-          <v-layout align-center justify-center v-if='mainList.items.length!=0'>
+          <v-layout align-center justify-center v-if='mainList.results.length!=0'>
             <v-flex xs12 mb-5>
               <v-card>
                 <v-list two-line>
 
-                  <template v-for="(item, index) in mainList.items">
+                  <template v-for="(result, index) in mainList.results">
 
-                    <v-list-tile :key="item.title" avatar ripple @click="">
-
-
+                    <v-list-tile :key="result.attributes.title" avatar ripple @click="">
 
 
-                      <v-list-tile-avatar ripple @click="howToPlay(item)">
-                        <v-btn v-if='item.icon!=undefined' :class="item.iconClass" icon>
-                          <v-icon>{{ item.icon }}</v-icon>
+
+
+                      <v-list-tile-avatar ripple @click="howToPlay(result)">
+                        <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" icon>
+                          <v-icon>{{ result.attributes.icon }}</v-icon>
                         </v-btn>
                         <v-btn v-else class="grey lighten-1 white--text" icon>
-                          <div>{{item.type}}</div>
+                          <div>{{result.attributes.type}}</div>
                         </v-btn>
 
                       </v-list-tile-avatar>
@@ -360,44 +390,56 @@
 
                       <v-list-tile-content>
 
-                        <v-list-tile-title class="font-weight-bold subheading">{{ item.name }}</v-list-tile-title>
+                        <v-list-tile-title class="font-weight-bold subheading">{{ result.attributes.name }}
+                        </v-list-tile-title>
                         <v-list-tile-sub-title class="body-2 font-weight-regular text--gray"
-                          v-if="item.name !== item.name_trans">{{ item.name_trans }}</v-list-tile-sub-title>
-                        <v-list-tile-sub-title class="caption font-weight-light" v-if="item.size">
-                          {{ renderSize(item.size) }}</v-list-tile-sub-title>
+                          v-if="result.attributes.name !== result.attributes.name_trans">
+                          {{ result.attributes.name_trans }}</v-list-tile-sub-title>
+                        <v-list-tile-sub-title class="caption font-weight-light" v-if="result.attributes.size">
+                          {{ renderSize(result.attributes.size) }}</v-list-tile-sub-title>
 
 
                       </v-list-tile-content>
 
-                      <!-- <v-list-tile-action @click="toggle(index)">
-
-                      <v-btn icon v-if="mainList.selected.indexOf(index) < 0">
-                        <v-icon color="grey lighten-1">
-                          star_border
-                        </v-icon>
-                      </v-btn>
-                      <v-btn icon v-else>
-                        <v-icon color="yellow darken-2">
-                          star
-                        </v-icon>
-                      </v-btn>
-                    </v-list-tile-action> -->
-
                       <v-list-tile-action>
-                        <v-btn icon ripple>
-                          <v-icon color="grey lighten-1">more_vert</v-icon>
-                        </v-btn>
+                        <v-menu bottom left offset-y>
+                          <v-btn slot="activator" icon ripple>
+                            <v-icon color="grey lighten-1">more_horiz</v-icon>
+                          </v-btn>
+                          <v-list>
+                            <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
+                              @click="menuItem.action(result,$event)" :name="menuItem.name"
+                              :copyContent='result.attributes.copyContent'>
+                              <v-list-tile-avatar>
+                                <v-icon>{{ menuItem.icon }}</v-icon>
+                              </v-list-tile-avatar>
+                              <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
+                            </v-list-tile>
+                          </v-list>
+                        </v-menu>
                       </v-list-tile-action>
 
 
+
                     </v-list-tile>
-                    <v-divider v-if="index + 1 < mainList.items.length" :key="index" inset></v-divider>
+                    <v-divider v-if="index + 1 < mainList.results.length" :key="index" inset></v-divider>
+
+
+
+
                   </template>
                 </v-list>
               </v-card>
             </v-flex>
+
+
+
+
+
+
           </v-layout>
         </v-slide-y-transition>
+
 
 
       </v-content>
@@ -418,13 +460,36 @@
 
       </v-footer>
 
+
+      <v-dialog v-model="deleteConfirmDialog" max-width="290">
+           
+          <v-card>
+            <v-card-title class="headline red--text">确定要删除该项?</v-card-title>
+
+            <v-card-text>
+              删除操作不可撤回，请谨慎考虑。
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+
+              <v-btn color="primary" flat="flat" @click="deleteConfirmDialog = false">
+                取消
+              </v-btn>
+
+              <v-btn color="error" @click="deleteConfirmDialog = false;deleteContent(deleteOjbect)">
+                删除
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+
+
+
     </v-app>
 
   </div>
-
-
-
-
 
   <div id="floatBTN" v-scroll="occurFab" v-cloak>
 
@@ -471,9 +536,14 @@
   crossorigin="anonymous"></script>
 <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
 <script src="js/leanCloudInit.js"></script>
 <script src="js/searchShimo.js"></script>
 <script src="js/index.js"></script>
 
+
+<script>
+
+</script>
 
 </html>
