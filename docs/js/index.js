@@ -287,6 +287,7 @@ var app = new Vue({
         } */
   },
   methods: {
+
     rightClick(index, e) {
       /*       e.preventDefault()
             console.log(e);
@@ -296,6 +297,7 @@ var app = new Vue({
             this.$nextTick(() => {
               this.showMenu = true
             }) */
+
       e.preventDefault()
       console.log(index);
       this.showMenu = false;

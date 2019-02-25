@@ -368,11 +368,11 @@
                         </v-btn>
                       </v-list-tile-action>
 
-                      <v-menu v-model="showMenu" v-if="index==showMenuIndex" :position-x="MenuX" :position-y="MenuY"
-                        absolute offset-y>
+                      <v-menu  v-model="showMenu" v-if="index==showMenuIndex" :position-x="MenuX" :position-y="MenuY"
+                        absolute offset-y >
                         <v-list>
                           <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
-                            @click="menuItem.action(result,$event)" :name="menuItem.name"
+                            @click="menuItem.action(result,$event)"  :name="menuItem.name"
                             :copyContent='result.attributes.copyContent'>
                             <v-list-tile-avatar>
                               <v-icon>{{ menuItem.icon }}</v-icon>
