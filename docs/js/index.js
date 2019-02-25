@@ -4,7 +4,11 @@
 var app = new Vue({
   el: '#app',
   data: () => ({
-    
+
+    showMenuIndex: 'init',
+    MenuX: 0,
+    MenuY: 0,
+    showMenu: false,
     deleteConfirmDialog: false,
     copyBtn: null, //存储初始化复制按钮事件
     mobile: null,
@@ -259,7 +263,7 @@ var app = new Vue({
     this.getQ();
     this.getV();
     this.getID();
-    this.initClipboardJS();
+
 
   },
   watch: {
@@ -283,6 +287,31 @@ var app = new Vue({
         } */
   },
   methods: {
+    rightClick(index, e) {
+      /*       e.preventDefault()
+            console.log(e);
+            this.showMenu = false
+            this.MenuX = e.clientX
+            this.MenuY = e.clientY
+            this.$nextTick(() => {
+              this.showMenu = true
+            }) */
+      e.preventDefault()
+      console.log(index);
+      this.showMenu = false;
+      this.showMenuIndex = index;
+      this.MenuX = e.clientX;
+      this.MenuY = e.clientY;
+
+
+      this.$nextTick(() => {
+        this.showMenu = true;
+      })
+      setTimeout(() => {
+        this.initClipboardJS();
+      }, 0);
+
+    },
     deleteContent: async function (currentVideo) {
       console.log(currentVideo);
       if (currentVideo.id) {
@@ -294,7 +323,7 @@ var app = new Vue({
           .destroy()
           .then(function () {
             this.mainList.results.splice(this.mainList.results.indexOf(currentVideo), 1)
-            this.bottomSheet=false;
+            this.bottomSheet = false;
           }.bind(this))
           .catch(alert);
 
@@ -309,6 +338,7 @@ var app = new Vue({
     },
     initClipboardJS() {
       //bottomSheet里面的复制按钮初始化
+      console.log(app);
       var btn = document.getElementById('复制短链');
       var clipboard = new ClipboardJS(btn, {
         text: function (trigger) {
@@ -661,7 +691,7 @@ var app = new Vue({
 
       setTimeout(() => {
         this.initClipboardJS();
-      }, 1)
+      }, 0)
     },
     showLoading(target) {
       target.custom = false;

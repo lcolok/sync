@@ -330,7 +330,8 @@
 
                   <template v-for="(result, index) in mainList.results">
 
-                    <v-list-tile :key="result.attributes.title" avatar ripple @click="">
+                    <v-list-tile :key="result.attributes.title" avatar ripple @click=""
+                      @contextmenu="rightClick(index,$event)">
 
 
 
@@ -359,24 +360,27 @@
 
                       </v-list-tile-content>
 
+
+
                       <v-list-tile-action>
-                        <v-menu bottom left offset-y>
-                          <v-btn slot="activator" icon ripple>
-                            <v-icon color="grey lighten-1">more_horiz</v-icon>
-                          </v-btn>
-                          <v-list>
-                            <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
-                              @click="menuItem.action(result,$event)" :name="menuItem.name"
-                              :copyContent='result.attributes.copyContent'>
-                              <v-list-tile-avatar>
-                                <v-icon>{{ menuItem.icon }}</v-icon>
-                              </v-list-tile-avatar>
-                              <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
-                            </v-list-tile>
-                          </v-list>
-                        </v-menu>
+                        <v-btn icon ripple @click="rightClick(index,$event)">
+                          <v-icon color="grey lighten-1">more_horiz</v-icon>
+                        </v-btn>
                       </v-list-tile-action>
 
+                      <v-menu v-model="showMenu" v-if="index==showMenuIndex" :position-x="MenuX" :position-y="MenuY"
+                        absolute offset-y>
+                        <v-list>
+                          <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
+                            @click="menuItem.action(result,$event)" :name="menuItem.name"
+                            :copyContent='result.attributes.copyContent'>
+                            <v-list-tile-avatar>
+                              <v-icon>{{ menuItem.icon }}</v-icon>
+                            </v-list-tile-avatar>
+                            <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
+                          </v-list-tile>
+                        </v-list>
+                      </v-menu>
 
 
                     </v-list-tile>
@@ -386,6 +390,22 @@
 
 
                   </template>
+
+                  <!--                   <v-menu v-model='showMenu' :position-x="MenuX" :position-y="MenuY" absolute offset-y>
+                    <v-btn slot="activator" icon ripple>
+                      <v-icon color="grey lighten-1">more_horiz</v-icon>
+                    </v-btn>
+                    <v-list>
+                      <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i" :name="menuItem.name">
+                        <v-list-tile-avatar>
+                          <v-icon>{{ menuItem.icon }}</v-icon>
+                        </v-list-tile-avatar>
+                        <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu> -->
+
+
                 </v-list>
               </v-card>
             </v-flex>
