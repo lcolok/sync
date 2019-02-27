@@ -6,7 +6,7 @@
   <meta name="referrer" content="never" />
   <meta name="referrer" content="no-referrer" />
   <link rel="shortcut icon" href="https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png">
-  <link rel='apple-touch-icon' href='/docs/addIcon/assets/UploadCloud.jpg'>  
+  <link rel='apple-touch-icon' href='addIcon/assets/UploadCloud.jpg'>
   <title>石墨床</title>
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'>
   <link rel="stylesheet" href="//cdn.materialdesignicons.com/3.4.93/css/materialdesignicons.min.css">
@@ -26,7 +26,8 @@
 
 
 
-  <div id="app" v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true' v-resize="onResize">
+
+  <v-flex id="app" v-if='user' v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true' v-resize="onResize">
 
 
     <v-app id="sandbox" :dark="dark">
@@ -34,7 +35,8 @@
       <v-snackbar ref="snackbar" top v-model="snackbar.show" :color="snackbar.color">
 
         <v-icon color="white">{{ snackbar.snackbarIcon }}</v-icon>
-        <div class="transparent" flat :ripple="snackbar.ripple" @click="snackbar.action"> {{ snackbar.snackbarText }}
+        <div class="transparent" flat :ripple="snackbar.ripple" @click="snackbar.action">
+          {{ snackbar.snackbarText }}
         </div>
         <v-btn icon dark flat @click="snackbar.show = false">
           <v-icon color="white">close</v-icon>
@@ -468,9 +470,34 @@
 
     </v-app>
 
-  </div>
 
-  <div id="floatBTN" v-scroll="occurFab" v-cloak>
+    <v-flex v-scroll="occurFab" v-cloak>
+
+        <v-fab-transition>
+          <v-speed-dial slot="activator" v-show="floatBTN_Occur" v-model="fab" :top="top" :bottom="bottom" :right="right"
+            :left="left" :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
+    
+            <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab>
+              <v-icon>{{ activeFab.icon }}</v-icon>
+            </v-btn>
+            <v-btn fab dark small color="orange" @click="$vuetify.goTo(0);">
+              <v-icon>keyboard_arrow_up</v-icon>
+            </v-btn>
+            <v-btn fab dark small color="indigo">
+              <v-icon>add</v-icon>
+            </v-btn>
+            <v-btn fab dark small color="green" @click="hoverOrNot;backToSearchTarget;">
+              <v-icon>search</v-icon>
+            </v-btn>
+          </v-speed-dial>
+        </v-fab-transition>
+    
+      </v-flex>
+
+
+  </v-flex>
+
+<!--   <v-flex id="floatBTN" v-scroll="occurFab" v-cloak>
 
     <v-fab-transition>
       <v-speed-dial slot="activator" v-show="floatBTN_Occur" v-model="fab" :top="top" :bottom="bottom" :right="right"
@@ -491,12 +518,8 @@
       </v-speed-dial>
     </v-fab-transition>
 
-    <!-- <v-fab-transition>
-      <v-btn v-show="showOrNot" color="pink" fab dark bottom left fixed>
-        <v-icon>edit</v-icon>
-      </v-btn>
-    </v-fab-transition> -->
-  </div>
+  </v-flex> -->
+
 
 
 
