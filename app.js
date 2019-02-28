@@ -32,6 +32,8 @@ app.use(timeout('240s'));
 // 加载云引擎中间件
 app.use(AV.express());
 
+
+
 app.enable('trust proxy');
 // 需要重定向到 HTTPS 可去除下一行的注释。
 app.use(AV.Cloud.HttpsRedirect());

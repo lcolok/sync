@@ -95,6 +95,13 @@ var app = new Vue({
         icon: 'mdi-database-edit', text: '数据管理', action: () => {
           window.open('https://leancloud.cn/dashboard/data.html?appid=Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz#/ShimoBed')
         }
+      },
+      {
+        icon: 'mdi-apple-safari', text: '创建捷径', action: () => {
+          // window.location.href='mqqapi://';//打开QQ
+          var encodedURL = encodeURIComponent("https://www.baidu.com");
+          window.location.href=`x-web-search://?${encodedURL}`
+        }
       }
     ],
     tabs: null,
