@@ -301,12 +301,13 @@
 
 
         <v-expand-transition>
-          <v-tabs v-model="tabs" v-if='mainList.results.length!=0' centered color="transparent" slider-color="primary"
-            :show-arrows='showArrow'>
+          <v-tabs v-model="tabs" v-if='(mainList.results.length!=0)&&(typeList.length!=0)' color="transparent"
+            slider-color="primary" :show-arrows='showArrow'>
 
-            <v-tab v-for="n in typeList" :key='typeList.text'>
+            <v-tab v-for="(n, index)  in typeList" v-if="n.count>0" :key='index'
+              @change='mainList.results = n.subClassArr;'>
               <v-badge overlap>
-                <span slot="badge" class="caption">99</span>
+                <span slot="badge" class="caption">{{n.count}}</span>
                 <v-chip>
                   <v-flex>
                     <v-icon :size='n.size'>{{n.icon}}</v-icon>
@@ -325,6 +326,7 @@
           </v-subheader>
         </v-slide-y-transition>
 
+
         <v-slide-y-transition>
           <v-layout align-center justify-center v-if='mainList.results.length!=0'>
             <v-flex xs12 mb-5>
@@ -335,9 +337,11 @@
 
                     <v-list-tile :key="result.attributes.title" avatar ripple @click=""
                       @contextmenu="rightClick(index,$event)">
-                      <v-badge :color="canPlay(result).color" left overlap>
+                      <v-badge :color="result.attributes.canPlay?result.attributes.canPlay.color:'primary'" left
+                        overlap>
                         <!-- <v-icon slot="badge" dark small>done</v-icon> -->
-                        <v-icon v-if='canPlay(result)' color="white" slot="badge">{{canPlay(result).icon}}</v-icon>
+                        <v-icon v-if='result.attributes.canPlay' color="white" slot="badge">
+                          {{result.attributes.canPlay.icon}}</v-icon>
                         <v-list-tile-avatar ripple @click="">
 
                           <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" small

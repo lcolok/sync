@@ -5,6 +5,88 @@ var app = new Vue({
   data: () => ({
     user: true,
 
+    fileDescription: [
+      {
+        rule: ["mp4", "mov", "webm"],
+        emoji: "🎬",//常规视频文件
+        type: "视频",
+        size: '',
+        icon: 'mdi-movie',
+        canPlay: {
+          icon: 'mdi-play',
+          color: 'red',
+        },
+      },
+      {
+        rule: ["mkv", "avi", "flv"],
+        emoji: "▶️",//常规视频文件
+        type: "非标视频",
+        size: '',
+        icon: 'mdi-file-video',
+      },
+      {
+        rule: ["mp3", "ogg", "wav", "flac", "ape", "alca", "aac"],
+        emoji: "🎵",//音频文件
+        type: "音频",
+        size: '',
+        icon: 'mdi-music',
+      },
+      {
+        rule: ["zip", "7z", "rar"],
+        emoji: "📦",//压缩包
+        type: "压缩包",
+        size: '20',
+        icon: 'fas fa-file-archive fa-xs',
+      },
+      {
+        rule: ["dmg", "iso"],
+        emoji: "💽",//光盘映像
+        type: "光盘映像",
+        size: '',
+        icon: 'mdi-harddisk',
+      },
+      {
+        rule: ["ai", "psd", "aep"],
+        emoji: "📐",//工程文件
+        type: "工程文件",
+        size: '',
+        icon: 'mdi-briefcase-edit',
+      },
+      {
+        rule: ["ppt", "pptx", "key"],
+        emoji: "📽️",//演示文件
+        type: "演示文件",
+        icon: "mdi-projector-screen",
+      },
+      {
+        rule: ["ttf", "otf"],
+        emoji: "🔤️",//字体文件
+        type: "字体",
+        size: '',
+        icon: 'mdi-format-font',
+      },
+      {
+        rule: ["doc", "pdf", "txt"],
+        emoji: "📄",//文档
+        type: "文档",
+        size: '',
+        icon: 'mdi-file-pdf',
+      },
+      {
+        rule: ["puppet"],
+        emoji: "🤖",//
+        type: "Ch人偶模型",
+        size: '',
+        icon: 'mdi-robot',
+      },
+      {
+        rule: [],
+        emoji: "❓",//未知格式
+        type: "未知格式",
+        size: '',
+        icon: 'mdi-file-question',
+      }
+    ],
 
     direction: 'top',
     fab: false,
@@ -115,7 +197,7 @@ var app = new Vue({
         icon: 'mdi-apple-safari', text: '创建捷径', action: () => {
           // window.location.href='mqqapi://';//打开QQ
           var encodedURL = encodeURIComponent("https://www.baidu.com");
-          window.location.href=`x-web-search://?${encodedURL}`
+          window.location.href = `x-web-search://?${encodedURL}`
         }
       }
     ],
@@ -138,18 +220,6 @@ var app = new Vue({
       { size: '', icon: 'mdi-file-pdf', text: 'PDF' },
       { size: '20', icon: 'fas fa-file-archive fa-xs', text: '压缩包' },
 
-      { size: '20', icon: 'fas fa-globe-americas', text: '全部' },
-      { size: '', icon: 'mdi-movie', text: '视频' },
-      { size: '', icon: 'mdi-music', text: '音乐' },
-      { size: '', icon: 'mdi-image-area', text: '图片' },
-      { size: '', icon: 'mdi-file-pdf', text: 'PDF' },
-      { size: '20', icon: 'fas fa-file-archive fa-xs', text: '压缩包' },
-      { size: '20', icon: 'fas fa-globe-americas', text: '全部' },
-      { size: '', icon: 'mdi-movie', text: '视频' },
-      { size: '', icon: 'mdi-music', text: '音乐' },
-      { size: '', icon: 'mdi-image-area', text: '图片' },
-      { size: '', icon: 'mdi-file-pdf', text: 'PDF' },
-      { size: '20', icon: 'fas fa-file-archive fa-xs', text: '压缩包' },
     ],
     mainList: {
       selected: [],
@@ -413,7 +483,7 @@ var app = new Vue({
             }) */
 
       e.preventDefault()
-      console.log(index);
+      // console.log(index);
       this.showMenu = false;
       this.showMenuIndex = index;
       this.MenuX = e.clientX;
@@ -454,7 +524,7 @@ var app = new Vue({
     },
     initClipboardJS() {
       //bottomSheet里面的复制按钮初始化
-      console.log(app);
+
       var btn = document.getElementById('复制短链');
       var clipboard = new ClipboardJS(btn, {
         text: function (trigger) {
@@ -481,7 +551,7 @@ var app = new Vue({
       });
 
       clipboard.on('success', function (e) {
-        console.log(e);
+        // console.log(e);
         app.copySuccess();
       });
 
@@ -494,7 +564,7 @@ var app = new Vue({
       this.infoPanel = this.infoPanel ? false : true;
     },
     onResize() {
-      console.log({ x: window.innerWidth, y: window.innerHeight });
+      // console.log({ x: window.innerWidth, y: window.innerHeight });
       this.mobile = this.isMobile();
     },
     isMobile() {
@@ -529,28 +599,11 @@ var app = new Vue({
       size = size.toFixed(2);
       return `${size} ${unitArr[index]}`;
     },
-    canPlay(item) {
-      var type, icon, color;
-      switch ((item.attributes.type).toLowerCase()) {
+    howToPlay(item) {
+
+      switch (item.attributes.type) {
         case '视频':
         case '大视频':
-          type = 'video';
-          icon = 'mdi-play';
-          color = 'red';
-          break;
-        default:
-          return false;
-      };
-      return {
-        type: type,
-        icon: icon,
-        color: color
-      };
-    },
-    howToPlay(item) {
-      var canPlay = this.canPlay(item);
-      switch (canPlay.type) {
-        case 'video':
           // document.getElementById('dplayer').setAttribute("src", item.shortURL);
           if (this.currentVideo.attributes.name !== item.attributes.name) {//标题跟之前的不同才会切换新视频进行播放
 
@@ -719,50 +772,143 @@ var app = new Vue({
       }
       return emoji;
     },
+
+
     suffixHandle(suffix) {
-      var emoji, type;
+      suffix = suffix.toLowerCase();
+      const fileIndex = {};
 
-      if (suffix.match(/[a-zA-Z]/g)) {
-        if (suffix.match(/mp4|mov/ig)) {//根据后缀给出emoji
-          emoji = "🎬";//常规视频文件
-          type = "视频";
-        } else if (suffix.match(/webm|mkv|avi|flv/ig)) {
-          emoji = "▶️";//手机无法播放的非常规视频文件
-          type = "大视频";
-        } else if (suffix.match(/mp3|ogg|wav|flac|ape|alca|aac/ig)) {
-          emoji = "🎵";//音频文件
-          type = "音频";
-        } else if (suffix.match(/zip|7z|rar/ig)) {
-          emoji = "📦";//压缩包
-          type = "压缩包";
-        } else if (suffix.match(/dmg|iso/ig)) {
-          emoji = "💽";//光盘映像
-          type = "光盘映像";
-        } else if (suffix.match(/ai|psd|aep/ig)) {
-          emoji = "📐";//工程文件
-          type = "工程文件";
-        } else if (suffix.match(/ppt|pptx|key/ig)) {
-          emoji = "📽️";//演示文件
-          type = "演示文件";
-        } else if (suffix.match(/ttf|otf/ig)) {
-          emoji = "🔤️";//字体文件
-          type = "字体";
-        } else if (suffix.match(/doc|pdf|txt/ig)) {
-          emoji = "️📄";//文档
-          type = "文档";
-        } else {
-          emoji = "❓";//未知格式
-          type = "未知格式";
+      this.fileDescription.forEach((e, index) => {
+
+        e.rule.forEach((type) => fileIndex[type] = this.fileDescription[index])
+      });
+
+      if (!fileIndex[suffix]) {
+        return {
+          emoji: "❓",//未知格式
+          type: "未知格式",
         }
-      } else {
-        emoji = suffix;
-
       }
 
       return {
-        emoji: emoji,
-        type: type,
+        emoji: fileIndex[suffix].emoji,
+        type: fileIndex[suffix].type,
+        canPlay: fileIndex[suffix].canPlay,
       };
+
+
+      // var arr = [
+      //   {
+      //     regex: /mp4|mov/ig,
+      //     emoji: "🎬",//常规视频文件
+      //     type: "视频",
+      //   },
+      //   {
+      //     regex: /webm|mkv|avi|flv/ig,
+      //     emoji: "▶️",//常规视频文件
+      //     type: "大视频",
+      //   },
+      //   {
+      //     regex: /mp3|ogg|wav|flac|ape|alca|aac/ig,
+      //     emoji: "🎵",//音频文件
+      //     type: "音频",
+      //   },
+      //   {
+      //     regex: /zip|7z|rar/ig,
+      //     emoji: "📦",//压缩包
+      //     type: "压缩包",
+      //   },
+      //   {
+      //     regex: /dmg|iso/ig,
+      //     emoji: "💽",//光盘映像
+      //     type: "光盘映像",
+      //   },
+      //   {
+      //     regex: /ai|psd|aep/ig,
+      //     emoji: "📐",//工程文件
+      //     type: "工程文件",
+      //   },
+      //   {
+      //     regex: /ppt|pptx|key/ig,
+      //     emoji: "📽️",//演示文件
+      //     type: "演示文件",
+      //   },
+      //   {
+      //     regex: /ttf|otf/ig,
+      //     emoji: "🔤️",//字体文件
+      //     type: "字体",
+      //   },
+      //   {
+      //     regex: /doc|pdf|txt/ig,
+      //     emoji: "️📄",//文档
+      //     type: "文档",
+      //   },
+      //   {
+      //     regex: /.*/ig,
+      //     emoji: "❓",//未知格式
+      //     type: "未知格式",
+      //   }
+      // ];
+
+
+      // for (var i = 0; i < arr.length; i++) {
+      //   if (suffix.match(arr[i].regex)) {
+      //     return {
+      //       emoji: arr[i].emoji,
+      //       type: arr[i].type,
+      //     };
+      //   };
+      // }
+
+
+      // if (suffix.match(/[a-zA-Z]/g)) {
+      //   if (suffix.match(/mp4|mov/ig)) {//根据后缀给出emoji
+      //     regex = /mp4|mov/ig;
+      //     emoji = "🎬";//常规视频文件
+      //     type = "视频";
+      //   } else if (suffix.match(/webm|mkv|avi|flv/ig)) {
+      //     regex = /webm|mkv|avi|flv/ig;
+      //     emoji = "▶️";//手机无法播放的非常规视频文件
+      //     type = "大视频";
+      //   } else if (suffix.match(/mp3|ogg|wav|flac|ape|alca|aac/ig)) {
+      //     regex = /mp3|ogg|wav|flac|ape|alca|aac/ig;
+      //     emoji = "🎵";//音频文件
+      //     type = "音频";
+      //   } else if (suffix.match(/zip|7z|rar/ig)) {
+      //     regex = /zip|7z|rar/ig;
+      //     emoji = "📦";//压缩包
+      //     type = "压缩包";
+      //   } else if (suffix.match(/dmg|iso/ig)) {
+      //     regex = /dmg|iso/ig;
+      //     emoji = "💽";//光盘映像
+      //     type = "光盘映像";
+      //   } else if (suffix.match(/ai|psd|aep/ig)) {
+      //     regex = /ai|psd|aep/ig;
+      //     emoji = "📐";//工程文件
+      //     type = "工程文件";
+      //   } else if (suffix.match(/ppt|pptx|key/ig)) {
+      //     regex = /ppt|pptx|key/ig;
+      //     emoji = "📽️";//演示文件
+      //     type = "演示文件";
+      //   } else if (suffix.match(/ttf|otf/ig)) {
+      //     regex = /ttf|otf/ig;
+      //     emoji = "🔤️";//字体文件
+      //     type = "字体";
+      //   } else if (suffix.match(/doc|pdf|txt/ig)) {
+      //     regex = /doc|pdf|txt/ig;
+      //     emoji = "️📄";//文档
+      //     type = "文档";
+      //   } else {
+      //     regex = /.*/ig;
+      //     emoji = "❓";//未知格式
+      //     type = "未知格式";
+      //   }
+      // } else {
+      //   emoji = suffix;
+
+      // }
+
+
     },
     makeNewDic(e) {
 
@@ -777,6 +923,8 @@ var app = new Vue({
       var emoji = handle.emoji;
 
       e.attributes.type = handle.type;
+
+      e.attributes.canPlay = handle.canPlay;
 
       var name = dic.name;
 
@@ -793,10 +941,45 @@ var app = new Vue({
     makeAList(resp) {
       var result = [];
 
+
+      app.typeList = [
+        {
+          size: '20', icon: 'fas fa-globe-americas', text: '全部', count: 0,
+        },
+      ];
+
+      const fileIndex = {};
+
+      this.fileDescription.forEach((e, index) => {
+        fileIndex[e.type] = { count: 0, subClassArr: [], icon: e.icon, size: e.size };
+      });
+
+
+
       resp.forEach(e => {
         var newDic = app.makeNewDic(e);
+
+        fileIndex[newDic.attributes.type].count++;
+        fileIndex[newDic.attributes.type].subClassArr.push(newDic);
+        app.typeList[0].count++;//也就是'全部'
         result.push(newDic);
       });
+
+      app.typeList[0].subClassArr = result;//全部的subClassArr
+
+      this.fileDescription.forEach((e, index) => {
+        var subClass = fileIndex[e.type];
+        app.typeList.push({
+          text: e.type,
+          count: subClass.count,
+          icon: subClass.icon,
+          size: subClass.size,
+          subClassArr: subClass.subClassArr,
+        })
+
+      });
+
+
       return result;
     }
     ,
@@ -875,7 +1058,7 @@ var app = new Vue({
       }
       app.keywordLasttime = key;
       // console.log(app.mainList.results);
-      console.log(results);
+
       app.mainList.results = results;
 
       var endTime = new Date();
@@ -899,7 +1082,7 @@ var app = new Vue({
         var key = target.keyword;
         this.showLoading(target);
         // window.location.href = `?q=${key}`
-        console.log('关键词为:' + key);
+        // console.log('关键词为:' + key);
         // bingDic(key);
         app.searchShimo(key);
       }, delay)
