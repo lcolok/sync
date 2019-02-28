@@ -1,9 +1,24 @@
 'use strict'
 
-
 var app = new Vue({
   el: '#app',
   data: () => ({
+    user: true,
+
+
+    direction: 'top',
+    fab: false,
+    fling: false,
+    hover: true,
+    tabs: null,
+    top: false,
+    right: true,
+    bottom: true,
+    left: false,
+    transition: 'scale-transition',
+    floatBTN_Occur: 0,
+    windowSize: {},
+
 
     showMenuIndex: 'init',
     MenuX: 0,
@@ -111,10 +126,12 @@ var app = new Vue({
     floatPlayBTN_Occur: false,
     currentVideo: { attributes: {} },
     searchDuration: 0,
-    keywordLasttime: '',
+    keywordLasttime: null,
     typeList: [
 
-      { size: '20', icon: 'fas fa-globe-americas', text: '全部' },
+      {
+        size: '20', icon: 'fas fa-globe-americas', text: '全部'
+      },
       { size: '', icon: 'mdi-movie', text: '视频' },
       { size: '', icon: 'mdi-music', text: '音乐' },
       { size: '', icon: 'mdi-image-area', text: '图片' },
@@ -227,6 +244,23 @@ var app = new Vue({
     arrowDegree: 0,
   }),
   computed: {
+    activeFab() {
+      switch (this.fab) {
+        case true: return { color: 'red', icon: 'close' }
+        case false: return { color: "blue darken-2", icon: 'more_horiz' }
+        default: return {}
+      }
+    },
+    backToSearchTarget() {
+      return app.$refs.searchBar.focus();
+    },
+    backToSearchOptions() {
+      return {
+        offset: 16,
+        duration: 300,
+        easing: 'easeInOutCubic'
+      }
+    },
     style() {
       return { transform: 'rotate(' + this.arrowDegree / 360 + 'turn)' }
     },
@@ -264,14 +298,15 @@ var app = new Vue({
     },
   },
   mounted() {
-    this.getScrollStyle();
-    this.initPlayers();
-    //处理Params
-    this.getQ();
-    this.getV();
-    this.getID();
-
-
+    if (this.user) {
+      this.getScrollStyle();
+      this.initPlayers();
+      //处理Params
+      this.getQ();
+      this.getV();
+      this.getID();
+      this.pasteEvent();
+    }
   },
   watch: {
     bottomSheet() {
@@ -294,7 +329,79 @@ var app = new Vue({
         } */
   },
   methods: {
+    copySuccess() {
+      app.snackbar.show = false;
+      app.snackbar = {
+        show: true,
+        color: 'success',
+        ripple: false,
+        snackbarText: '已复制',
+        snackbarIcon: 'file_copy',
+        action: () => {
 
+        }
+      }
+    },
+    pasteEvent() {
+      //paste事件监听
+      document.addEventListener("paste", function (e) {
+        e.preventDefault();
+        var cbd = e.clipboardData;
+        var ua = window.navigator.userAgent;
+
+        // 如果是 Safari 直接 return
+        if (!(e.clipboardData && e.clipboardData.items)) {
+          return;
+        }
+
+        // Mac平台下Chrome49版本以下 复制Finder中的文件的Bug Hack掉
+        if (cbd.items && cbd.items.length === 2 && cbd.items[0].kind === "string" && cbd.items[1].kind === "file" &&
+          cbd.types && cbd.types.length === 2 && cbd.types[0] === "text/plain" && cbd.types[1] === "Files" &&
+          ua.match(/Macintosh/i) && Number(ua.match(/Chrome\/(\d{2})/i)[1]) < 49) {
+          return;
+        }
+
+        for (var i = 0; i < cbd.items.length; i++) {
+          var item = cbd.items[i];
+          console.log(item.kind);
+          switch (item.kind) {
+            case "file":
+              var blob = item.getAsFile();
+              if (blob.size === 0) {
+                return;
+              }
+              console.log(blob);
+              // blob 就是从剪切板获得的文件 可以进行上传或其他操作
+              break;
+            case "string":
+
+              console.log(item);
+              break;
+          }
+        }
+      }, false);
+    },
+
+    hoverOrNot() {
+      this.hover = false;
+      setTimeout(() => {
+        this.hover = true;
+      }, 800);
+    },
+
+    occurFab() {
+      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+      // console.log(scrollTop);
+      this.windowSize = { x: window.innerWidth, y: window.innerHeight }
+      if (scrollTop > this.windowSize.y * 0.1) {
+        this.floatBTN_Occur = 1;
+        return 1
+      } else {
+        this.fab = false;//确保浮动按钮消失的时候,弹出来的按钮也是收起状态
+        this.floatBTN_Occur = 0;
+        return 0
+      }
+    },
     rightClick(index, e) {
       /*       e.preventDefault()
             console.log(e);
@@ -356,8 +463,7 @@ var app = new Vue({
       });
 
       clipboard.on('success', function (e) {
-        // console.log(e);
-
+        app.copySuccess();
       });
 
       clipboard.on('error', function (e) {
@@ -375,8 +481,8 @@ var app = new Vue({
       });
 
       clipboard.on('success', function (e) {
-        // console.log(e);
-
+        console.log(e);
+        app.copySuccess();
       });
 
       clipboard.on('error', function (e) {
@@ -423,12 +529,28 @@ var app = new Vue({
       size = size.toFixed(2);
       return `${size} ${unitArr[index]}`;
     },
-    howToPlay(item) {
-
+    canPlay(item) {
+      var type, icon, color;
       switch ((item.attributes.type).toLowerCase()) {
-        case 'webm':
-        case 'mov':
-        case 'mp4':
+        case '视频':
+        case '大视频':
+          type = 'video';
+          icon = 'mdi-play';
+          color = 'red';
+          break;
+        default:
+          return false;
+      };
+      return {
+        type: type,
+        icon: icon,
+        color: color
+      };
+    },
+    howToPlay(item) {
+      var canPlay = this.canPlay(item);
+      switch (canPlay.type) {
+        case 'video':
           // document.getElementById('dplayer').setAttribute("src", item.shortURL);
           if (this.currentVideo.attributes.name !== item.attributes.name) {//标题跟之前的不同才会切换新视频进行播放
 
@@ -462,7 +584,7 @@ var app = new Vue({
           });
           break;
         default:
-          return;
+          return
       }
     },
     toggle(index) {
@@ -597,13 +719,64 @@ var app = new Vue({
       }
       return emoji;
     },
+    suffixHandle(suffix) {
+      var emoji, type;
+
+      if (suffix.match(/[a-zA-Z]/g)) {
+        if (suffix.match(/mp4|mov/ig)) {//根据后缀给出emoji
+          emoji = "🎬";//常规视频文件
+          type = "视频";
+        } else if (suffix.match(/webm|mkv|avi|flv/ig)) {
+          emoji = "▶️";//手机无法播放的非常规视频文件
+          type = "大视频";
+        } else if (suffix.match(/mp3|ogg|wav|flac|ape|alca|aac/ig)) {
+          emoji = "🎵";//音频文件
+          type = "音频";
+        } else if (suffix.match(/zip|7z|rar/ig)) {
+          emoji = "📦";//压缩包
+          type = "压缩包";
+        } else if (suffix.match(/dmg|iso/ig)) {
+          emoji = "💽";//光盘映像
+          type = "光盘映像";
+        } else if (suffix.match(/ai|psd|aep/ig)) {
+          emoji = "📐";//工程文件
+          type = "工程文件";
+        } else if (suffix.match(/ppt|pptx|key/ig)) {
+          emoji = "📽️";//演示文件
+          type = "演示文件";
+        } else if (suffix.match(/ttf|otf/ig)) {
+          emoji = "🔤️";//字体文件
+          type = "字体";
+        } else if (suffix.match(/doc|pdf|txt/ig)) {
+          emoji = "️📄";//文档
+          type = "文档";
+        } else {
+          emoji = "❓";//未知格式
+          type = "未知格式";
+        }
+      } else {
+        emoji = suffix;
+
+      }
+
+      return {
+        emoji: emoji,
+        type: type,
+      };
+    },
     makeNewDic(e) {
 
       if (!e.id) { return }
 
       var dic = e.attributes;
 
-      var emoji = app.makeEmoji(dic.type);
+      e.attributes.suffix = dic.type;//后缀
+
+      var handle = app.suffixHandle(dic.type);
+
+      var emoji = handle.emoji;
+
+      e.attributes.type = handle.type;
 
       var name = dic.name;
 
@@ -645,7 +818,17 @@ var app = new Vue({
         console.log(data);
 
         if (data > 0) {
-          showUpdate(data);
+          app.snackbar.show = false;
+          app.snackbar = {
+            show: true,
+            color: 'success',
+            ripple: false,
+            snackbarText: `新增${data}条记录`,
+            snackbarIcon: 'mdi-sync',
+            action: () => {
+
+            }
+          };
         } else {
           this.showTop20();
 
@@ -676,7 +859,7 @@ var app = new Vue({
           //   type: "error"//Type of the Toast ['success', 'info', 'error']
           //   // fullWidth:"true",
           // });
-
+          app.snackbar.show = false;
           app.snackbar = {
             show: true,
             color: 'error',
@@ -761,91 +944,6 @@ var app = new Vue({
 
 })
 
-var floatBTN = new Vue({
-  el: '#floatBTN',//Floating Action Button
-  data: () => ({
-    direction: 'top',
-    fab: false,
-    fling: false,
-    hover: true,
-    tabs: null,
-    top: false,
-    right: true,
-    bottom: true,
-    left: false,
-    transition: 'scale-transition',
-    floatBTN_Occur: 0,
-    windowSize: {},
-  }),
-
-  computed: {
-    activeFab() {
-      switch (this.fab) {
-        case true: return { color: 'red', icon: 'close' }
-        case false: return { color: "blue darken-2", icon: 'more_horiz' }
-        default: return {}
-      }
-    },
-    backToSearchTarget() {
-      return app.$refs.searchBar.focus();
-    },
-    backToSearchOptions() {
-      return {
-        offset: 16,
-        duration: 300,
-        easing: 'easeInOutCubic'
-      }
-    },
-  },
-  watch: {
-    top(val) {
-      this.bottom = !val
-    },
-    right(val) {
-      this.left = !val
-    },
-    bottom(val) {
-      this.top = !val
-    },
-    left(val) {
-      this.right = !val
-    },
-
-  },
-
-  mounted() {
-
-  },
-
-  methods: {
-    hoverOrNot() {
-      this.hover = false;
-      setTimeout(() => {
-        this.hover = true;
-      }, 800);
-    },
-
-    occurFab() {
-      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
-      // console.log(scrollTop);
-      this.windowSize = { x: window.innerWidth, y: window.innerHeight }
-      if (scrollTop > this.windowSize.y * 0.1) {
-        this.floatBTN_Occur = 1;
-        return 1
-      } else {
-        this.fab = false;//确保浮动按钮消失的时候,弹出来的按钮也是收起状态
-        this.floatBTN_Occur = 0;
-        return 0
-      }
-    },
-
-  }
-})
-
-
-
-
-
 
 function process(s, evaluator) {
   var h = Object.create(null), k;
@@ -918,37 +1016,7 @@ async function bingDic(word) {
 }
 
 
-//paste事件监听
-document.addEventListener("paste", function (e) {
 
-  var cbd = e.clipboardData;
-  var ua = window.navigator.userAgent;
-
-  // 如果是 Safari 直接 return
-  if (!(e.clipboardData && e.clipboardData.items)) {
-    return;
-  }
-
-  // Mac平台下Chrome49版本以下 复制Finder中的文件的Bug Hack掉
-  if (cbd.items && cbd.items.length === 2 && cbd.items[0].kind === "string" && cbd.items[1].kind === "file" &&
-    cbd.types && cbd.types.length === 2 && cbd.types[0] === "text/plain" && cbd.types[1] === "Files" &&
-    ua.match(/Macintosh/i) && Number(ua.match(/Chrome\/(\d{2})/i)[1]) < 49) {
-    return;
-  }
-
-  for (var i = 0; i < cbd.items.length; i++) {
-    var item = cbd.items[i];
-    console.log(item.kind);
-    if (item.kind == "file") {
-      var blob = item.getAsFile();
-      if (blob.size === 0) {
-        return;
-      }
-      console.log(blob);
-      // blob 就是从剪切板获得的文件 可以进行上传或其他操作
-    }
-  }
-}, false);
 
 
 

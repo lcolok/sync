@@ -6,7 +6,7 @@
   <meta name="referrer" content="never" />
   <meta name="referrer" content="no-referrer" />
   <link rel="shortcut icon" href="https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png">
-  <link rel='apple-touch-icon' href='/docs/addIcon/assets/UploadCloud.jpg'>  
+  <link rel='apple-touch-icon' href='addIcon/assets/UploadCloud.jpg'>
   <title>石墨床</title>
   <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'>
   <link rel="stylesheet" href="//cdn.materialdesignicons.com/3.4.93/css/materialdesignicons.min.css">
@@ -26,15 +26,17 @@
 
 
 
-  <div id="app" v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true' v-resize="onResize">
+
+  <v-flex id="app" v-if='user' v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true' v-resize="onResize">
 
 
     <v-app id="sandbox" :dark="dark">
 
-      <v-snackbar ref="snackbar" top v-model="snackbar.show" :color="snackbar.color">
+      <v-snackbar ref="snackbar" bottom v-model="snackbar.show" :color="snackbar.color">
 
         <v-icon color="white">{{ snackbar.snackbarIcon }}</v-icon>
-        <div class="transparent" flat :ripple="snackbar.ripple" @click="snackbar.action"> {{ snackbar.snackbarText }}
+        <div class="transparent" flat :ripple="snackbar.ripple" @click="snackbar.action">
+          {{ snackbar.snackbarText }}
         </div>
         <v-btn icon dark flat @click="snackbar.show = false">
           <v-icon color="white">close</v-icon>
@@ -304,7 +306,7 @@
 
             <v-tab v-for="n in typeList" :key='typeList.text'>
               <v-badge overlap>
-                <span slot="badge" class="caption">38</span>
+                <span slot="badge" class="caption">99</span>
                 <v-chip>
                   <v-flex>
                     <v-icon :size='n.size'>{{n.icon}}</v-icon>
@@ -318,7 +320,7 @@
         </v-expand-transition>
 
         <v-slide-y-transition>
-          <v-subheader class='caption' v-if='mainList.results.length!=0'>
+          <v-subheader class='caption' v-if='(mainList.results.length!=0)&&(keywordLasttime!="")'>
             找到有关『{{keywordLasttime}}』的{{mainList.results.length}}条结果（用时{{searchDuration}}秒）
           </v-subheader>
         </v-slide-y-transition>
@@ -333,22 +335,27 @@
 
                     <v-list-tile :key="result.attributes.title" avatar ripple @click=""
                       @contextmenu="rightClick(index,$event)">
+                      <v-badge :color="canPlay(result).color" left overlap>
+                        <!-- <v-icon slot="badge" dark small>done</v-icon> -->
+                        <v-icon v-if='canPlay(result)' color="white" slot="badge">{{canPlay(result).icon}}</v-icon>
+                        <v-list-tile-avatar ripple @click="">
+
+                          <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" small
+                            fab>
+                            <v-icon>{{ result.attributes.icon }}</v-icon>
+                          </v-btn>
+                          <v-btn v-else class="grey lighten-1 white--text caption" small fab>
+                            <div>{{ result.attributes.suffix }}</div>
+                          </v-btn>
+
+                        </v-list-tile-avatar>
+                      </v-badge>
 
 
 
 
-                      <v-list-tile-avatar ripple @click="howToPlay(result)">
-                        <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" icon>
-                          <v-icon>{{ result.attributes.icon }}</v-icon>
-                        </v-btn>
-                        <v-btn v-else class="grey lighten-1 white--text" icon>
-                          <div>{{result.attributes.type}}</div>
-                        </v-btn>
 
-                      </v-list-tile-avatar>
-
-
-                      <v-list-tile-content>
+                      <v-list-tile-content @click="howToPlay(result)">
 
                         <v-list-tile-title class="font-weight-bold subheading">{{ result.attributes.name }}
                         </v-list-tile-title>
@@ -357,8 +364,6 @@
                           {{ result.attributes.name_trans }}</v-list-tile-sub-title>
                         <v-list-tile-sub-title class="caption font-weight-light" v-if="result.attributes.size">
                           {{ renderSize(result.attributes.size) }}</v-list-tile-sub-title>
-
-
                       </v-list-tile-content>
 
 
@@ -468,9 +473,34 @@
 
     </v-app>
 
-  </div>
 
-  <div id="floatBTN" v-scroll="occurFab" v-cloak>
+    <v-flex v-scroll="occurFab" v-cloak>
+
+      <v-fab-transition>
+        <v-speed-dial slot="activator" v-show="floatBTN_Occur" v-model="fab" :top="top" :bottom="bottom" :right="right"
+          :left="left" :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
+
+          <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab>
+            <v-icon>{{ activeFab.icon }}</v-icon>
+          </v-btn>
+          <v-btn fab dark small color="orange" @click="$vuetify.goTo(0);">
+            <v-icon>keyboard_arrow_up</v-icon>
+          </v-btn>
+          <v-btn fab dark small color="indigo">
+            <v-icon>add</v-icon>
+          </v-btn>
+          <v-btn fab dark small color="green" @click="hoverOrNot;backToSearchTarget;">
+            <v-icon>search</v-icon>
+          </v-btn>
+        </v-speed-dial>
+      </v-fab-transition>
+
+    </v-flex>
+
+
+  </v-flex>
+
+  <!--   <v-flex id="floatBTN" v-scroll="occurFab" v-cloak>
 
     <v-fab-transition>
       <v-speed-dial slot="activator" v-show="floatBTN_Occur" v-model="fab" :top="top" :bottom="bottom" :right="right"
@@ -491,12 +521,8 @@
       </v-speed-dial>
     </v-fab-transition>
 
-    <!-- <v-fab-transition>
-      <v-btn v-show="showOrNot" color="pink" fab dark bottom left fixed>
-        <v-icon>edit</v-icon>
-      </v-btn>
-    </v-fab-transition> -->
-  </div>
+  </v-flex> -->
+
 
 
 
