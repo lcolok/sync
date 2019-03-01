@@ -159,8 +159,8 @@ var app = new Vue({
     logout: function () {
       AV.User.logOut()
       this.user = null
-      this.subscription.unsubscribe()
-      this.unbind()
+      // this.subscription.unsubscribe()
+      // this.unbind()
     },
 
     updateTodos: function (todos) {

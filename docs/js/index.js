@@ -1,9 +1,12 @@
 'use strict'
 
+
+
 var app = new Vue({
   el: '#app',
+
   data: () => ({
-    user: true,
+    user: null,
 
     fileDescription: [
       {
@@ -199,6 +202,11 @@ var app = new Vue({
           var encodedURL = encodeURIComponent("https://www.baidu.com");
           window.location.href = `x-web-search://?${encodedURL}`
         }
+      },
+      {
+        icon: 'mdi-logout', text: '安全登出', action: () => {
+          app.logOut();
+        }
       }
     ],
     tabs: null,
@@ -367,6 +375,10 @@ var app = new Vue({
       }
     },
   },
+  created() {
+    this.autoLogin();
+    this.captchaInit();
+  },
   mounted() {
     if (this.user) {
       this.getScrollStyle();
@@ -379,6 +391,15 @@ var app = new Vue({
     }
   },
   watch: {
+    'user.objectId': {
+      handler: function (id) {
+        if (id) {
+          console.log(id);
+        } else {
+
+        }
+      },
+    },
     bottomSheet() {
       if (this.bottomSheet == false) {
         this.dpFloat.pause();
@@ -399,6 +420,70 @@ var app = new Vue({
         } */
   },
   methods: {
+    autoLogin() {
+      var user = AV.User.current()
+      if (user) {
+        // user.isAuthenticated().then(function(authenticated) {
+        //   if (authenticated) {
+        this.user = user.toJSON()
+        //   }
+        // }
+      }
+    },
+    captchaInit() {
+      AV.Captcha.request().then(function (captcha) {
+        // console.log(captcha);
+        // console.log(app.$refs.captchaImage);
+        captcha.bind({
+          textInput: 'captchaCode', // the id for textInput
+          image: 'captchaImage',    // the id for image element
+          verifyButton: 'verify',    // the id for verify button
+        }, {
+            success: function (validateCode) {
+              console.log('验证成功，下一步')
+            },
+            error: function (error) {
+              console.error(error.message)
+            },
+          });
+      });
+    },
+    logOut: function () {
+      AV.User.logOut()
+      this.user = null;
+    },
+    signUp() {
+
+      var username = $('#inputUsername').val();
+      var password = $('#inputPassword').val();
+      var email = $('inputEmail').val();
+
+      // LeanCloud - 注册
+      // https://leancloud.cn/docs/leanstorage_guide-js.html#注册
+      var user = new AV.User();
+      user.setUsername(username);
+      user.setPassword(password);
+      user.setEmail(email);
+      user.signUp().then(function (user) {
+        // 注册成功
+        console.log(user);
+        app.user = user.toJSON();
+
+      }).catch(alert);
+    },
+    login() {
+      var username = $('#inputUsername').val();
+      var password = $('#inputPassword').val();
+
+      // LeanCloud - 登录
+      // https://leancloud.cn/docs/leanstorage_guide-js.html#用户名和密码登录
+      AV.User.logIn(username, password).then(function (user) {
+        // 登录成功
+        console.log(user);
+        app.user = user.toJSON();
+        console.log(app.user);
+      }).catch(alert);
+    },
     copySuccess() {
       app.snackbar.show = false;
       app.snackbar = {
@@ -510,7 +595,7 @@ var app = new Vue({
           .then(function () {
             this.mainList.results.splice(this.mainList.results.indexOf(currentVideo), 1)
             this.bottomSheet = false;
-          }.bind(this))
+          })
           .catch(alert);
 
       } else {
