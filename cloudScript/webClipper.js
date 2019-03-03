@@ -11,7 +11,7 @@ AV.Cloud.define('webClipper', function (request) {
 
     var url = request.params.url;
 
-    if (!url) { return 'url参数不能为空!!' }
+    if (!url) { throw new AV.Cloud.Error('url参数不能为空!!'); }
 
     return new Promise((resolve, reject) => {
         read(url, function (err, article, meta) {

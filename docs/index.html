@@ -82,12 +82,23 @@
 
     <v-app id="sandbox" v-if='user' :dark="dark">
 
+      <v-dialog v-model="loadingDialog.model" hide-overlay persistent width="300">
+        <v-card color="primary" dark>
+          <v-card-text>
+            {{loadingDialog.text}}
+            <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
       <v-snackbar ref="snackbar" bottom v-model="snackbar.show" :color="snackbar.color">
 
         <v-icon color="white">{{ snackbar.snackbarIcon }}</v-icon>
-        <div class="transparent" flat :ripple="snackbar.ripple" @click="snackbar.action">
+        <div class="transparent" flat>
           {{ snackbar.snackbarText }}
         </div>
+        <v-btn v-if='snackbar.actionText' :ripple="snackbar.ripple" @click="snackbar.action" color='primary'
+          :icon='snackbar.actionIcon'>{{snackbar.actionText}}</v-btn>
         <v-btn icon dark flat @click="snackbar.show = false">
           <v-icon color="white">close</v-icon>
         </v-btn>

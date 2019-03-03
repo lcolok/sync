@@ -1,6 +1,15 @@
 'use strict'
 
-
+// 禁止右键菜单
+document.oncontextmenu = function () { return false; };
+// 禁止文字选择
+// document.onselectstart = function(){ return false; };
+// 禁止复制
+// document.oncopy = function(){ return false; };
+// 禁止剪切
+// document.oncut = function(){ return false; };
+// 禁止粘贴
+// document.onpaste = function(){ return false; };
 
 var app = new Vue({
   el: '#app',
@@ -8,6 +17,7 @@ var app = new Vue({
   data: () => ({
     user: null,
 
+    loadingDialog: {},
     fileDescription: [
       {
         rule: ["mp4", "mov", "webm"],
@@ -391,6 +401,7 @@ var app = new Vue({
     }
   },
   watch: {
+
     'user.objectId': {
       handler: function (id) {
         if (id) {
@@ -408,6 +419,11 @@ var app = new Vue({
         this.dpFloat.play();
       }
 
+    },
+    loadingDialog(val) {
+      if (!val) return
+      console.log(val);
+      // setTimeout(() => (this.loadingDialog = false), 4000)
     },
     /*     loader() {
           var _this = this;
@@ -500,7 +516,7 @@ var app = new Vue({
     pasteEvent() {
       //paste事件监听
       document.addEventListener("paste", function (e) {
-        e.preventDefault();
+
         var cbd = e.clipboardData;
         var ua = window.navigator.userAgent;
 
@@ -516,24 +532,60 @@ var app = new Vue({
           return;
         }
 
-        for (var i = 0; i < cbd.items.length; i++) {
+        /* for (var i = 0; i < cbd.items.length; i++) {
           var item = cbd.items[i];
           console.log(item.kind);
           switch (item.kind) {
             case "file":
               var blob = item.getAsFile();
-              if (blob.size === 0) {
-                return;
-              }
               console.log(blob);
               // blob 就是从剪切板获得的文件 可以进行上传或其他操作
               break;
             case "string":
+              item.getAsString((text) => {
+                console.log(text);
+                return
+                app.searchShimo(text);
+              })
 
-              console.log(item);
               break;
           }
+        } */
+        for (var i = 0, unikind; i < cbd.items.length; i++) {
+          var item = cbd.items[i];
+          if (!unikind) {
+            unikind = item.kind;
+          }
+          if (i == cbd.items.length - 1) {
+            console.log(`${i}项全部都是${unikind}`);
+            if (unikind == 'string') {
+              /* for (var j = 0; j < cbd.items.length; j++) {
+                var item = cbd.items[j];
+                console.log(item.kind);
+                var k = 0;
+                if (j !== 0) {
+                  item.getAsString((text) => {
+                    console.log(`这是第${k}项目的解析结果:${text}`);
+                    k++;
+                    return
+                    app.searchShimo(text);
+                  })
+                }
+              } */
+              cbd.items[0].getAsString((text) => {
+                app.keyword = text;
+                app.searchShimo(text);
+              })
+            }
+          }
+
+          if (unikind == item.kind) { continue; } else {
+            break;
+          }
         }
+
+
+        // e.preventDefault();//这句可以导致粘贴不成功
       }, false);
     },
 
@@ -1080,6 +1132,40 @@ var app = new Vue({
     searchShimo: async function (key) {
       var startTime = new Date();
       var results = "";
+
+      var matchedURL = key.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gm);
+      if (matchedURL) {
+        console.log('即将执行webClipper');
+        app.loadingDialog = {
+          model: true,
+          text: '正在摘抄您指定的URL'
+        };
+        matchedURL.forEach(e => {
+          AV.Cloud.run('webClipper', {
+            url: e,
+          }).then(function (data) {
+            // 成功
+            console.log(data);
+            app.loadingDialog.model = false;
+            app.snackbar.show = false;
+            app.snackbar = {
+              show: true,
+              color: 'success',
+              ripple: false,
+              snackbarText: `文章已保存到石墨上`,
+              snackbarIcon: 'mdi-content-save',
+              actionText: '点击查看',
+              action: () => {
+                window.open(data.docURL);
+              }
+            };
+          }, function (error) {
+            // 失败
+            console.log(error);
+          });
+        })
+        return
+      }
 
       if (!key) {
         var data = await AV.Cloud.run('updateShimo');
