@@ -30,8 +30,8 @@ AV.Cloud.define('webClipper', function (request) {
 
             var markdown = turndownService.turndown(content);
 
-            var data = markdown;
-
+            var data = `本文摘抄自此网址:[${url}](${url})\n\n` + markdown;
+            
             const r = http.post({
                 url: 'https://shimo.im/lizard-api/files/import',
                 gzip: true,
