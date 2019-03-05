@@ -179,7 +179,7 @@ var app = new Vue({
         }
       },
       {
-        icon: 'mdi-numeric', text: '获取ID', name: 'getID', action: () => {
+        icon: 'mdi-egg-easter', text: '获取ID', name: 'getID', action: () => {
 
         }
       },
