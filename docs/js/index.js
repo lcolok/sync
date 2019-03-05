@@ -17,7 +17,7 @@ var app = new Vue({
   data: () => ({
     user: null,
 
-    moreBottomSheet:false,
+    moreBottomSheet: false,
     loadingDialog: {},
     fileDescription: [
       {
@@ -407,7 +407,12 @@ var app = new Vue({
     }
   },
   watch: {
+    'primaryDrawer.model'(val) {
+      if (val) return;
+      if (!tempPlayingID) return;
 
+      this.getID(tempPlayingID);
+    },
     'user.objectId': {
       handler: function (id) {
         if (id) {
@@ -1175,7 +1180,7 @@ var app = new Vue({
       if (objectID) {
         this.getID(objectID);
       }
-      
+
       if (!key) {
         var data = await AV.Cloud.run('updateShimo');
         console.log(data);
