@@ -17,6 +17,7 @@ var app = new Vue({
   data: () => ({
     user: null,
 
+    moreBottomSheet:false,
     loadingDialog: {},
     fileDescription: [
       {
@@ -168,12 +169,17 @@ var app = new Vue({
       */
 
       {
-        icon: 'mdi-cloud-upload', text: '测试可删', action: () => {
+        icon: 'mdi-rename-box', text: '重命名', showInSheet: true, action: () => {
 
         }
       },
       {
-        icon: 'mdi-cloud-upload', text: '测试可删', action: () => {
+        icon: 'mdi-comment-plus', text: '备注', action: () => {
+
+        }
+      },
+      {
+        icon: 'mdi-numeric', text: '获取ID', name: 'getID', action: () => {
 
         }
       },
@@ -661,38 +667,43 @@ var app = new Vue({
     },
     initClipboardJS() {
       //bottomSheet里面的复制按钮初始化
-
-      var btn = document.getElementById('复制短链');
-      var clipboard = new ClipboardJS(btn, {
+      new ClipboardJS(document.getElementById('复制短链'), {
         text: function (trigger) {
-          return app.makeNewDic(app.currentVideo).attributes.copyContent;
+          // return app.makeNewDic(app.currentVideo).attributes.copyContent;
+          return app.currentVideo.attributes.copyContent;
+
         }
-      });
-
-      clipboard.on('success', function (e) {
+      }).on('success', function (e) {
         app.copySuccess();
-      });
-
-      clipboard.on('error', function (e) {
+      }).on('error', function (e) {
         console.log(e);
       });
 
       //more按钮的复制按钮初始化
-      var btn = document.getElementsByName('copyBTN')
-      if (btn.length == 0) { return }
-      var clipboard = new ClipboardJS(btn, {
+      new ClipboardJS(document.getElementsByName('copyBTN'), {
         text: function (trigger) {
           return trigger.getAttribute('copyContent')
         }
 
-      });
-
-      clipboard.on('success', function (e) {
+      }).on('success', function (e) {
         // console.log(e);
         app.copySuccess();
+      }).on('error', function (e) {
+        console.log(e);
       });
 
-      clipboard.on('error', function (e) {
+      //获取ID的复制按钮初始化
+      new ClipboardJS(document.getElementsByName('getID'), {
+        text: function (trigger) {
+          console.log(trigger);
+          console.log(trigger.getAttribute('objectID'));
+          return trigger.getAttribute('objectID')
+        }
+
+      }).on('success', function (e) {
+        // console.log(e);
+        app.copySuccess();
+      }).on('error', function (e) {
         console.log(e);
       });
     },
@@ -743,8 +754,9 @@ var app = new Vue({
         case '大视频':
           // document.getElementById('dplayer').setAttribute("src", item.shortURL);
           if (this.currentVideo.attributes.name !== item.attributes.name) {//标题跟之前的不同才会切换新视频进行播放
-
+            // console.log(item);
             this.currentVideo = item;
+
             // this.currentVideo.name = item.name;
             // this.currentVideo.shortURL = item.shortURL;
             // this.currentVideo.name_trans = item.name_trans;
@@ -816,26 +828,16 @@ var app = new Vue({
         ],
       });
     },
-    getID() {
-      var id = this.getUrlVars().id;
+    getID(id) {
+      id = id ? id : this.getUrlVars().id;
+
       if (id) {
         let query = new AV.Query('ShimoBed');
         query.get(id).then(function (item) {
-          // console.log(item.attributes);
-          app.howToPlay(item);
-          /*           app.currentVideo.name = item.get('name');
-                    app.currentVideo.name_trans = item.get('name_trans');
-                    app.currentVideo.size = item.get('size');
-                    app.currentVideo.shortURL = item.get('shortURL');
-                    app.currentVideo.type = item.get('type');
-          
-                    var uploaderURL = item.get('uploaderURL');
-                    var expandedURL = item.get('expandedURL');
-                    var v = expandedURL ? expandedURL : uploaderURL;
-                    this.dpFloat.switchVideo({
-                      url: v,
-                    });
-                    app.bottomSheet = true; */
+          var newDic = app.makeNewDic(item);
+          console.log(newDic);
+          app.howToPlay(newDic);
+          app.initClipboardJS();
         }, function (error) {
           // 异常处理
           console.error(error);
@@ -1048,12 +1050,13 @@ var app = new Vue({
 
     },
     makeNewDic(e) {
-
       if (!e.id) { return }
 
       var dic = e.attributes;
 
       e.attributes.suffix = dic.type;//后缀
+
+      // console.log(dic.type);
 
       var handle = app.suffixHandle(dic.type);
 
@@ -1133,6 +1136,7 @@ var app = new Vue({
       var startTime = new Date();
       var results = "";
 
+      //如果识别为网址的话
       var matchedURL = key.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gm);
       if (matchedURL) {
         console.log('即将执行webClipper');
@@ -1166,7 +1170,12 @@ var app = new Vue({
         })
         return
       }
-
+      //如果识别为objectID的话
+      var objectID = key.match(/[0-9a-zA-Z]{24}/gm);
+      if (objectID) {
+        this.getID(objectID);
+      }
+      
       if (!key) {
         var data = await AV.Cloud.run('updateShimo');
         console.log(data);
