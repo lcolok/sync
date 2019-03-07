@@ -625,9 +625,12 @@ var app = new Vue({
       this.loadingItems = false;
     },
     autoLoad() {
-      let bottomOfWindow = document.documentElement.offsetHeight - document.documentElement.scrollTop - window.innerHeight;
+      var offsetHeight = document.documentElement.offsetHeight || document.body.offsetHeight;
+      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+      let bottomOfWindow = offsetHeight - scrollTop - window.innerHeight;
+      // console.log(this.keywordLasttime);
       // console.log(bottomOfWindow);
-      if ((bottomOfWindow <= 50) && !this.loadingItems && this.keywordLasttime=='') {
+      if (bottomOfWindow <= 50 && !this.loadingItems && this.keywordLasttime == null) {//如果已经进行过搜索的话,就不会进行自动加载
         this.loadingItems = true;
         this.hasLoadedPages++;
         this.loadMoreItems();
@@ -685,10 +688,11 @@ var app = new Vue({
         AV.Object.createWithoutData('ShimoBed', currentVideo.id)
           .destroy()
           .then(function () {
-            this.mainList.results.splice(this.mainList.results.indexOf(currentVideo), 1)
-            this.bottomSheet = false;
+         
+            app.mainList.results.splice(app.mainList.results.indexOf(currentVideo), 1)
+            app.bottomSheet = false;
           })
-          .catch(alert);
+          .catch((err)=>{console.log(err);});
 
       } else {
         console.error("没有石墨评论id号,无法删除!");
@@ -896,8 +900,17 @@ var app = new Vue({
     },
     getQ() {
       var keyword = this.getUrlVars().q;
-      if (!keyword) { return this.keyword = '' }
-      else { this.keyword = decodeURIComponent(keyword); this.searchByKeyword(); return }
+      if (!keyword) {
+        return this.keyword = ''
+      }
+      else {
+        this.keyword = decodeURIComponent(keyword);
+        this.keywordLasttime = decodeURIComponent(keyword);
+
+        this.searchByKeyword();
+
+        return
+      }
     },
     submit(e) {
       // key.Code === 13表示回车键 
@@ -1245,6 +1258,7 @@ var app = new Vue({
       }
 
       if (key) {
+
         results = await app.searchLC(key);
 
         if (results == "") {
@@ -1270,8 +1284,10 @@ var app = new Vue({
           }
           return
         }
+
+        app.keywordLasttime = key;
       }
-      app.keywordLasttime = key;
+
 
       app.mainList.results = results;
 
@@ -1306,7 +1322,7 @@ var app = new Vue({
       var target = this;
       if (target.keywordLasttime != target.keyword) {
         target.mainList.results = [];
-        target.keywordLasttime = '';
+        // target.keywordLasttime = '';
         if (target.lastTime == 0) {
           this.searchDelay(target, delay);
         } else {
