@@ -627,7 +627,7 @@ var app = new Vue({
     autoLoad() {
       let bottomOfWindow = document.documentElement.offsetHeight - document.documentElement.scrollTop - window.innerHeight;
       // console.log(bottomOfWindow);
-      if ((bottomOfWindow <= 50) && !this.loadingItems) {
+      if ((bottomOfWindow <= 50) && !this.loadingItems && this.keywordLasttime=='') {
         this.loadingItems = true;
         this.hasLoadedPages++;
         this.loadMoreItems();
