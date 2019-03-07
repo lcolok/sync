@@ -17,6 +17,9 @@ var app = new Vue({
   data: () => ({
     user: null,
 
+    maxItemsPerPage: 20,
+    hasLoadedPages: 0,
+
     moreBottomSheet: false,
     loadingDialog: {},
     fileDescription: [
@@ -300,12 +303,14 @@ var app = new Vue({
 
 
     },
+    tempPlayingID: '',
     primaryDrawer: {
       model: false,//决定一开始是展开状态还是折叠状态
       type: 'default (no property)',
       clipped: false,
       floating: false,
-      mini: false
+      mini: false,
+
     },
     footer: {
       inset: false
@@ -394,6 +399,7 @@ var app = new Vue({
   created() {
     this.autoLogin();
     this.captchaInit();
+
   },
   mounted() {
     if (this.user) {
@@ -404,6 +410,7 @@ var app = new Vue({
       this.getV();
       this.getID();
       this.pasteEvent();
+      this.searchShimo('');
     }
   },
   watch: {
@@ -606,10 +613,32 @@ var app = new Vue({
         this.hover = true;
       }, 800);
     },
+    loadMoreItems: async function () {
+      var query = new AV.Query('ShimoBed');
+      query.descending("updatedAt");
+      query.limit(this.maxItemsPerPage * (this.hasLoadedPages + 1));//请求数量上限为1000条
+      var every = await query.find();
+
+      console.log(every);
+
+      app.mainList.results = app.makeAList(every);
+      this.loadingItems = false;
+    },
+    autoLoad() {
+      let bottomOfWindow = document.documentElement.offsetHeight - document.documentElement.scrollTop - window.innerHeight;
+      // console.log(bottomOfWindow);
+      if ((bottomOfWindow <= 50) && !this.loadingItems) {
+        this.loadingItems = true;
+        this.hasLoadedPages++;
+        this.loadMoreItems();
+      }
+    },
 
     occurFab() {
       var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
-      // console.log(scrollTop);
+      /*       console.log(`已经滚动：${scrollTop}`);
+            console.log(`窗口高度：${window.innerHeight}`);
+            console.log(`两者之差：${window.innerHeight - scrollTop}`); */
       this.windowSize = { x: window.innerWidth, y: window.innerHeight }
       if (scrollTop > this.windowSize.y * 0.1) {
         this.floatBTN_Occur = 1;
@@ -840,7 +869,7 @@ var app = new Vue({
         let query = new AV.Query('ShimoBed');
         query.get(id).then(function (item) {
           var newDic = app.makeNewDic(item);
-          console.log(newDic);
+          // console.log(newDic);
           app.howToPlay(newDic);
           app.initClipboardJS();
         }, function (error) {
@@ -1136,10 +1165,44 @@ var app = new Vue({
       //    console.log("找到了 " + query.hits() + " 个文件.");
       return app.makeAList(resp);
     },
+    regularCheckUpdate: async function () {
+      var data = await AV.Cloud.run('updateShimo');
+      console.log(data);
 
+      if (data > 0) {
+        app.snackbar.show = false;
+        app.snackbar = {
+          show: true,
+          color: 'success',
+          ripple: false,
+          snackbarText: `新增${data}条记录`,
+          snackbarIcon: 'mdi-sync',
+          action: () => {
+
+          }
+        };
+      } else {
+        this.showTop20();
+
+      }
+
+      var query = new AV.Query('ShimoBed');
+      query.descending("updatedAt");
+      query.limit(this.maxItemsPerPage * (this.hasLoadedPages + 1));//请求数量上限为1000条
+      var every = await query.find();
+
+      console.log(every);
+
+      return app.makeAList(every);
+      // console.log(results);
+    },
     searchShimo: async function (key) {
       var startTime = new Date();
-      var results = "";
+      var results;
+
+      if (!key) {
+        results = await this.regularCheckUpdate();
+      }
 
       //如果识别为网址的话
       var matchedURL = key.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gm);
@@ -1181,42 +1244,10 @@ var app = new Vue({
         this.getID(objectID);
       }
 
-      if (!key) {
-        var data = await AV.Cloud.run('updateShimo');
-        console.log(data);
+      if (key) {
+        results = await app.searchLC(key);
 
-        if (data > 0) {
-          app.snackbar.show = false;
-          app.snackbar = {
-            show: true,
-            color: 'success',
-            ripple: false,
-            snackbarText: `新增${data}条记录`,
-            snackbarIcon: 'mdi-sync',
-            action: () => {
-
-            }
-          };
-        } else {
-          this.showTop20();
-
-        }
-
-        var query = new AV.Query('ShimoBed');
-        query.descending("updatedAt");
-        query.limit(20);//请求数量上限为1000条
-        var every = await query.find();
-
-        console.log(every);
-
-        results = app.makeAList(every);
-        // console.log(results);
-      } else {
-
-        var results = await app.searchLC(key);
-        // alert(JSON.stringify(this.todos[0]));
         if (results == "") {
-
           // Vue.toasted.show(`找不到关于“${key}”的项目`, {
           //   position: 'top-center',
           //   theme: 'toasted-primary',//Theme of the toast you prefer['toasted-primary', 'outline', 'bubble']
@@ -1235,14 +1266,12 @@ var app = new Vue({
             snackbarText: `找不到关于“${key}”的项目`,
             snackbarIcon: 'report_problem',
             action: () => {
-
             }
           }
           return
         }
       }
       app.keywordLasttime = key;
-      // console.log(app.mainList.results);
 
       app.mainList.results = results;
 
