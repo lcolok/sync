@@ -2,7 +2,39 @@
   display: none;
 }
 
+.badge {
+  background-color: white;
+  -webkit-border-radius: 40px;
+  border-radius: 40px;
+  -webkit-box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  color: rgba(0, 0, 0, .54);
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  height: 30px;
+  line-height: 40px;
+  margin-left: 8px;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, .1);
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 3px 0 6px;
+}
 
+.shadowChip {
+  background-color: white;
+  -webkit-border-radius: 40px;
+  border-radius: 40px;
+  -webkit-box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  box-shadow: 0 2px 6px rgba(32, 33, 36, 0.28);
+  color: rgba(0, 0, 0, .54);
+  display: inline-block;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, .1);
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
 .custom-loader {
   animation: loader 1s infinite;
