@@ -437,7 +437,7 @@
         </v-expand-transition>
 
         <v-slide-y-transition>
-          <v-subheader class='caption' v-if='(mainList.results.length!=0)&&(keywordLasttime!="")'>
+          <v-subheader class='caption' v-if='(mainList.results.length!=0)&&(keywordLasttime!=null)'>
             找到有关『{{keywordLasttime}}』的{{mainList.results.length}}条结果（用时{{searchDuration}}秒）
           </v-subheader>
         </v-slide-y-transition>

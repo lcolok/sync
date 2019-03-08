@@ -405,12 +405,14 @@ var app = new Vue({
     if (this.user) {
       this.getScrollStyle();
       this.initPlayers();
+      this.initPasteEvent();
       //处理Params
-      this.getQ();
-      this.getV();
-      this.getID();
-      this.pasteEvent();
-      this.searchShimo('');
+      // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchShimo('')))
+      if (this.getQ()) { return };
+      if (this.getV()) { return };
+      if (this.getV()) { return };
+      if (this.searchShimo('')) { return };
+
     }
   },
   watch: {
@@ -531,7 +533,7 @@ var app = new Vue({
         }
       }
     },
-    pasteEvent() {
+    initPasteEvent() {
       //paste事件监听
       document.addEventListener("paste", function (e) {
 
@@ -565,7 +567,7 @@ var app = new Vue({
                 return
                 app.searchShimo(text);
               })
-
+  
               break;
           }
         } */
@@ -688,11 +690,11 @@ var app = new Vue({
         AV.Object.createWithoutData('ShimoBed', currentVideo.id)
           .destroy()
           .then(function () {
-         
+
             app.mainList.results.splice(app.mainList.results.indexOf(currentVideo), 1)
             app.bottomSheet = false;
           })
-          .catch((err)=>{console.log(err);});
+          .catch((err) => { console.log(err); });
 
       } else {
         console.error("没有石墨评论id号,无法删除!");
@@ -883,8 +885,9 @@ var app = new Vue({
 
 
         return true;
+      } else {
+        return false;
       }
-      return false;
     },
     getV() {
       var v = this.getUrlVars().v;
@@ -896,20 +899,21 @@ var app = new Vue({
         this.dpFloat.switchVideo({
           url: v,
         });
+        return true
+      } else {
+        return false
       }
     },
     getQ() {
       var keyword = this.getUrlVars().q;
       if (!keyword) {
-        return this.keyword = ''
+        this.keyword = '';
+        return false
       }
       else {
         this.keyword = decodeURIComponent(keyword);
-        this.keywordLasttime = decodeURIComponent(keyword);
-
         this.searchByKeyword();
-
-        return
+        return true
       }
     },
     submit(e) {
