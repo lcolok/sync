@@ -1,7 +1,7 @@
 'use strict'
 
 // 禁止右键菜单
-document.oncontextmenu = function () { return false; };
+// document.oncontextmenu = function () { return false; };
 // 禁止文字选择
 // document.onselectstart = function(){ return false; };
 // 禁止复制

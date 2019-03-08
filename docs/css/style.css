@@ -2,20 +2,23 @@
   display: none;
 }
 
+
+
 .custom-loader {
   animation: loader 1s infinite;
   display: flex;
 }
+
 .card--flex-toolbar {
   margin-top: -64px;
 }
 
-.scrollContainer{
+.scrollContainer {
   width: auto;
-  height: auto;   
+  height: auto;
   -webkit-overflow-scrolling: touch;
-  overflow-y: auto;       
-  overflow-x: hidden;    
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 @-moz-keyframes loader {
@@ -26,6 +29,7 @@
     transform: rotate(360deg);
   }
 }
+
 @-webkit-keyframes loader {
   from {
     transform: rotate(0);
@@ -34,6 +38,7 @@
     transform: rotate(360deg);
   }
 }
+
 @-o-keyframes loader {
   from {
     transform: rotate(0);
@@ -42,6 +47,7 @@
     transform: rotate(360deg);
   }
 }
+
 @keyframes loader {
   from {
     transform: rotate(0);
@@ -51,13 +57,13 @@
   }
 }
 
-input[type="search"]{
-  -webkit-appearance:none;
-
+input[type="search"] {
+  -webkit-appearance: none;
 }
-input::-webkit-search-cancel-button {display: none;}
 
-
+input::-webkit-search-cancel-button {
+  display: none;
+}
 
 /* 以下是新增的Dplayer播放窗口组件的CSS */
 
@@ -65,7 +71,6 @@ video {
   max-width: 100%;
   display: block;
   margin: 1em auto;
-  
 }
 
 .output {

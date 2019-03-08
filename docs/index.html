@@ -418,7 +418,7 @@
 
         <v-expand-transition>
           <v-tabs v-model="tabs" v-if='(mainList.results.length!=0)&&(typeList.length!=0)' color="transparent"
-            slider-color="primary" :show-arrows='showArrow'>
+            slider-color="primary" :show-arrows='showArrow' height='60'>
 
             <v-tab v-for="(n, index)  in typeList" v-if="n.count>0" :key='index'
               @change='mainList.results = n.subClassArr;'>
