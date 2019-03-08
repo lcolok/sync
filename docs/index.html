@@ -308,11 +308,12 @@
 
 
             <v-list-tile>
-              <v-toolbar flat class='transparent'>
-                <v-layout align-center justify-space-between row fill-height />
 
-                <div class="text-xs-center" v-for="x in bottomSheetToolbar" v-if='x.showInSheet'
-                  :key='bottomSheetToolbar.text'>
+              <v-toolbar flat class='transparent'>
+                <v-layout align-center v-bind="layoutAttributes" row fill-height />
+
+                <div class="text-xs-center" v-for="x in bottomSheetToolbar"
+                  v-show='x.showInSheet||$vuetify.breakpoint.name!=="xs"' :key='bottomSheetToolbar.text'>
                   <v-btn flat fab @click="x.action(currentVideo,$event);" :id='x.text'>
                     <v-flex class='caption'>
                       <v-layout align-center justify-center column fill-height />
@@ -323,7 +324,8 @@
 
                 <div class="text-xs-center">
                   <v-bottom-sheet v-model='moreBottomSheet' bottom left offset-y>
-                    <v-btn slot="activator" flat fab @click="moreBTN.action($event);" :id='moreBTN.text'>
+                    <v-btn slot="activator" flat fab @click="moreBTN.action($event);" :id='moreBTN.text'
+                      v-show='($vuetify.breakpoint.name=="xs")'>
                       <v-flex class='caption'>
                         <v-layout align-center justify-center column fill-height />
                         <v-icon size=20>{{moreBTN.icon}}</v-icon>{{moreBTN.text}}
@@ -352,6 +354,7 @@
 
 
               </v-toolbar>
+
             </v-list-tile>
 
             <v-divider></v-divider>
@@ -375,17 +378,17 @@
 
               <v-card flat v-if='infoPanel' class="scrollContainer">
 
-                <v-container>
-                  <v-layout v-scroll:#scroll-target="" mx-2 column />
-                  <v-list-tile-content>
+                <v-flex xs2>
+                  <v-layout v-scroll:#scroll-target="" ma-4 column align-begin justify-begin />
+                  <v-card>
                     创建时间:
                     {{ `${currentVideo.createdAt.toLocaleDateString()} ${currentVideo.createdAt.toLocaleTimeString()}` }}
-                  </v-list-tile-content>
-                  <v-list-tile-content>
+                  </v-card>
+                  <v-card>
                     修改时间:
                     {{ `${currentVideo.updatedAt.toLocaleDateString()} ${currentVideo.updatedAt.toLocaleTimeString()}` }}
-                  </v-list-tile-content>
-                </v-container>
+                  </v-card>
+                </v-flex>
 
               </v-card>
             </v-expand-transition>
@@ -399,12 +402,12 @@
 
 
 
+          <v-flex id="scroll-target" class="scrollContainer">
+            <v-layout v-scroll:#scroll-target="" ma-4 column align-center justify-center />
 
-          <v-container id="scroll-target" class="scrollContainer">
-            <v-layout v-scroll:#scroll-target="" mx-2 column align-center justify-center>
-              一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字
-            </v-layout>
-          </v-container>
+            一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字
+
+          </v-flex>
 
 
 
@@ -420,104 +423,118 @@
 
         <v-expand-transition>
           <v-tabs v-model="tabs" v-if='(mainList.results.length!=0)&&(typeList.length!=0)' color="transparent"
-            slider-color="primary" :show-arrows='showArrow' >
-            <v-layout align-center justify-center row fill-height />
-            <v-tab v-for="(n, index)  in typeList" v-if="n.count>0" :key='index'
+            slider-color="primary" :show-arrows='showArrow'>
+            <v-layout align-center justify-begin row fill-height />
+            <v-tab :ripple="false" class="badgeGrey" v-for="(n, index)  in typeList" v-if="n.count>0" :key='index'
               @change='mainList.results = n.subClassArr;'>
-              <v-chip class="shadowChip" color="white" text-color="">
-                <v-icon :size='n.size'>{{n.icon}}</v-icon>
-                <v-flex ml-2>{{n.text}}</v-flex>
-                <v-divider class="mx-1" inset vertical></v-divider>
-                <v-flex>
-                  <span>{{n.count}}</span>
-                </v-flex>
-              </v-chip>
+              <!-- <v-chip class="shadowChip" color="white" text-color=""> -->
+
+              <v-icon :size='n.size'>{{n.icon}}</v-icon>
+              <v-flex ml-2>{{n.text}}</v-flex>
+              <!-- <v-divider class="mx-1" vertical></v-divider> -->
+              <v-flex class="circleNumber">
+                <v-flex>{{n.count<=99 ? n.count:'99+'}}</v-flex>
+              </v-flex>
+
+              <!-- </v-chip> -->
             </v-tab>
           </v-tabs>
         </v-expand-transition>
 
         <v-slide-y-transition>
-          <v-subheader class='caption' v-if='(mainList.results.length!=0)&&(keywordLasttime!=null)'>
-            找到有关『{{keywordLasttime}}』的{{mainList.results.length}}条结果（用时{{searchDuration}}秒）
+          <v-subheader class='caption' v-if='(resultSumLasttime!=null)&&(keywordLasttime!=null)'>
+            找到有关『{{keywordLasttime}}』的{{resultSumLasttime}}条结果（用时{{searchDuration}}秒）
           </v-subheader>
         </v-slide-y-transition>
 
 
         <v-slide-y-transition>
           <v-layout align-center justify-center v-if='mainList.results.length!=0'>
-            <v-flex xs12 mb-5>
-              <v-card>
-                <v-list two-line>
+            <v-flex>
 
-                  <template v-for="(result, index) in mainList.results">
+              <v-list two-line>
 
-                    <v-list-tile :key="result.attributes.title" avatar ripple @click=""
-                      @contextmenu="rightClick(index,$event)">
-                      <v-badge :color="result.attributes.canPlay?result.attributes.canPlay.color:'primary'" left
-                        overlap>
-                        <!-- <v-icon slot="badge" dark small>done</v-icon> -->
-                        <v-icon v-if='result.attributes.canPlay' color="white" slot="badge">
-                          {{result.attributes.canPlay.icon}}</v-icon>
-                        <v-list-tile-avatar ripple @click="">
+                <template v-for="(result, index) in mainList.results">
 
-                          <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" small
-                            fab>
-                            <v-icon>{{ result.attributes.icon }}</v-icon>
-                          </v-btn>
-                          <v-btn v-else class="grey lighten-1 white--text caption" small fab>
-                            <div>{{ result.attributes.suffix }}</div>
-                          </v-btn>
+                  <v-list-tile :key="result.attributes.title" avatar ripple @click=""
+                    @contextmenu="rightClick(index,$event)">
+                    <v-badge :color="result.attributes.canPlay?result.attributes.canPlay.color:'primary'" left overlap>
+                      <!-- <v-icon slot="badge" dark small>done</v-icon> -->
+                      <v-icon v-if='result.attributes.canPlay' color="white" slot="badge">
+                        {{result.attributes.canPlay.icon}}</v-icon>
+                      <v-list-tile-avatar ripple @click="">
 
-                        </v-list-tile-avatar>
-                      </v-badge>
+                        <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" small fab>
+                          <v-icon>{{ result.attributes.icon }}</v-icon>
+                        </v-btn>
+                        <v-btn v-else class="grey lighten-1 white--text caption" small fab>
+                          <div>{{ result.attributes.suffix }}</div>
+                        </v-btn>
+
+                      </v-list-tile-avatar>
+                    </v-badge>
 
 
 
 
 
-                      <v-list-tile-content @click="howToPlay(result)">
-
+                    <v-list-tile-content @click="howToPlay(result)">
+                      <v-layout align-start justify-center column fill-height />
+                      <v-card flat class='transparent'>
                         <v-list-tile-title class="font-weight-bold subheading">{{ result.attributes.name }}
                         </v-list-tile-title>
-                        <v-list-tile-sub-title class="body-2 font-weight-regular text--gray"
-                          v-if="result.attributes.name !== result.attributes.name_trans">
+                      </v-card>
+                      <v-card flat class='transparent' v-if="result.attributes.name !== result.attributes.name_trans">
+                        <v-list-tile-sub-title class="body-2 font-weight-regular text--gray">
                           {{ result.attributes.name_trans }}</v-list-tile-sub-title>
-                        <v-list-tile-sub-title class="caption font-weight-light" v-if="result.attributes.size">
-                          {{ renderSize(result.attributes.size) }}</v-list-tile-sub-title>
-                      </v-list-tile-content>
+                      </v-card>
+                      <!-- <v-list-tile-sub-title class="caption font-weight-light" v-if="result.attributes.size">
+                          {{ renderSize(result.attributes.size) }}</v-list-tile-sub-title> -->
+                      <v-card flat class='transparent'>
+                        <v-layout align-center justify-start row fill-height />
+                        <v-card class='shadowChip' v-if="result.attributes.size" color="orange lighten-4">
+                          <v-flex mx-2 class="caption font-weight-light">{{ result.attributes.suffix }}
+                          </v-flex>
+                        </v-card>
+                        <v-card class='shadowChip' v-if="result.attributes.size" color="primary lighten-4">
+                          <v-flex mx-2 class="caption font-weight-light">{{ renderSize(result.attributes.size) }}
+                          </v-flex>
+                        </v-card>
+                      </v-card>
+                    </v-list-tile-content>
 
 
 
-                      <v-list-tile-action>
-                        <v-btn icon ripple @click="rightClick(index,$event)">
-                          <v-icon color="grey lighten-1">more_horiz</v-icon>
-                        </v-btn>
-                      </v-list-tile-action>
+                    <v-list-tile-action>
+                      <v-btn icon ripple @click="rightClick(index,$event)">
+                        <v-icon color="grey lighten-1">more_horiz</v-icon>
+                      </v-btn>
+                    </v-list-tile-action>
 
-                      <v-menu v-model="showMenu" v-if="index==showMenuIndex" :position-x="MenuX" :position-y="MenuY"
-                        absolute offset-y>
-                        <v-list>
-                          <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
-                            @click="menuItem.action(result,$event)" :name="menuItem.name"
-                            :copyContent='result.attributes.copyContent' :objectID="result.id">
-                            <v-list-tile-avatar>
-                              <v-icon>{{ menuItem.icon }}</v-icon>
-                            </v-list-tile-avatar>
-                            <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
-                          </v-list-tile>
-                        </v-list>
-                      </v-menu>
-
-
-                    </v-list-tile>
-                    <v-divider v-if="index + 1 < mainList.results.length" :key="index" inset></v-divider>
+                    <v-menu v-model="showMenu" v-if="index==showMenuIndex" :position-x="MenuX" :position-y="MenuY"
+                      absolute offset-y>
+                      <v-list>
+                        <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
+                          @click="menuItem.action(result,$event)" :name="menuItem.name"
+                          :copyContent='result.attributes.copyContent' :objectID="result.id">
+                          <v-list-tile-avatar>
+                            <v-icon>{{ menuItem.icon }}</v-icon>
+                          </v-list-tile-avatar>
+                          <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </v-menu>
 
 
+                  </v-list-tile>
+                  <v-divider v-if="index + 1 < mainList.results.length" :key="index" inset></v-divider>
 
 
-                  </template>
 
-                  <!--                   <v-menu v-model='showMenu' :position-x="MenuX" :position-y="MenuY" absolute offset-y>
+
+                </template>
+
+                <!--                   <v-menu v-model='showMenu' :position-x="MenuX" :position-y="MenuY" absolute offset-y>
                     <v-btn slot="activator" icon ripple>
                       <v-icon color="grey lighten-1">more_horiz</v-icon>
                     </v-btn>
@@ -532,8 +549,8 @@
                   </v-menu> -->
 
 
-                </v-list>
-              </v-card>
+              </v-list>
+
             </v-flex>
 
 

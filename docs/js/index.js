@@ -1,7 +1,7 @@
 'use strict'
 
 // 禁止右键菜单
-// document.oncontextmenu = function () { return false; };
+document.oncontextmenu = function () { return false; };
 // 禁止文字选择
 // document.onselectstart = function(){ return false; };
 // 禁止复制
@@ -236,6 +236,7 @@ var app = new Vue({
     currentVideo: { attributes: {} },
     searchDuration: 0,
     keywordLasttime: null,
+    resultSumLasttime: null,
     typeList: [
 
       {
@@ -343,6 +344,16 @@ var app = new Vue({
     arrowDegree: 0,
   }),
   computed: {
+    layoutAttributes() {
+      var BPN = this.$vuetify.breakpoint.name;
+      console.log(BPN);
+      switch (BPN) {
+        case 'xs':
+          return { 'justify-space-between': true };
+        default:
+          return { 'jusetify-begin': true };
+      }
+    },
     activeFab() {
       switch (this.fab) {
         case true: return { color: 'red', icon: 'close' }
@@ -403,6 +414,7 @@ var app = new Vue({
   },
   mounted() {
     if (this.user) {
+
       this.getScrollStyle();
       this.initPlayers();
       this.initPasteEvent();
@@ -410,12 +422,13 @@ var app = new Vue({
       // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchShimo('')))
       if (this.getQ()) { return };
       if (this.getV()) { return };
-      if (this.getV()) { return };
+      if (this.getID()) { return };
       if (this.searchShimo('')) { return };
 
     }
   },
   watch: {
+
     'primaryDrawer.model'(val) {
       if (val) return;
       if (!tempPlayingID) return;
@@ -456,6 +469,16 @@ var app = new Vue({
         } */
   },
   methods: {
+    /*     screenSizeStatus() {
+          console.log(this.$vuetify.breakpoint.name);
+          switch (this.$vuetify.breakpoint.name) {
+            case 'xs': return '220px';
+            case 'sm': return '400px';
+            case 'md': return '500px';
+            case 'lg': return '600px';
+            case 'xl': return '800px';
+          }
+        }, */
     autoLogin() {
       var user = AV.User.current()
       if (user) {
@@ -732,11 +755,22 @@ var app = new Vue({
         console.log(e);
       });
 
-      //获取ID的复制按钮初始化
+      //bottomSheet里面的获取ID的复制按钮初始化
+      new ClipboardJS(document.getElementById('获取ID'), {
+        text: function (trigger) {
+          return app.currentVideo.id;
+        }
+      }).on('success', function (e) {
+        app.copySuccess();
+      }).on('error', function (e) {
+        console.log(e);
+      });
+
+      //more按钮的获取ID的复制按钮初始化
       new ClipboardJS(document.getElementsByName('getID'), {
         text: function (trigger) {
-          console.log(trigger);
-          console.log(trigger.getAttribute('objectID'));
+          // console.log(trigger);
+          // console.log(trigger.getAttribute('objectID'));
           return trigger.getAttribute('objectID')
         }
 
@@ -746,6 +780,8 @@ var app = new Vue({
       }).on('error', function (e) {
         console.log(e);
       });
+
+
     },
     expandPanel() {
       this.arrowDegree += 180;
@@ -1219,49 +1255,46 @@ var app = new Vue({
 
       if (!key) {
         results = await this.regularCheckUpdate();
-      }
-
-      //如果识别为网址的话
-      var matchedURL = key.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gm);
-      if (matchedURL) {
-        console.log('即将执行webClipper');
-        app.loadingDialog = {
-          model: true,
-          text: '正在摘抄您指定的URL'
-        };
-        matchedURL.forEach(e => {
-          AV.Cloud.run('webClipper', {
-            url: e,
-          }).then(function (data) {
-            // 成功
-            console.log(data);
-            app.loadingDialog.model = false;
-            app.snackbar.show = false;
-            app.snackbar = {
-              show: true,
-              color: 'success',
-              ripple: false,
-              snackbarText: `文章已保存到石墨上`,
-              snackbarIcon: 'mdi-content-save',
-              actionText: '点击查看',
-              action: () => {
-                window.open(data.docURL);
-              }
-            };
-          }, function (error) {
-            // 失败
-            console.log(error);
-          });
-        })
-        return
-      }
-      //如果识别为objectID的话
-      var objectID = key.match(/[0-9a-zA-Z]{24}/gm);
-      if (objectID) {
-        this.getID(objectID);
-      }
-
-      if (key) {
+      } else {
+        //如果识别为网址的话
+        var matchedURL = key.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gm);
+        if (matchedURL) {
+          console.log('即将执行webClipper');
+          app.loadingDialog = {
+            model: true,
+            text: '正在摘抄您指定的URL'
+          };
+          matchedURL.forEach(e => {
+            AV.Cloud.run('webClipper', {
+              url: e,
+            }).then(function (data) {
+              // 成功
+              console.log(data);
+              app.loadingDialog.model = false;
+              app.snackbar.show = false;
+              app.snackbar = {
+                show: true,
+                color: 'success',
+                ripple: false,
+                snackbarText: `文章已保存到石墨上`,
+                snackbarIcon: 'mdi-content-save',
+                actionText: '点击查看',
+                action: () => {
+                  window.open(data.docURL);
+                }
+              };
+            }, function (error) {
+              // 失败
+              console.log(error);
+            });
+          })
+          return
+        }
+        //如果识别为objectID的话
+        var objectID = key.match(/[0-9a-zA-Z]{24}/gm);
+        if (objectID) {
+          this.getID(objectID);
+        }
 
         results = await app.searchLC(key);
 
@@ -1292,6 +1325,7 @@ var app = new Vue({
         app.keywordLasttime = key;
       }
 
+      app.resultSumLasttime = results.length;
 
       app.mainList.results = results;
 
