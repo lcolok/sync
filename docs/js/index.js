@@ -824,7 +824,6 @@ var app = new Vue({
       return `${size} ${unitArr[index]}`;
     },
     howToPlay(item) {
-
       switch (item.attributes.type) {
         case '视频':
         case '大视频':
@@ -862,6 +861,16 @@ var app = new Vue({
           });
           break;
         default:
+          app.snackbar.show = false;
+          app.snackbar = {
+            show: true,
+            color: 'error',
+            ripple: false,
+            snackbarText: `暂不支持『${item.attributes.type}』的预览`,
+            snackbarIcon: 'report_problem',
+            action: () => {
+            }
+          }
           return
       }
     },
@@ -907,11 +916,14 @@ var app = new Vue({
     getID(id) {
       id = id ? id : this.getUrlVars().id;
 
+
       if (id) {
         let query = new AV.Query('ShimoBed');
         query.get(id).then(function (item) {
+
           var newDic = app.makeNewDic(item);
           // console.log(newDic);
+
           app.howToPlay(newDic);
           app.initClipboardJS();
         }, function (error) {
