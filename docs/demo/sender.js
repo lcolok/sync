@@ -13,7 +13,7 @@ id.run({
             appKey: 'g7G4uPGRbJc5GaK4yn36FqkC',
         });
 
-        var src = '/Users/seisakubu/Downloads/AnimationComposer_2.9.1_win.zip';
+        var src = '/Users/seisakubu/Desktop/测试删除的视频.mov';
         var data = fs.createReadStream(src);
         var size = fs.lstatSync(src).size;
         // console.log(data);
