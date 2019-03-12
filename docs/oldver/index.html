@@ -9,7 +9,7 @@
       appKey: 'vLplaY3j4OYf3e6e603sb0JX',
     });
   </script>
-<!--   <script>
+  <!--   <script>
     function getUrlVars() {
       var vars = {};
       var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
@@ -46,28 +46,35 @@
   <link rel="shortcut icon" href="https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png">
   <link rel="stylesheet" href="public/stylesheets/fbui.css">
   <style>
-    [v-cloak] { display: none; }
-      .userinfo {
-        position: absolute;
-        bottom: -46px;
-        width: 100%;
-        font-size: 100%;
-      }
-      #login input {
-        padding: 16px;
-        text-align: center;
-      }
-      #login input:disabled {
-        color: #ddd;
-        cursor: not-allowed;
-      }
-      #login .control {
-        display: flex;
-      }
-      #login-button {
-        background-color: #fafafa;
-      }
-    </style>
+    [v-cloak] {
+      display: none;
+    }
+
+    .userinfo {
+      position: absolute;
+      bottom: -46px;
+      width: 100%;
+      font-size: 100%;
+    }
+
+    #login input {
+      padding: 16px;
+      text-align: center;
+    }
+
+    #login input:disabled {
+      color: #ddd;
+      cursor: not-allowed;
+    }
+
+    #login .control {
+      display: flex;
+    }
+
+    #login-button {
+      background-color: #fafafa;
+    }
+  </style>
 </head>
 
 <body>
@@ -110,7 +117,8 @@
       <section class="main" v-show="todos.length">
         <input class="toggle-all" type="checkbox" v-model="allDone">
         <ul class="todo-list">
-          <li v-for="todo in filteredTodos" class="todo" :key="todo.objectId" :class="{ completed: todo.done, editing: todo == editedTodo }">
+          <li v-for="todo in filteredTodos" class="todo" :key="todo.objectId"
+            :class="{ completed: todo.done, editing: todo == editedTodo }">
             <div class="view">
 
               <input class="toggle" type="checkbox" v-model="todo.done" @change="multiSelection()">
@@ -121,10 +129,10 @@
                 <div class="v-cloak">{{ todo.copyContent }}</div>
                 <button title="播放" style="cursor:pointer; font-size: 1em; color: Tomato;"><i class="fas fa-play-circle"
                     @click="playVideo(todo)"></i></button>
-                <button title="下载" style="cursor:pointer; font-size: 1em; color: Dodgerblue;"><i class="fas fa-arrow-alt-circle-down"
-                    @click="download(todo)"></i></button>
-                <button title="删除" style="cursor:pointer; font-size: 1em; color: Mediumslateblue;"><i class="fas fa-trash-alt"
-                    @click="deleteContent(todo)"></i></button>
+                <button title="下载" style="cursor:pointer; font-size: 1em; color: Dodgerblue;"><i
+                    class="fas fa-arrow-alt-circle-down" @click="download(todo)"></i></button>
+                <button title="删除" style="cursor:pointer; font-size: 1em; color: Mediumslateblue;"><i
+                    class="fas fa-trash-alt" @click="deleteContent(todo)"></i></button>
               </label>
               <!-- 上面ENS的意思就是指Emoji+Name+Vertical bar+ShortURL的首字母缩写,便于短链复制和分享 -->
 
@@ -137,8 +145,8 @@
               <!-- <button class="destroy" @click="removeTodo(todo)"></button>   -->
 
             </div>
-            <input class="edit" type="text" v-model="todo.content" v-todo-focus="todo == editedTodo" @blur="doneEdit(todo)"
-              @keyup.enter="doneEdit(todo)" @keyup.esc="cancelEdit(todo)">
+            <input class="edit" type="text" v-model="todo.content" v-todo-focus="todo == editedTodo"
+              @blur="doneEdit(todo)" @keyup.enter="doneEdit(todo)" @keyup.esc="cancelEdit(todo)">
           </li>
         </ul>
       </section>
@@ -368,8 +376,8 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAQMklEQVR42u
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-toasted/1.1.26/vue-toasted.min.js"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <!-- 引入谷歌的Material Icons -->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
-    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 
   <script>
     Vue.use(Toasted, {

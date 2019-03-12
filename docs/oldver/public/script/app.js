@@ -605,10 +605,10 @@ function jump() {
   var currentURL = window.location.href;
   console.log(currentURL);
   if (currentURL.match(/\/index\.html/)) {//如果存在index.html的话
-    var redirectURL = currentURL.replace(/\/index\.html/,'/vuetify')
+    var redirectURL = currentURL.replace(/\/index\.html/, '/vuetify')
     window.open(redirectURL);
   } else {//如果是本地打开的话
-    var domain = currentURL+'/vuetify';
+    var domain = currentURL + '/vuetify';
     window.open(domain);
   }
 

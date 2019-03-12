@@ -378,16 +378,41 @@
 
               <v-card flat v-if='infoPanel' class="scrollContainer">
 
-                <v-flex xs2>
-                  <v-layout v-scroll:#scroll-target="" ma-4 column align-begin justify-begin />
-                  <v-card>
+                <v-flex xs12>
+                  <v-layout v-scroll:#scroll-target="" ma-4 column align-start justify-start />
+                  <v-flex>
                     创建时间:
-                    {{ `${currentVideo.createdAt.toLocaleDateString()} ${currentVideo.createdAt.toLocaleTimeString()}` }}
-                  </v-card>
-                  <v-card>
+                    <v-card class='shadowChip' color="orange lighten-4">
+                      <v-flex mx-2>
+                        {{ `${currentVideo.createdAt.toLocaleDateString()} ${currentVideo.createdAt.toLocaleTimeString()}` }}
+                      </v-flex>
+                    </v-card>
+                  </v-flex>
+
+                  <v-flex>
                     修改时间:
-                    {{ `${currentVideo.updatedAt.toLocaleDateString()} ${currentVideo.updatedAt.toLocaleTimeString()}` }}
-                  </v-card>
+                    <v-card class='shadowChip' color="orange lighten-4">
+                      <v-flex mx-2>
+                        {{ `${currentVideo.updatedAt.toLocaleDateString()} ${currentVideo.updatedAt.toLocaleTimeString()}` }}
+                      </v-flex>
+                    </v-card>
+                  </v-flex>
+
+                  <v-flex>
+                    文件后缀:
+                    <v-card class='shadowChip' color="orange lighten-4">
+                      <v-flex mx-2>{{ currentVideo.attributes.suffix }}
+                      </v-flex>
+                    </v-card>
+                  </v-flex>
+                  <v-flex>
+                    文件体积:
+                    <v-card class='shadowChip' color="primary lighten-4">
+                      <v-flex mx-2>{{ renderSize(currentVideo.attributes.size) }}
+                      </v-flex>
+                    </v-card>
+                  </v-flex>
+
                 </v-flex>
 
               </v-card>
@@ -462,7 +487,7 @@
                       <!-- <v-icon slot="badge" dark small>done</v-icon> -->
                       <v-icon v-if='result.attributes.canPlay' color="white" slot="badge">
                         {{result.attributes.canPlay.icon}}</v-icon>
-                      <v-list-tile-avatar ripple @click="">
+                      <v-list-tile-avatar ripple @click="howToPlay(result)">
 
                         <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" small fab>
                           <v-icon>{{ result.attributes.icon }}</v-icon>
