@@ -12,7 +12,7 @@ var main = new Vue({
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            path: 'assets/牛油果先生.json'
+            path: 'assets/mr_niuyouguo.json'
         })
 
         var fingerAnimation = bodymovin.loadAnimation({
