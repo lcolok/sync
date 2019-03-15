@@ -1,12 +1,28 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Error</title>
-    <link rel="stylesheet" href="/stylesheets/style.css">
-  </head>
-  <body>
-    <h1><%= message %></h1>
-    <h2><%= error.status %></h2>
-    <pre><%= error.stack %></pre>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="referrer" content="never" />
+  <meta name="referrer" content="no-referrer" />
+  <link rel="shortcut icon" href="https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png">
+  <title>出错啦！</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body>
+  <div id="bm" onclick='console.log("aaaaa")'> </div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.4.4/lottie.min.js"></script>
+<script>
+  var animation = bodymovin.loadAnimation({
+    container: document.getElementById('bm'),
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: 'lottie/404-not-found.json'
+  })
+</script>
+
 </html>
