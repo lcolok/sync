@@ -30,7 +30,7 @@
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   overflow-x: hidden;
-  margin: 40px 30px 0px 30px;
+  margin: 0px 30px 40px 30px;
 }
 
 .badgeGrey {
