@@ -216,10 +216,11 @@ var app = new Vue({
         }
       },
       {
-        icon: 'mdi-apple-safari', text: '创建捷径', action: () => {
+        icon: 'mdi-apple-safari', text: '桌面图标', action: () => {
           // window.location.href='mqqapi://';//打开QQ
-          var encodedURL = encodeURIComponent("https://www.baidu.com");
-          window.location.href = `x-web-search://?${encodedURL}`
+          // var encodedURL = encodeURIComponent("https://www.baidu.com");
+          // window.location.href = `x-web-search://?${encodedURL}`
+          window.location.href='addIcon';
         }
       },
       {
