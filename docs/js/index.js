@@ -220,7 +220,7 @@ var app = new Vue({
           // window.location.href='mqqapi://';//打开QQ
           // var encodedURL = encodeURIComponent("https://www.baidu.com");
           // window.location.href = `x-web-search://?${encodedURL}`
-          window.location.href='addIcon';
+          window.location.href = 'addIcon';
         }
       },
       {
@@ -546,6 +546,7 @@ var app = new Vue({
     },
     copySuccess() {
       app.snackbar.show = false;
+      sfx.play('https://uploader.shimo.im/f/YOwjiyzl4Kk0Dd5H.mp3?attname=Paste_Copy.mp3');
       app.snackbar = {
         show: true,
         color: 'success',
@@ -1269,7 +1270,7 @@ var app = new Vue({
       if (!key) {
         results = await this.regularCheckUpdate();
       } else {
-        //如果识别为网址的话
+        //如果识别为网址的话 正则
         var matchedURL = key.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gm);
         if (matchedURL) {
           console.log('即将执行webClipper');
