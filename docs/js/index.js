@@ -546,7 +546,7 @@ var app = new Vue({
     },
     copySuccess() {
       app.snackbar.show = false;
-      sfx.play('https://uploader.shimo.im/f/YOwjiyzl4Kk0Dd5H.mp3?attname=Paste_Copy.mp3');
+
       app.snackbar = {
         show: true,
         color: 'success',
@@ -557,6 +557,8 @@ var app = new Vue({
 
         }
       }
+
+      sfx.play('https://uploader.shimo.im/f/YOwjiyzl4Kk0Dd5H.mp3?attname=Paste_Copy.mp3');
     },
     initPasteEvent() {
       //paste事件监听
