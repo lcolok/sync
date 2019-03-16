@@ -4,60 +4,6 @@
 <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
     crossorigin="anonymous"></script>
 <script>
-    async function url2Base64(img) {
-        return new Promise((resolve) => {
-            function getBase64Image(img) {
-                var canvas = document.createElement("canvas");
-                canvas.width = img.width;
-                canvas.height = img.height;
-                var ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0, img.width, img.height);
-                var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
-                var dataURL = canvas.toDataURL("image/" + ext);
-                return dataURL;
-            }
-
-            var image = new Image();
-            image.crossOrigin = '';
-            image.src = img;
-            image.onload = function () {
-                var base64 = getBase64Image(image);
-
-                resolve(base64);
-            }
-        });
-    }
-
-    async function makeMeta(assetsFolderName, html) {
-        //使用$.each方法遍历返回的数据date,插入到id为#result中
-        // console.log(html);
-        var htmlString = html.toString();
-        // console.log(htmlString);
-
-        var matcher = new RegExp("[^`" + `|'|"]*` + assetsFolderName + "[^`" + `|'|"]*`, 'gm');//[^`|'|"]*assets[^`|'|"]*
-
-        var replaceArray = htmlString.match(matcher);
-        console.log(replaceArray);
-
-        var base64Array = [];
-
-        for (var i = 0; i < replaceArray.length; i++) {
-            base64Array.push(await url2Base64(replaceArray[i]));
-        }
-
-        var j = -1;
-        htmlString = htmlString.replace(matcher, function () {
-            j++
-            return base64Array[j];
-        });
-
-        var dataURI = encodeURIComponent(htmlString);
-
-        var meta = `<meta http-equiv="refresh" content="0;URL= data:text/html;charset=utf-8,${dataURI}">`;
-
-        console.log(decodeURIComponent(meta));
-        $("head").prepend(meta);
-    }
 
     function isMobileSafari() {
         var ua = navigator.userAgent;
@@ -86,13 +32,68 @@
                 url: "middle.html",
                 cache: false,
                 success: async function (html) {
+                    async function url2Base64(img) {
+                        return new Promise((resolve) => {
+                            function getBase64Image(img) {
+                                var canvas = document.createElement("canvas");
+                                canvas.width = img.width;
+                                canvas.height = img.height;
+                                var ctx = canvas.getContext("2d");
+                                ctx.drawImage(img, 0, 0, img.width, img.height);
+                                var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
+                                var dataURL = canvas.toDataURL("image/" + ext);
+                                return dataURL;
+                            }
+
+                            var image = new Image();
+                            image.crossOrigin = '';
+                            image.src = img;
+                            image.onload = function () {
+                                var base64 = getBase64Image(image);
+
+                                resolve(base64);
+                            }
+                        });
+                    }
+
+                    async function makeMeta(assetsFolderName, html) {
+                        //使用$.each方法遍历返回的数据date,插入到id为#result中
+                        // console.log(html);
+                        var htmlString = html.toString();
+                        // console.log(htmlString);
+
+                        var matcher = new RegExp("[^`" + `|'|"]*` + assetsFolderName + "[^`" + `|'|"]*`, 'gm');//[^`|'|"]*assets[^`|'|"]*
+
+                        var replaceArray = htmlString.match(matcher);
+                        console.log(replaceArray);
+
+                        var base64Array = [];
+
+                        for (var i = 0; i < replaceArray.length; i++) {
+                            base64Array.push(await url2Base64(replaceArray[i]));
+                        }
+
+                        var j = -1;
+                        htmlString = htmlString.replace(matcher, function () {
+                            j++
+                            return base64Array[j];
+                        });
+
+                        var dataURI = encodeURIComponent(htmlString);
+
+                        var meta = `<meta http-equiv="refresh" content="0;URL= data:text/html;charset=utf-8,${dataURI}">`;
+
+                        console.log(decodeURIComponent(meta));
+                        $("head").prepend(meta);
+                    }
+
                     await makeMeta('assets', html);
                 }
             });
         });
     } else {
         // alert('不是safari');
-        window.location.href='./warn.html';
+        window.location.href = './warn.html';
     }
 
 
