@@ -6,7 +6,11 @@
 </template>
 
 <script>
+
+
+
 import syncMainApp from "./components/syncMainApp.vue";
+
 
 export default {
   name: "app",

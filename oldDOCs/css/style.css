@@ -1,0 +1,178 @@
+[v-cloak] {
+  display: none;
+}
+
+.circleNumber {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  font-size: 10px;
+  color: #ffffff;
+  background-color: #0074cf;
+  text-align: center;
+  border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -webkit-box-shadow: 0 1px 5px rgba(32, 33, 36, 0.37);
+  box-shadow: 0 1px 5px rgba(32, 33, 36, 0.37);
+  margin-right: -6px;
+  margin-left: 4px;
+}
+
+.customToast {
+  background-color: white;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: 2px 2px 32px rgba(32, 33, 36, 0.4);
+  box-shadow: 2px 2px 32px rgba(32, 33, 36, 0.4);
+  /* color: rgba(0, 0, 0, .7); */
+  display: inline-block;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, .1);
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0px 30px 40px 30px;
+}
+
+.badgeGrey {
+  background-color: #ffffff;
+  -webkit-border-radius: 40px;
+  border-radius: 40px;
+  -webkit-box-shadow: 0 1px 6px rgba(32, 33, 36, 0.37);
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.37);
+  color: rgba(0, 0, 0, .54);
+  display: inline-block;
+  font-size: 14px;
+  /* font-weight: 400; */
+  height: 30px;
+  line-height: 40px;
+  margin-left: 8px;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-overflow-scrolling: touch;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  /* padding: 0px 0 0px; */
+}
+
+.badge {
+  background-color: white;
+  -webkit-border-radius: 40px;
+  border-radius: 40px;
+  -webkit-box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  color: rgba(0, 0, 0, .54);
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  height: 30px;
+  line-height: 40px;
+  margin-left: 8px;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, .1);
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 3px 0 6px;
+}
+
+.shadowChip {
+  background-color: white;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  box-shadow: 0 2px 6px rgba(32, 33, 36, 0.28);
+  color: rgba(0, 0, 0, .54);
+  display: inline-block;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, .1);
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-left: 4px;
+}
+
+.custom-loader {
+  animation: loader 1s infinite;
+  display: flex;
+}
+
+.card--flex-toolbar {
+  margin-top: -64px;
+}
+
+.scrollContainer {
+  width: auto;
+  height: auto;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+@-moz-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@-o-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+input[type="search"] {
+  -webkit-appearance: none;
+}
+
+input::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* 以下是新增的Dplayer播放窗口组件的CSS */
+
+video {
+  max-width: 100%;
+  display: block;
+  margin: 1em auto;
+}
+
+.output {
+  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+  padding: 10px;
+  max-height: 480px;
+  overflow: auto;
+}
+
+.output:empty::before {
+  content: '这里记录操作状态，API支持情况等信息';
+  opacity: .75;
+}
+
+.clear {
+  float: right;
+  margin: -2.75em 0 0 8em;
+}

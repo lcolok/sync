@@ -1,0 +1,16 @@
+[v-cloak] {
+  display: none;
+}
+
+.lottie {
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+#bm {
+  width: 100%;
+  height: 100%;
+}

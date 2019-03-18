@@ -1,667 +1,18 @@
-<template>
-   <v-flex id="app" v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true' v-resize="onResize">
-
-
-    <v-app id="loginView" v-if='!user' v-cloak>
-
-      <v-content>
-        <v-container fluid fill-height>
-          <v-layout align-center justify-center>
-            <v-flex xs12 sm8 md4>
-              <v-card class="elevation-5">
-                <v-toolbar dark color="primary">
-                  <v-toolbar-title>请登录</v-toolbar-title>
-                  <v-spacer></v-spacer>
-                  <v-tooltip bottom>
-                    <v-btn icon large target="_blank" slot="activator">
-                      <v-icon large>code</v-icon>
-                    </v-btn>
-                    <span>Source</span>
-                  </v-tooltip>
-                </v-toolbar>
-                <v-card-text>
-                  <v-form>
-                    <v-text-field prepend-icon="person" name="login" label="用户名" type="text" id="inputUsername"
-                      @keydown.enter="login">
-                    </v-text-field>
-                    <v-text-field prepend-icon="lock" name="password" label="密码" id="inputPassword" type="password"
-                      @keydown.enter="login">
-                    </v-text-field>
-                    <v-flex>
-                      <v-layout align-center justify-center row fill-height />
-                      <v-text-field prepend-icon="mdi-check-decagram" name="captchaCode" label="校验码" id="captchaCode"
-                        type="text" @keydown.enter="login">
-                      </v-text-field>
-                      <img id="captchaImage" />
-                    </v-flex>
-
-
-                  </v-form>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" @click='login'>登录</v-btn>
-                  <v-btn id="verify" color="orange darken-2 white--text" @click='signUp'>注册</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-content>
-
-    </v-app>
-
-    <v-app id="sandbox" v-if='user' :dark="dark" v-scroll="autoLoad">
-
-      <v-dialog v-model="loadingDialog.model" hide-overlay persistent width="300">
-        <v-card color="primary" dark>
-          <v-card-text>
-            {{loadingDialog.text}}
-            <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-
-      <v-snackbar class='customToast' ref="snackbar" bottom v-model="snackbar.show" :color="snackbar.color">
-
-        <v-icon color="white">{{ snackbar.snackbarIcon }}</v-icon>
-        <div class="transparent" flat>
-          {{ snackbar.snackbarText }}
-        </div>
-        <v-btn v-if='snackbar.actionText' :ripple="snackbar.ripple" @click="snackbar.action" color='primary'
-          :icon='snackbar.actionIcon'>{{snackbar.actionText}}</v-btn>
-        <v-btn icon dark flat @click="snackbar.show = false">
-          <v-icon color="white">close</v-icon>
-        </v-btn>
-
-      </v-snackbar>
-
-
-      <v-navigation-drawer v-model="primaryDrawer.model" width=180 temporary app>
-
-        <v-toolbar flat>
-          <v-list>
-            <v-list-tile>
-              <v-list-tile-title class="title">
-                选项
-              </v-list-tile-title>
-            </v-list-tile>
-          </v-list>
-        </v-toolbar>
-
-        <v-btn slot="activator" dark icon>
-          <v-icon>more_vert</v-icon>
-        </v-btn>
-
-        <v-list>
-          <v-list-tile v-for="(item, i) in generalMenu" :key="i"
-            @click="item.action();this.tempPlayingID='';primaryDrawer.model=!primaryDrawer.model">
-            <v-list-tile-avatar>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-tile-avatar>
-            <v-list-tile-title>
-              {{ item.text }}
-            </v-list-tile-title>
-          </v-list-tile>
-        </v-list>
-      </v-navigation-drawer>
-
-      <!-- <v-toolbar :clipped-left="primaryDrawer.clipped" app scroll-toolbar-off-screen scroll-threshold=50 tabs >
-        <v-toolbar-side-icon v-if="primaryDrawer.type !== 'permanent'"
-          @click.stop="primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
-        <v-toolbar-title>石墨床VUE</v-toolbar-title>
-      </v-toolbar> -->
-
-      <v-toolbar color="primary" :dark="!dark" dense extension-height=70 app scroll-off-screen fixed>
-        <v-toolbar-side-icon v-if="primaryDrawer.type !== 'permanent'"
-          @click.stop="this.tempPlayingID='';primaryDrawer.model = !primaryDrawer.model"></v-toolbar-side-icon>
-        <v-toolbar-title>石墨床VUE</v-toolbar-title>
-
-        <v-spacer></v-spacer>
-
-
-        <!-- <v-btn icon>
-          <v-icon>refresh</v-icon>
-        </v-btn>
-
-        <v-menu bottom left transition="slide-y-transition">
-          <v-btn slot="activator" dark icon>
-            <v-icon>more_vert</v-icon>
-          </v-btn>
-
-          <v-list>
-            <v-list-tile v-for="(item, i) in generalMenu" :key="i" @click="item.action">
-              <v-list-tile-avatar>
-                <v-icon>{{ item.icon }}</v-icon>
-              </v-list-tile-avatar>
-              <v-list-tile-title>
-                {{ item.text }}
-              </v-list-tile-title>
-            </v-list-tile>
-          </v-list>
-        </v-menu> -->
-
-        <!-- <v-toolbar color="primary" :dark="!dark" slot="extension" flat>
-
-          <v-btn-toggle v-model="toggle_multiple" class="transparent" multiple >
-              <v-btn flat>
-                <v-icon>format_bold</v-icon>
-              </v-btn>
-              <v-btn flat>
-                <v-icon>format_italic</v-icon>
-              </v-btn>
-              <v-btn flat>
-                <v-icon>format_underlined</v-icon>
-              </v-btn>
-              <v-btn flat>
-                <v-icon>format_color_fill</v-icon>
-              </v-btn>
-            </v-btn-toggle>
-        </v-toolbar> -->
-
-        <v-layout align-space-around justify-center row slot="extension" />
-
-        <!--         <v-flex xs5 lg2 mr-2>
-          <v-select solo-inverted v-model="searchType.value" :items="searchType.items" label="全部" multiple>
-            <template slot="selection" slot-scope="{ item, index }">
-              <v-chip v-if="index === 0" color="white" class="caption" text-color="primary">
-
-                <v-icon class="hidden-sm-and-down">find_in_page</v-icon>
-
-                {{ searchRange }}
-              </v-chip>
-            </template>
-          </v-select>
-        </v-flex> -->
-
-        <v-flex>
-          <form action="javascript:return true">
-
-            <v-text-field solo-inverted ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
-              prepend-inner-icon="search" :append-icon="paste ? 'file_copy' : undefined"
-              @click:append="pasteFromClipboard" clearable autofocus @keydown="submit($event)" loading hint="随便搜点什么吧..."
-              :rules="[]">
-
-              <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
-
-            </v-text-field>
-
-          </form>
-        </v-flex>
-
-
-
-        </v-layout>
-      </v-toolbar>
-      </form>
-
-
-
-      <v-fab-transition>
-        <v-btn color="white" dark fab fixed bottom left tile v-show='floatPlayBTN_Occur' @click="bottomSheet=true">
-          <!-- <v-icon>keyboard_arrow_up</v-icon> -->
-          <img src='https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png' width='40' height='40'>
-        </v-btn>
-      </v-fab-transition>
-
-
-      <v-dialog v-model='bottomSheet' ref='bottomSheet' fullscreen hide-overlay transition="dialog-bottom-transition"
-        scrollable>
-        <v-card tile>
-
-          <v-toolbar dense card dark color="primary">
-
-
-            <v-toolbar-side-icon
-              @click.stop="bottomSheet=false;primaryDrawer.model=!primaryDrawer.model;this.tempPlayingID=currentVideo.id;">
-              <v-icon>mdi-eye</v-icon>
-            </v-toolbar-side-icon>
-            <v-toolbar-title>预览</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-toolbar-items>
-              <!-- <v-btn dark flat @click="bottomSheet = false">Save</v-btn> -->
-            </v-toolbar-items>
-            <!-- <v-menu bottom right transition="slide-y-transition">
-              <v-btn slot="activator" dark icon>
-                <v-icon>more_vert</v-icon>
-              </v-btn>
-              <v-list>
-                <v-list-tile v-for="(item, i) in generalMenu" :key="i" @click="item.action">
-                  <v-list-tile-avatar>
-                    <v-icon>{{ item.icon }}</v-icon>
-                  </v-list-tile-avatar>
-                  <v-list-tile-title>
-                    {{ item.text }}
-                  </v-list-tile-title>
-                </v-list-tile>
-              </v-list>
-            </v-menu> -->
-            <v-btn icon dark @click="bottomSheet = false;">
-              <v-icon>close</v-icon>
-            </v-btn>
-          </v-toolbar>
-
-          <v-img id="dplayer" src="" poster="" controls="" playsinline="" loop="" :max-height='videoView.height'
-            :max-width='videoView.width' x5-video-player-type="h5" x5-video-player-fullscreen="true" v-touch="{
-              down:()=>{bottomSheet=false},
-            }"></v-img>
-
-
-          <!-- <v-progress-linear :value="50" class="my-0" height="3"></v-progress-linear> -->
-
-
-          <v-list dense two-line>
-
-            <v-list-tile ripple @click='expandPanel'>
-              <v-list-tile-content>
-
-                <v-list-tile-title class="font-weight-bold subheading">{{ currentVideo.attributes.name }}
-                </v-list-tile-title>
-
-                <v-list-tile-sub-title class="caption font-weight-regular text--gray">
-                  {{ currentVideo.attributes.name_trans }}
-                </v-list-tile-sub-title>
-                <v-list-tile-sub-title class="caption font-weight-light">
-                  {{ this.renderSize(currentVideo.attributes.size) }}</v-list-tile-sub-title>
-                <v-divider></v-divider>
-
-              </v-list-tile-content>
-
-
-
-
-              <v-list-tile-action>
-                <v-btn icon flat :ripple='false'>
-                  <v-icon :style="style" color="grey darken-2" small>fas fa-caret-down</v-icon>
-                </v-btn>
-              </v-list-tile-action>
-            </v-list-tile>
-
-
-            <v-list-tile>
-
-              <v-toolbar flat class='transparent'>
-                <v-layout align-center v-bind="layoutAttributes" row fill-height />
-
-                <div class="text-xs-center" v-for="x in bottomSheetToolbar"
-                  v-show='x.showInSheet||$vuetify.breakpoint.name!=="xs"' :key='bottomSheetToolbar.text'>
-                  <v-btn flat fab @click="x.action(currentVideo,$event);" :id='x.text'>
-                    <v-flex class='caption'>
-                      <v-layout align-center justify-center column fill-height />
-                      <v-icon size=20>{{x.icon}}</v-icon>{{x.text}}
-                    </v-flex>
-                  </v-btn>
-                </div>
-
-                <div class="text-xs-center">
-                  <v-bottom-sheet v-model='moreBottomSheet' bottom left offset-y>
-                    <v-btn slot="activator" flat fab @click="moreBTN.action($event);" :id='moreBTN.text'
-                      v-show='($vuetify.breakpoint.name=="xs")'>
-                      <v-flex class='caption'>
-                        <v-layout align-center justify-center column fill-height />
-                        <v-icon size=20>{{moreBTN.icon}}</v-icon>{{moreBTN.text}}
-                      </v-flex>
-                    </v-btn>
-
-
-                    <v-list>
-                      <template v-for="(menuItem, i) in bottomSheetToolbar" v-if='!menuItem.showInSheet'>
-                        <v-subheader v-if='menuItem.subheader' class='caption'>{{ menuItem.subheader}}</v-subheader>
-                        <v-divider v-if='menuItem.subheader' class="mx-3"></v-divider>
-                        <v-list-tile :name="menuItem.name" :objectID="currentVideo.id" :key="i"
-                          @click="menuItem.action(currentVideo,$event);moreBottomSheet=false;">
-                          <v-list-tile-avatar>
-                            <v-icon>{{ menuItem.icon }}</v-icon>
-                          </v-list-tile-avatar>
-                          <v-list-tile-title>
-                            {{ menuItem.text }}
-                          </v-list-tile-title>
-                        </v-list-tile>
-                      </template>
-                    </v-list>
-                  </v-bottom-sheet>
-
-                </div>
-
-
-              </v-toolbar>
-
-            </v-list-tile>
-
-            <v-divider></v-divider>
-
-            <v-expand-transition>
-              <!-- 
-              <v-list-tile v-if='infoPanel'>
-                  <v-layout v-scroll:#scroll-target="" mx-2 column />
-                <v-list-tile-content>
-                  创建时间:
-                  {{ `${currentVideo.createdAt.toLocaleDateString()} ${currentVideo.createdAt.toLocaleTimeString()}` }}
-                </v-list-tile-content>
-                <v-list-tile-content>
-                  修改时间:
-                  {{ `${currentVideo.updatedAt.toLocaleDateString()} ${currentVideo.updatedAt.toLocaleTimeString()}` }}
-                </v-list-tile-content>
-                
-              </v-list-tile> -->
-
-
-
-              <v-card flat v-if='infoPanel' class="scrollContainer">
-
-                <v-flex xs12>
-                  <v-layout v-scroll:#scroll-target="" ma-4 column align-start justify-start />
-                  <v-flex>
-                    创建时间:
-                    <v-card class='shadowChip' color="orange lighten-4">
-                      <v-flex mx-2>
-                        {{ `${currentVideo.createdAt.toLocaleDateString()} ${currentVideo.createdAt.toLocaleTimeString()}` }}
-                      </v-flex>
-                    </v-card>
-                  </v-flex>
-
-                  <v-flex>
-                    修改时间:
-                    <v-card class='shadowChip' color="orange lighten-4">
-                      <v-flex mx-2>
-                        {{ `${currentVideo.updatedAt.toLocaleDateString()} ${currentVideo.updatedAt.toLocaleTimeString()}` }}
-                      </v-flex>
-                    </v-card>
-                  </v-flex>
-
-                  <v-flex>
-                    文件后缀:
-                    <v-card class='shadowChip' color="orange lighten-4">
-                      <v-flex mx-2>{{ currentVideo.attributes.suffix }}
-                      </v-flex>
-                    </v-card>
-                  </v-flex>
-                  <v-flex>
-                    文件体积:
-                    <v-card class='shadowChip' color="primary lighten-4">
-                      <v-flex mx-2>{{ renderSize(currentVideo.attributes.size) }}
-                      </v-flex>
-                    </v-card>
-                  </v-flex>
-
-                </v-flex>
-
-              </v-card>
-            </v-expand-transition>
-
-            <v-fade-transition>
-              <v-divider v-if='infoPanel'></v-divider>
-            </v-fade-transition>
-
-          </v-list>
-
-
-
-
-          <v-flex id="scroll-target" class="scrollContainer">
-            <v-layout v-scroll:#scroll-target="" ma-4 column align-center justify-center />
-
-            一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字一堆无意义的文字
-
-          </v-flex>
-
-
-
-        </v-card>
-
-      </v-dialog>
-
-
-
-      <v-content>
-
-
-
-        <v-expand-transition>
-          <v-tabs v-model="tabs" v-if='(mainList.results.length!=0)&&(typeList.length!=0)' color="transparent"
-            slider-color="primary" :show-arrows='showArrow'>
-            <v-layout align-center justify-begin row fill-height />
-            <v-tab :ripple="false" class="badgeGrey" v-for="(n, index)  in typeList" v-if="n.count>0" :key='index'
-              @change='mainList.results = n.subClassArr;'>
-              <!-- <v-chip class="shadowChip" color="white" text-color=""> -->
-
-              <v-icon :size='n.size'>{{n.icon}}</v-icon>
-              <v-flex ml-2>{{n.text}}</v-flex>
-              <!-- <v-divider class="mx-1" vertical></v-divider> -->
-              <v-flex class="circleNumber">
-                <v-flex>{{n.count<=99 ? n.count:'99+'}}</v-flex>
-              </v-flex>
-
-              <!-- </v-chip> -->
-            </v-tab>
-          </v-tabs>
-        </v-expand-transition>
-
-        <v-slide-y-transition>
-          <v-subheader class='caption' v-if='(resultSumLasttime!=null)&&(keywordLasttime!=null)'>
-            找到有关『{{keywordLasttime}}』的{{resultSumLasttime}}条结果（用时{{searchDuration}}秒）
-          </v-subheader>
-        </v-slide-y-transition>
-
-
-        <v-slide-y-transition>
-          <v-layout align-center justify-center v-if='mainList.results.length!=0'>
-            <v-flex>
-
-              <v-list two-line>
-
-                <template v-for="(result, index) in mainList.results">
-
-                  <v-list-tile :key="result.attributes.title" avatar ripple @click=""
-                    @contextmenu="rightClick(index,$event)">
-                    <v-badge :color="result.attributes.canPlay?result.attributes.canPlay.color:'primary'" left overlap>
-                      <!-- <v-icon slot="badge" dark small>done</v-icon> -->
-                      <v-icon v-if='result.attributes.canPlay' color="white" slot="badge">
-                        {{result.attributes.canPlay.icon}}</v-icon>
-                      <v-list-tile-avatar ripple @click="howToPlay(result)">
-
-                        <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" small fab>
-                          <v-icon>{{ result.attributes.icon }}</v-icon>
-                        </v-btn>
-                        <v-btn v-else class="grey lighten-1 white--text caption" small fab>
-                          <div>{{ result.attributes.suffix }}</div>
-                        </v-btn>
-
-                      </v-list-tile-avatar>
-                    </v-badge>
-
-
-
-
-
-                    <v-list-tile-content @click="howToPlay(result)">
-                      <v-layout align-start justify-center column fill-height />
-                      <v-card flat class='transparent'>
-                        <v-list-tile-title class="font-weight-bold subheading">{{ result.attributes.name }}
-                        </v-list-tile-title>
-                      </v-card>
-                      <v-card flat class='transparent' v-if="result.attributes.name !== result.attributes.name_trans">
-                        <v-list-tile-sub-title class="body-2 font-weight-regular text--gray">
-                          {{ result.attributes.name_trans }}</v-list-tile-sub-title>
-                      </v-card>
-                      <!-- <v-list-tile-sub-title class="caption font-weight-light" v-if="result.attributes.size">
-                          {{ renderSize(result.attributes.size) }}</v-list-tile-sub-title> -->
-                      <v-card flat class='transparent'>
-                        <v-layout align-center justify-start row fill-height />
-                        <v-card class='shadowChip' v-if="result.attributes.size" color="orange lighten-4">
-                          <v-flex mx-2 class="caption font-weight-light">{{ result.attributes.suffix }}
-                          </v-flex>
-                        </v-card>
-                        <v-card class='shadowChip' v-if="result.attributes.size" color="primary lighten-4">
-                          <v-flex mx-2 class="caption font-weight-light">{{ renderSize(result.attributes.size) }}
-                          </v-flex>
-                        </v-card>
-                      </v-card>
-                    </v-list-tile-content>
-
-
-
-                    <v-list-tile-action>
-                      <v-btn icon ripple @click="rightClick(index,$event)">
-                        <v-icon color="grey lighten-1">more_horiz</v-icon>
-                      </v-btn>
-                    </v-list-tile-action>
-
-                    <v-menu v-model="showMenu" v-if="index==showMenuIndex" :position-x="MenuX" :position-y="MenuY"
-                      absolute offset-y>
-                      <v-list>
-                        <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
-                          @click="menuItem.action(result,$event)" :name="menuItem.name"
-                          :copyContent='result.attributes.copyContent' :objectID="result.id">
-                          <v-list-tile-avatar>
-                            <v-icon>{{ menuItem.icon }}</v-icon>
-                          </v-list-tile-avatar>
-                          <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
-                        </v-list-tile>
-                      </v-list>
-                    </v-menu>
-
-
-                  </v-list-tile>
-                  <v-divider v-if="index + 1 < mainList.results.length" :key="index" inset></v-divider>
-
-
-
-
-                </template>
-
-                <!--                   <v-menu v-model='showMenu' :position-x="MenuX" :position-y="MenuY" absolute offset-y>
-                    <v-btn slot="activator" icon ripple>
-                      <v-icon color="grey lighten-1">more_horiz</v-icon>
-                    </v-btn>
-                    <v-list>
-                      <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i" :name="menuItem.name">
-                        <v-list-tile-avatar>
-                          <v-icon>{{ menuItem.icon }}</v-icon>
-                        </v-list-tile-avatar>
-                        <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
-                      </v-list-tile>
-                    </v-list>
-                  </v-menu> -->
-
-
-              </v-list>
-
-            </v-flex>
-
-
-
-
-
-
-          </v-layout>
-        </v-slide-y-transition>
-
-
-
-      </v-content>
-
-      <v-layout row>
-        <v-flex xs12 sm6 offset-sm3>
-          <v-card>
-
-
-
-          </v-card>
-        </v-flex>
-      </v-layout>
-
-
-      <v-flex v-scroll="occurFab" v-cloak>
-
-        <v-fab-transition>
-          <v-speed-dial slot="activator" v-show="floatBTN_Occur" v-model="fab" :top="top" :bottom="bottom"
-            :right="right" :left="left" :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
-
-            <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab>
-              <v-icon>{{ activeFab.icon }}</v-icon>
-            </v-btn>
-            <v-btn fab dark small color="orange" @click="$vuetify.goTo(0);">
-              <v-icon>keyboard_arrow_up</v-icon>
-            </v-btn>
-            <v-btn fab dark small color="indigo">
-              <v-icon>add</v-icon>
-            </v-btn>
-            <v-btn fab dark small color="green" @click="hoverOrNot;backToSearchTarget;">
-              <v-icon>search</v-icon>
-            </v-btn>
-          </v-speed-dial>
-        </v-fab-transition>
-
-      </v-flex>
-
-
-
-      <v-dialog v-model="deleteConfirmDialog" max-width="290">
-
-        <v-card>
-          <v-card-title class="headline red--text">确定要删除该项?</v-card-title>
-
-          <v-card-text>
-            删除操作不可撤回，请谨慎考虑。
-          </v-card-text>
-
-          <v-card-actions>
-            <v-spacer></v-spacer>
-
-            <v-btn color="primary" flat="flat" @click="deleteConfirmDialog = false">
-              取消
-            </v-btn>
-
-            <v-btn color="error" @click="deleteConfirmDialog = false;deleteContent(deleteOjbect)">
-              删除
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-
-
-      <v-footer :inset="footer.inset">
-
-        <span class="px-3">&copy; {{ new Date().getFullYear() }}</span>
-
-      </v-footer>
-
-    </v-app>
-
-
-
-
-
-  </v-flex>
-</template>
-
-<script>
-
-
-import 'vuetify'
-
-
-
-import 'font-awesome/css/font-awesome.min.css'
-import "vue-material-design-icons/styles.css"
-import 'material-design-icons-iconfont/dist/material-design-icons.css'
-import 'font-awesome/css/font-awesome.min.css'
-import '@fortawesome/fontawesome-free/css/all.css'
-
-
-
-
-import AV from 'leancloud-storage'
-
-AV.init({
-  appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-  appKey: 'vLplaY3j4OYf3e6e603sb0JX',
-});
-
-export default {
-  name: 'syncMainApp',
+'use strict'
+
+// 禁止右键菜单
+document.oncontextmenu = function () { return false; };
+// 禁止文字选择
+// document.onselectstart = function(){ return false; };
+// 禁止复制
+// document.oncopy = function(){ return false; };
+// 禁止剪切
+// document.oncut = function(){ return false; };
+// 禁止粘贴
+// document.onpaste = function(){ return false; };
+
+var app = new Vue({
+  el: '#app',
 
   data: () => ({
     user: null,
@@ -2058,24 +1409,171 @@ export default {
 
   },
 
+})
+
+
+function process(s, evaluator) {
+  var h = Object.create(null), k;
+  s.split('').forEach(function (c) {
+    h[c] && h[c]++ || (h[c] = 1);
+  });
+  if (evaluator) for (k in h) evaluator(k, h[k]);
+  return h;
+};
+
+function continuity(s) {
+  var sc = 0, arr = s.split(''), len = s.length;
+
+  for (var i = 0; i < len; i++) {
+    for (var j = 1; j < len - i; j++) {
+      if (arr[i] == arr[i + j]) {
+        sc = sc + j;
+      } else { break; }
+    }
+  }
+  return sc / len
+}
+
+function entropy(s) {
+  var sum = 0, len = s.length;
+  process(s, function (k, f) {
+    var p = f / len;
+    sum -= p * Math.log(p) / Math.log(2);
+  });
+  return sum;
+};
+
+
+function newEntropy(s) {
+  var sum_1 = 0, len = s.length;
+  process(s, function (k, f) {
+    var p = f / len;
+    sum_1 -= p * Math.log(p) / Math.log(2);
+  });
+
+  var sum_2 = continuity(s);
+
+  var sum = sum_1 - sum_2 * 2;
+
+  return sum;
+};
+
+
+async function bingDic(word) {
+
+  try {
+    var resp = await axios({
+      method: 'GET',
+      url: "http://xtk.azurewebsites.net/BingDictService.aspx",
+      params: { Word: word, Samples: false },
+    });
+    if (resp.defs != null) {
+      var arr;
+      resp.defs.forEach(e => {
+        arr.push(e.def)
+      })
+      console.log(arr.join(''));
+      return arr.join('')
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
 
 }
-</script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
+
+
+
+
+
+
+
+
+
+
+//以下是新增的Dplayer播放窗口组件
+
+
+
+
+
+
+
+// var log = function (content) {
+//   if (!output.innerHTML) {
+//     output.innerHTML = content;
+//   } else {
+//     output.innerHTML += '<br>' + content;
+//   }
+//   output.scrollTop = 99999;
+// };
+
+// var pipWindow, currentVideo;
+
+// currentVideo = dplayer.getElementsByTagName('video')[0];
+/*
+// console.log(dplayer);
+// console.log(dplayer.getElementsByTagName('video')[0]);
+currentVideo = dplayer.getElementsByTagName('video')[0];
+pipBtn.addEventListener('click', function (event) {
+  log('切换Picture-in-Picture模式...');
+  // 禁用按钮，防止二次点击
+  this.disabled = true;
+  try {
+      if (currentVideo !== document.pictureInPictureElement) {
+          // 尝试进入画中画模式
+          currentVideo.requestPictureInPicture();
+      } else {
+          // 退出画中画
+          document.exitPictureInPicture();
+      }
+  } catch (error) {
+      log('&gt; 出错了！' + error);
+  } finally {
+      this.disabled = false;
+  }
+});
+
+// 点击切换按钮可以触发画中画模式，同样，在有些浏览器中，右键也可以切换，甚至可以自动进入画中画模式
+currentVideo.addEventListener('enterpictureinpicture', function (event) {
+  log('&gt; 视频已进入Picture-in-Picture模式');
+  pipBtn.value = pipBtn.value.replace('进入', '退出');
+
+  pipWindow = event.pictureInPictureWindow;
+  log('&gt; 视频窗体尺寸为：' + pipWindow.width + ' × ' + pipWindow.height);
+
+  // 添加resize事件，一切都是为了测试API
+  pipWindow.addEventListener('resize', onPipWindowResize);
+});
+// 退出画中画模式时候
+currentVideo.addEventListener('leavepictureinpicture', function (event) {
+  log('&gt; 视频已退出Picture-in-Picture模式');
+  pipBtn.value = pipBtn.value.replace('退出', '进入');
+  // 移除resize事件
+  pipWindow.removeEventListener('resize', onPipWindowResize);
+});
+// 视频窗口尺寸改变时候执行的事件
+var onPipWindowResize = function (event) {
+  log('&gt; 窗口尺寸改变为：' + pipWindow.width + ' × ' + pipWindow.height);
+
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+// 特征检测
+if ('pictureInPictureEnabled' in document == false) {
+  log('当前浏览器不支持视频画中画。');
+  togglePipButton.disabled = true;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
+
+
+console.log($(".dplayer-menu-item:contains('关于作者')").remove());//移除关于作者的右键按钮
+console.log($(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove());//移除DPlayer版本号的右键按钮
+
+this.dpFloat.fullScreen.request('web');//全屏观看 */
+
+
+
+
+$(".dplayer-menu-item:contains('关于作者')").remove();//移除关于作者的右键按钮
+$(".dplayer-menu-item:contains('DPlayer v1.25.0')").remove();//移除DPlayer版本号的右键按钮
+
+
