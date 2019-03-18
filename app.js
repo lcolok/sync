@@ -52,13 +52,13 @@ app.get('/', async function (req, res) {
       query.equalTo('r', r).find().then(e => {
         // console.log(e);
         if (e.length != 0) {
-          if (e.length > 1) { alert(`该r出现了${e.length}次,如果出现重定向网址不正确,请删除重复项`) };
+          if (e.length > 1) { alert(`该r出现了${e.length}次,如果出现重定向网址不正确,请删除重复项`) }
           var redirectURL = e[0].attributes.redirectURL;
           if (redirectURL) {
 
             if (!redirectURL.toLowerCase().match('http')) {
               redirectURL = 'https://' + redirectURL;
-            };
+            }
             console.log(redirectURL);
             resolve(redirectURL);
           } else {
