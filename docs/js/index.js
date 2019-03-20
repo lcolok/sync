@@ -545,7 +545,7 @@ var app = new Vue({
       }).catch(alert);
     },
     copySuccess() {
-      app.snackbar.show = false;
+      /* app.snackbar.show = false;
 
       app.snackbar = {
         show: true,
@@ -556,7 +556,8 @@ var app = new Vue({
         action: () => {
 
         }
-      }
+      } */
+      app.$message.success('已复制');
 
       sfx.play('https://uploader.shimo.im/f/YOwjiyzl4Kk0Dd5H.mp3?attname=Paste_Copy.mp3');
     },
@@ -865,7 +866,7 @@ var app = new Vue({
           });
           break;
         default:
-          app.snackbar.show = false;
+          /* app.snackbar.show = false;
           app.snackbar = {
             show: true,
             color: 'error',
@@ -874,7 +875,8 @@ var app = new Vue({
             snackbarIcon: 'report_problem',
             action: () => {
             }
-          }
+          } */
+          app.$message.error(`暂不支持『${item.attributes.type}』的预览`);
           return
       }
     },
@@ -1239,7 +1241,7 @@ var app = new Vue({
       console.log(data);
 
       if (data > 0) {
-        app.snackbar.show = false;
+        /* app.snackbar.show = false;
         app.snackbar = {
           show: true,
           color: 'success',
@@ -1249,7 +1251,8 @@ var app = new Vue({
           action: () => {
 
           }
-        };
+        }; */
+        app.$message.success(`新增${data}条记录`);
       } else {
         this.showTop20();
 
@@ -1287,7 +1290,7 @@ var app = new Vue({
               // 成功
               console.log(data);
               app.loadingDialog.model = false;
-              app.snackbar.show = false;
+              /* app.snackbar.show = false;
               app.snackbar = {
                 show: true,
                 color: 'success',
@@ -1298,7 +1301,8 @@ var app = new Vue({
                 action: () => {
                   window.open(data.docURL);
                 }
-              };
+              }; */
+              app.$message.success(`文章已保存到石墨上`);
             }, function (error) {
               // 失败
               console.log(error);
@@ -1325,7 +1329,8 @@ var app = new Vue({
           //   type: "error"//Type of the Toast ['success', 'info', 'error']
           //   // fullWidth:"true",
           // });
-          app.snackbar.show = false;
+
+          /* app.snackbar.show = false;
           app.snackbar = {
             show: true,
             color: 'error',
@@ -1334,7 +1339,8 @@ var app = new Vue({
             snackbarIcon: 'report_problem',
             action: () => {
             }
-          }
+          } */
+          app.$message.error(`找不到关于“${key}”的项目`);
           return
         }
 
@@ -1393,16 +1399,17 @@ var app = new Vue({
       return vars;
     },
     showTop20() {
-      app.snackbar = {
-        show: true,
-        color: 'info',
-        ripple: false,
-        snackbarText: '已为你搜索最近20条项目',
-        snackbarIcon: 'update',
-        action: () => {
-
-        }
-      }
+      /*       app.snackbar = {
+              show: true,
+              color: 'info',
+              ripple: false,
+              snackbarText: '已为你搜索最近20条项目',
+              snackbarIcon: 'update',
+              action: () => {
+      
+              }
+            } */
+      app.$message.success('已为你搜索最近20条项目');
     }
 
 

@@ -11,7 +11,7 @@ setInterval(() => {
 
 function LeanCloudInit() {
 
-    app.snackbar = {
+    /* app.snackbar = {
         show: true,
         color: 'error',
         ripple: false,
@@ -24,12 +24,14 @@ function LeanCloudInit() {
             // app.snackbar.snackbarIcon = 'done';
 
         }
-    };
+    }; */
+    
+    // app.$message.success('正在连接LeanCloud中...');
 
     AV.Cloud.run('alive').then(function (data) {
         // 成功
         // console.log('是否已经连接上leancloud:' + data);
-        app.snackbar.show = false;
+        /* app.snackbar.show = false;
         app.snackbar = {
             show: true,
             color: 'success',
@@ -43,7 +45,9 @@ function LeanCloudInit() {
                 app.snackbar.snackbarIcon = 'done';
     
             }
-        };
+        }; */
+
+        // app.$message.success('LeanCloud连接成功！');
     }, function (error) {
         // 失败
     });
