@@ -20,6 +20,7 @@ var app = new Vue({
     maxItemsPerPage: 20,
     hasLoadedPages: 0,
 
+
     moreBottomSheet: false,
     loadingDialog: {},
     fileDescription: [
@@ -118,11 +119,13 @@ var app = new Vue({
     floatBTN_Occur: 0,
     windowSize: {},
 
-
+    originalName: '',
+    renameInput: '',
     showMenuIndex: 'init',
     MenuX: 0,
     MenuY: 0,
     showMenu: false,
+    renameDialog: false,
     deleteConfirmDialog: false,
     copyBtn: null, //存储初始化复制按钮事件
     mobile: null,
@@ -172,8 +175,16 @@ var app = new Vue({
       */
 
       {
-        icon: 'mdi-rename-box', text: '重命名', showInSheet: true, action: () => {
+        icon: 'mdi-rename-box', text: '重命名', showInSheet: true, action: (renameOjbect, event) => {
+          app.originalName = renameOjbect.attributes.name;
+          app.renameOjbect = renameOjbect;
+          console.log(event);
+          app.renameInput = renameOjbect.get('name');
+          app.renameDialog = true;
+          setTimeout(() => {
+            app.$refs.renameInput.focus();
 
+          }, 0)
         }
       },
       {
@@ -429,7 +440,13 @@ var app = new Vue({
     }
   },
   watch: {
-
+    renameDialog(val) {
+      if (val) {
+        app.removePasteEvent();
+      } else {
+        app.initPasteEvent();
+      }
+    },
     'primaryDrawer.model'(val) {
       if (val) return;
       if (!tempPlayingID) return;
@@ -561,82 +578,85 @@ var app = new Vue({
 
       sfx.play('https://uploader.shimo.im/f/YOwjiyzl4Kk0Dd5H.mp3?attname=Paste_Copy.mp3');
     },
-    initPasteEvent() {
-      //paste事件监听
-      document.addEventListener("paste", function (e) {
+    pasteEventHandler(e) {
+      var cbd = e.clipboardData;
+      var ua = window.navigator.userAgent;
 
-        var cbd = e.clipboardData;
-        var ua = window.navigator.userAgent;
+      // 如果是 Safari 直接 return
+      if (!(e.clipboardData && e.clipboardData.items)) {
+        return;
+      }
 
-        // 如果是 Safari 直接 return
-        if (!(e.clipboardData && e.clipboardData.items)) {
-          return;
-        }
+      // Mac平台下Chrome49版本以下 复制Finder中的文件的Bug Hack掉
+      if (cbd.items && cbd.items.length === 2 && cbd.items[0].kind === "string" && cbd.items[1].kind === "file" &&
+        cbd.types && cbd.types.length === 2 && cbd.types[0] === "text/plain" && cbd.types[1] === "Files" &&
+        ua.match(/Macintosh/i) && Number(ua.match(/Chrome\/(\d{2})/i)[1]) < 49) {
+        return;
+      }
 
-        // Mac平台下Chrome49版本以下 复制Finder中的文件的Bug Hack掉
-        if (cbd.items && cbd.items.length === 2 && cbd.items[0].kind === "string" && cbd.items[1].kind === "file" &&
-          cbd.types && cbd.types.length === 2 && cbd.types[0] === "text/plain" && cbd.types[1] === "Files" &&
-          ua.match(/Macintosh/i) && Number(ua.match(/Chrome\/(\d{2})/i)[1]) < 49) {
-          return;
-        }
-
-        /* for (var i = 0; i < cbd.items.length; i++) {
-          var item = cbd.items[i];
-          console.log(item.kind);
-          switch (item.kind) {
-            case "file":
-              var blob = item.getAsFile();
-              console.log(blob);
-              // blob 就是从剪切板获得的文件 可以进行上传或其他操作
-              break;
-            case "string":
-              item.getAsString((text) => {
-                console.log(text);
-                return
-                app.searchShimo(text);
-              })
-  
-              break;
-          }
-        } */
-        for (var i = 0, unikind; i < cbd.items.length; i++) {
-          var item = cbd.items[i];
-          if (!unikind) {
-            unikind = item.kind;
-          }
-          if (i == cbd.items.length - 1) {
-            console.log(`${i}项全部都是${unikind}`);
-            if (unikind == 'string') {
-              /* for (var j = 0; j < cbd.items.length; j++) {
-                var item = cbd.items[j];
-                console.log(item.kind);
-                var k = 0;
-                if (j !== 0) {
-                  item.getAsString((text) => {
-                    console.log(`这是第${k}项目的解析结果:${text}`);
-                    k++;
-                    return
-                    app.searchShimo(text);
-                  })
-                }
-              } */
-              cbd.items[0].getAsString((text) => {
-                app.keyword = text;
-                app.searchShimo(text);
-              })
-            }
-          }
-
-          if (unikind == item.kind) { continue; } else {
+      /* for (var i = 0; i < cbd.items.length; i++) {
+        var item = cbd.items[i];
+        console.log(item.kind);
+        switch (item.kind) {
+          case "file":
+            var blob = item.getAsFile();
+            console.log(blob);
+            // blob 就是从剪切板获得的文件 可以进行上传或其他操作
             break;
+          case "string":
+            item.getAsString((text) => {
+              console.log(text);
+              return
+              app.searchShimo(text);
+            })
+ 
+            break;
+        }
+      } */
+      for (var i = 0, unikind; i < cbd.items.length; i++) {
+        var item = cbd.items[i];
+        if (!unikind) {
+          unikind = item.kind;
+        }
+        if (i == cbd.items.length - 1) {
+          console.log(`${i}项全部都是${unikind}`);
+          if (unikind == 'string') {
+            /* for (var j = 0; j < cbd.items.length; j++) {
+              var item = cbd.items[j];
+              console.log(item.kind);
+              var k = 0;
+              if (j !== 0) {
+                item.getAsString((text) => {
+                  console.log(`这是第${k}项目的解析结果:${text}`);
+                  k++;
+                  return
+                  app.searchShimo(text);
+                })
+              }
+            } */
+            cbd.items[0].getAsString((text) => {
+              app.keyword = text;
+              app.searchShimo(text);
+            })
           }
         }
 
+        if (unikind == item.kind) { continue; } else {
+          break;
+        }
+      }
 
-        // e.preventDefault();//这句可以导致粘贴不成功
-      }, false);
+
+      // e.preventDefault();//这句可以导致粘贴不成功
+
+    }
+    ,
+    initPasteEvent() {
+      document.addEventListener("paste", this.pasteEventHandler, false);//初始化paste事件监听
     },
-
+    removePasteEvent() {
+      document.removeEventListener("paste", this.pasteEventHandler, false);//移除粘贴事件的监听
+    },
     hoverOrNot() {
       this.hover = false;
       setTimeout(() => {
@@ -707,6 +727,28 @@ var app = new Vue({
         this.initClipboardJS();
       }, 0);
 
+    },
+    focusOrNot(event) {
+      if (app.originalName !== app.renameInput) {
+        event.target.select();
+        app.originalName = app.renameInput;
+      }
+
+    },
+    renameContent: async function (currentVideo) {
+      if (app.renameInput !== app.originalName) {
+        var renameObject = AV.Object.createWithoutData('ShimoBed', currentVideo.id);
+        renameObject.set('name', app.renameInput);
+        renameObject.save().then(function (renameObject) {
+          currentVideo.attributes.name = app.renameInput;//刷新在屏幕上显示的名称
+          app.$message.success(`「${app.originalName}」已重命名为「${app.renameInput}」`);
+          // 成功保存之后，执行其他逻辑.
+        }).catch((err) => {
+          app.$message.error(`发生错误:${err}`);
+        })
+        return
+      }
+      console.log('名字没有更改');
     },
     deleteContent: async function (currentVideo) {
       console.log(currentVideo);
