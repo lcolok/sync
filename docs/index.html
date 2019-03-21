@@ -657,11 +657,13 @@
       <v-dialog v-model="renameDialog" max-width="500">
 
         <v-card>
-          <v-btn icon dark flat @click="snackbar.show = false">
-            <v-icon color="white">close</v-icon>
-          </v-btn>
-          <v-card-title class="headline red--text">重命名项目</v-card-title>
-
+          <v-flex>
+            <v-layout align-center justify-space-between row />
+            <v-card-title class="headline primary--text">重命名项目</v-card-title>
+            <v-btn icon dark flat @click="renameDialog = false">
+              <v-icon color="primary">close</v-icon>
+            </v-btn>
+          </v-flex>
           <v-flex ma-4>
             <form action="javascript:return true">
 
@@ -684,14 +686,39 @@
               取消
             </v-btn>
 
-            <v-btn color="success" @click="renameDialog = false;renameContent(renameOjbect)">
+            <v-btn color="primary" @click="renameDialog = false;renameContent(renameOjbect)">
               确定
             </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
 
-      <v-footer :inset="footer.inset">
+      <v-dialog v-model="browserDialog" max-width="500">
+
+        <v-card>
+          <v-flex>
+            <v-card-title class="headline primary--text">请选择启动的默认浏览器</v-card-title>
+          </v-flex>
+          <v-flex>
+            <v-container v-model="browserChoice">
+                <v-layout align-center justify-center column fill-height/>
+              <v-flex v-for="browser in browsers" :key="browser.name" ma-2>
+                <v-hover>
+                  <v-card slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`" style="border-radius: 8px"
+                    height=120 width=120>
+                    <v-layout align-center justify-center column fill-height />
+                    <v-icon large :color="browser.color">{{browser.icon}}</v-icon>
+                    <div :color="browser.color">{{browser.name}}</div>
+                  </v-card>
+                </v-hover>
+              </v-flex>
+            </v-container>
+          </v-flex>
+        </v-card>
+      </v-dialog>
+
+
+      <v-footer :inset="footer.inset" v-cloak>
 
         <span class="px-3">&copy; {{ new Date().getFullYear() }}</span>
 

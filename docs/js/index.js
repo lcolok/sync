@@ -119,6 +119,7 @@ var app = new Vue({
     floatBTN_Occur: 0,
     windowSize: {},
 
+    
     originalName: '',
     renameInput: '',
     showMenuIndex: 'init',
@@ -132,6 +133,27 @@ var app = new Vue({
     infoPanel: false,
     videoHeight: 0,
     videoWidth: 0,
+
+    browserDialog:false,
+    browserChoice: 'Chrome',
+    browsers: [
+      {
+        name: 'Chrome',
+        color:'',
+        icon:'mdi-google-chrome',
+      }, 
+      {
+        name: 'Safari',
+        color:'',
+        icon:'mdi-apple-safari',
+      },
+      {
+        name: 'Firefox',
+        color:'',
+        icon:'mdi-firefox',
+      }
+    ],
+
     moreBTN: {
       icon: 'mdi-settings', text: '更多操作', moreBTN: true, showInSheet: true, action: () => {
         clearTimeout(app.moreBTNTimer);
@@ -231,7 +253,8 @@ var app = new Vue({
           // window.location.href='mqqapi://';//打开QQ
           // var encodedURL = encodeURIComponent("https://www.baidu.com");
           // window.location.href = `x-web-search://?${encodedURL}`
-          window.location.href = 'addIcon';
+          app.browserDialog=true;
+          // window.location.href = 'addIcon/saveAsSafari.html';
         }
       },
       {
