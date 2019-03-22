@@ -119,7 +119,7 @@ var app = new Vue({
     floatBTN_Occur: 0,
     windowSize: {},
 
-    
+
     originalName: '',
     renameInput: '',
     showMenuIndex: 'init',
@@ -134,23 +134,23 @@ var app = new Vue({
     videoHeight: 0,
     videoWidth: 0,
 
-    browserDialog:false,
+    browserDialog: false,
     browserChoice: 'Chrome',
     browsers: [
       {
         name: 'Chrome',
-        color:'',
-        icon:'mdi-google-chrome',
-      }, 
+        color: '',
+        icon: 'mdi-google-chrome',
+      },
       {
         name: 'Safari',
-        color:'',
-        icon:'mdi-apple-safari',
+        color: '',
+        icon: 'mdi-apple-safari',
       },
       {
         name: 'Firefox',
-        color:'',
-        icon:'mdi-firefox',
+        color: '',
+        icon: 'mdi-firefox',
       }
     ],
 
@@ -253,7 +253,7 @@ var app = new Vue({
           // window.location.href='mqqapi://';//打开QQ
           // var encodedURL = encodeURIComponent("https://www.baidu.com");
           // window.location.href = `x-web-search://?${encodedURL}`
-          app.browserDialog=true;
+          app.browserDialog = true;
           // window.location.href = 'addIcon/saveAsSafari.html';
         }
       },
@@ -445,6 +445,7 @@ var app = new Vue({
   created() {
     this.autoLogin();
     this.captchaInit();
+
 
   },
   mounted() {
@@ -698,16 +699,20 @@ var app = new Vue({
       this.loadingItems = false;
     },
     autoLoad() {
-      var offsetHeight = document.documentElement.offsetHeight || document.body.offsetHeight;
-      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
-      let bottomOfWindow = offsetHeight - scrollTop - window.innerHeight;
-      // console.log(this.keywordLasttime);
-      // console.log(bottomOfWindow);
-      if (bottomOfWindow <= 50 && !this.loadingItems && this.keywordLasttime == null) {//如果已经进行过搜索的话,就不会进行自动加载
-        this.loadingItems = true;
-        this.hasLoadedPages++;
-        this.loadMoreItems();
-      }
+        //变量scrollTop是滚动条滚动时，距离顶部的距离
+        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        //变量windowHeight是可视区的高度
+        var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+        //变量scrollHeight是滚动条的总高度
+        var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+        //滚动条到底部的条件
+        if (scrollTop + windowHeight == scrollHeight) {
+          //写后台加载数据的函数
+          console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
+          this.loadingItems = true;
+          this.hasLoadedPages++;
+          this.loadMoreItems();
+        }
     },
 
     occurFab() {

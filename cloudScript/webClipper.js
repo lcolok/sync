@@ -1,6 +1,9 @@
 var AV = require('leanengine');
 
-AV.Cloud.define('webClipper', function (request) {
+AV.Cloud.define('webClipper', (request) => { webClipper(request) });
+
+
+function webClipper(request) {
 
     console.log('正在进行webClipper页面剪藏..');
     const TurndownService = require('turndown');
@@ -15,14 +18,16 @@ AV.Cloud.define('webClipper', function (request) {
 
     return new Promise((resolve, reject) => {
         read(url, function (err, article, meta) {
-            // console.log(article.html);
+            console.log(article.html);
+
+
 
             var $ = cheerio.load(article.html);
             article.realTitle = $("title").text();//通过这种方式获得的标题才是最准确的标题
-
+            // console.log(article.realTitle);
             var content = article.content.toString();
 
-            console.log(content);
+            // console.log(content);
 
             content = content.replace(/data-src/gm, 'src');//微信公众号的文章图片的src会写成data-src,因此turndown并不能识别这个label,进而会错误地砍掉图片部分
 
@@ -30,7 +35,19 @@ AV.Cloud.define('webClipper', function (request) {
 
             var markdown = turndownService.turndown(content);
 
-            var data = `本文摘抄自此网址:[${url}](${url})\n\n` + markdown;
+            // var headerContent = `本文摘抄自此网址:[${url}](${url})\n\n`;
+
+            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',hour:'numeric',minute:'numeric' };
+            var date = new Date().toLocaleDateString('zh-Hans-CN', options);
+            var author = $('.profile_nickname').text();
+
+            var headerContent =
+                `|摘抄时间|原作者|原地址| 
+            |:----:|:----:|:----:|
+            |${date}|${author}|[${url}](${url})| 
+            `;
+
+            var data = headerContent + markdown;
 
             const r = http.post({
                 url: 'https://shimo.im/lizard-api/files/import',
@@ -57,8 +74,10 @@ AV.Cloud.define('webClipper', function (request) {
                 }
             });
             const form = r.form();
-            form.append('file', data, 'filename.md');//一定要保持md这个后缀,才能被识别
-            form.append('name', article.realTitle);
+            var title = article.realTitle.split('\n').join('');//清除title中的回车
+
+            form.append('file', data, `${article.realTitle}.md`);//一定要保持md这个后缀,才能被识别
+            form.append('name', title);
             form.append('type', 'newdoc');
             form.append('parentId', 'SX3sphXKfvofOdRb');//文件夹ID
 
@@ -66,8 +85,7 @@ AV.Cloud.define('webClipper', function (request) {
         });
     });
 
-});
-
+}
 
 const id = require('../toolScript/identifier.js');
 
@@ -77,7 +95,7 @@ id.run({
     func: () => {
         webClipper({
             params: {
-                url: 'http://data.163.com/18/1222/01/E3JHUBU0000181IU.html'
+                url: 'https://mp.weixin.qq.com/s/Ldt-8IBpzhcibAPmPAInjQ'
             }
         })
     }
