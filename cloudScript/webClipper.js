@@ -1,6 +1,6 @@
 var AV = require('leanengine');
 
-AV.Cloud.define('webClipper', (request) => { webClipper(request) });
+AV.Cloud.define('webClipper', (request) => { return webClipper(request) });
 
 
 function webClipper(request) {
@@ -18,12 +18,11 @@ function webClipper(request) {
 
     return new Promise((resolve, reject) => {
         read(url, function (err, article, meta) {
-            console.log(article.html);
-
-
+            // console.log(article.html);
 
             var $ = cheerio.load(article.html);
             article.realTitle = $("title").text();//通过这种方式获得的标题才是最准确的标题
+            var title = article.realTitle.split('\n').join('');//清除title中的回车
             // console.log(article.realTitle);
             var content = article.content.toString();
 
@@ -37,8 +36,8 @@ function webClipper(request) {
 
             // var headerContent = `本文摘抄自此网址:[${url}](${url})\n\n`;
 
-            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',hour:'numeric',minute:'numeric' };
-            var date = new Date().toLocaleDateString('zh-Hans-CN', options);
+            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+            var date = new Date().toLocaleDateString('zh-Hans', options);
             var author = $('.profile_nickname').text();
 
             var headerContent =
@@ -69,15 +68,15 @@ function webClipper(request) {
                 var docURL = `https://shimo.im` + JSON.parse(body).url;
                 if (!err) {
                     console.log(docURL);
-                    resolve({ code: 0, docURL: docURL });
+                    resolve({ code: 0, docURL: docURL, title: title });
                 } else {
                     reject({ code: 1, error: err });
                 }
             });
             const form = r.form();
-            var title = article.realTitle.split('\n').join('');//清除title中的回车
 
-            form.append('file', data, `${article.realTitle}.md`);//一定要保持md这个后缀,才能被识别
+
+            form.append('file', data, `${title}.md`);//一定要保持md这个后缀,才能被识别
             form.append('name', title);
             form.append('type', 'newdoc');
             form.append('parentId', 'SX3sphXKfvofOdRb');//文件夹ID

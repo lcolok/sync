@@ -160,7 +160,7 @@
         </v-btn>
 
         <v-list>
-          <v-list-tile v-for="(item, i) in generalMenu" :key="i"
+          <v-list-tile v-for="(item, i) in generalMenu" :key="i" v-show="item.hide?item.hide():true"
             @click="item.action();this.tempPlayingID='';primaryDrawer.model=!primaryDrawer.model">
             <v-list-tile-avatar>
               <v-icon>{{ item.icon }}</v-icon>
@@ -770,9 +770,9 @@
             <v-flex class='body-2' ma-1>
               以获取更方便的访问体验。
             </v-flex>
-            <v-flex class='body-2 primary--text' >
+            <v-flex class='body-2 primary--text'>
               <v-layout align-center justify-center row fill-height />
-             点击
+              点击
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 style="margin: 0px 5px;">

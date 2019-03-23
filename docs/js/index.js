@@ -250,7 +250,11 @@ var app = new Vue({
         }
       },
       {
-        icon: 'mdi-apple-safari', text: '桌面图标', action: () => {
+        icon: 'mdi-apple-safari', text: '桌面图标',
+        hide: () => {//填写隐藏规则
+          return !window.navigator.standalone
+        },
+        action: () => {
           // window.location.href='mqqapi://';//打开QQ
           // var encodedURL = encodeURIComponent("https://www.baidu.com");
           // window.location.href = `x-web-search://?${encodedURL}`
@@ -853,8 +857,21 @@ var app = new Vue({
       window.location.href = downloadURL;
     },
     initClipboardJS() {
+      try {
+        app.bottomSheetCopyBTN.destroy();
+        app.moreCopyBTN.destroy();
+        app.bottomSheetIDbtn.destroy();
+        app.moreIDbtn.destroy();
+      } catch (e) { }
+
+      /* var arr = [];
+      for (var i in app) {
+        arr.push(app[i]);
+      }
+      console.log(arr); */
+
       //bottomSheet里面的复制按钮初始化
-      new ClipboardJS(document.getElementById('复制短链'), {
+      app.bottomSheetCopyBTN = new ClipboardJS(document.getElementById('复制短链'), {
         text: function (trigger) {
           // return app.makeNewDic(app.currentVideo).attributes.copyContent;
           return app.currentVideo.attributes.copyContent;
@@ -866,8 +883,10 @@ var app = new Vue({
         console.log(e);
       });
 
+      console.log(app.bottomSheetCopyBTN);
+
       //more按钮的复制按钮初始化
-      new ClipboardJS(document.getElementsByName('copyBTN'), {
+      app.moreCopyBTN = new ClipboardJS(document.getElementsByName('copyBTN'), {
         text: function (trigger) {
           return trigger.getAttribute('copyContent')
         }
@@ -880,7 +899,7 @@ var app = new Vue({
       });
 
       //bottomSheet里面的获取ID的复制按钮初始化
-      new ClipboardJS(document.getElementById('获取ID'), {
+      app.bottomSheetIDbtn = new ClipboardJS(document.getElementById('获取ID'), {
         text: function (trigger) {
           return app.currentVideo.id;
         }
@@ -891,7 +910,7 @@ var app = new Vue({
       });
 
       //more按钮的获取ID的复制按钮初始化
-      new ClipboardJS(document.getElementsByName('getID'), {
+      app.moreIDbtn = new ClipboardJS(document.getElementsByName('getID'), {
         text: function (trigger) {
           // console.log(trigger);
           // console.log(trigger.getAttribute('objectID'));
@@ -1426,7 +1445,32 @@ var app = new Vue({
                   window.open(data.docURL);
                 }
               }; */
-              app.$message.success(`文章已保存到石墨上`);
+              // app.$message.success(`文章已保存到石墨上`);
+              const key = `open${Date.now()}`;
+              app.$notification.open({
+                message: `文章已保存到石墨上`,
+                description: `标题:${data.title}`,
+
+                style: {
+                  width: `${358}px`,
+                },
+                btn: (h) => {
+                  return h('a-button', {
+                    props: {
+                      type: 'primary',
+                      size: 'small',
+                    },
+                    on: {
+                      click: () => {
+                        app.$notification.close(key);
+                        window.open(data.docURL);
+                      }
+                    }
+                  }, '点击查看')
+                },
+                key,
+                onClose: close,
+              });
             }, function (error) {
               // 失败
               console.log(error);
