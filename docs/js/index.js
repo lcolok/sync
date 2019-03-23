@@ -457,11 +457,14 @@ var app = new Vue({
       this.initPasteEvent();
       //处理Params
       // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchShimo('')))
+      var param = this.getUrlVars();
+      if (param !== {}) {
+        if (param.q) { return this.getQ(param.q) };
+        if (param.v) { return this.getV(param.v) };
+        if (param.id) { return this.getID(param.id) };
+        if (param.b) { return this.getB(param.b) };
+      }
 
-      if (this.getQ()) { return };
-      if (this.getV()) { return };
-      if (this.getID()) { return };
-      if (this.getB()) { return };
       if (this.searchShimo('')) { return };
 
     }
@@ -1038,7 +1041,6 @@ var app = new Vue({
     getID(id) {
       id = id ? id : this.getUrlVars().id;
 
-
       if (id) {
         let query = new AV.Query('ShimoBed');
         query.get(id).then(function (item) {
@@ -1059,8 +1061,8 @@ var app = new Vue({
         return false;
       }
     },
-    getV() {
-      var v = this.getUrlVars().v;
+    getV(param) {
+      var v = param ? param : this.getUrlVars().v;
       if (v) {
         console.log('正在加载该视频:' + v);
         this.bottomSheet = true;
@@ -1074,14 +1076,14 @@ var app = new Vue({
         return false
       }
     },
-    getB() {
-      var browser = this.getUrlVars().b;
+    getB(param) {
+      var browser = param ? param : this.getUrlVars().b;
       if (browser && !window.navigator.standalone) {
         this.saveDesktopIcon(browser);
       }
     },
-    getQ() {
-      var keyword = this.getUrlVars().q;
+    getQ(param) {
+      var keyword = param ? param : this.getUrlVars().q;
       if (!keyword) {
         this.keyword = '';
         return false
