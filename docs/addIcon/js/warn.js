@@ -27,8 +27,9 @@ var main = new Vue({
             text: function (trigger) {
                 // return app.makeNewDic(app.currentVideo).attributes.copyContent;
                 var currentURL = window.location.href;
+                var browser = main.getUrlVars().browser;
                 var splitName = 'addIcon';
-                currentURL = currentURL.split(splitName)[0] + splitName;
+                currentURL = currentURL.split(splitName)[0] + splitName + `/?browser=${browser}`;
                 console.log(currentURL);
                 return currentURL;
 
@@ -45,6 +46,13 @@ var main = new Vue({
         //     text = text ? text : '估计你忘记要填写文字内容';
         //     this.$message.info(text);
         // },
+        getUrlVars() {
+            var vars = {};
+            var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+                vars[key] = decodeURI(value);
+            });
+            return vars;
+        },
     }
 })
 

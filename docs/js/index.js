@@ -20,7 +20,7 @@ var app = new Vue({
     maxItemsPerPage: 20,
     hasLoadedPages: 0,
 
-
+    saveDesktopIconDialog: false,
     moreBottomSheet: false,
     loadingDialog: {},
     fileDescription: [
@@ -141,6 +141,7 @@ var app = new Vue({
         name: 'Chrome',
         color: '',
         icon: 'mdi-google-chrome',
+
       },
       {
         name: 'Safari',
@@ -456,9 +457,11 @@ var app = new Vue({
       this.initPasteEvent();
       //处理Params
       // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchShimo('')))
+
       if (this.getQ()) { return };
       if (this.getV()) { return };
       if (this.getID()) { return };
+      if (this.getB()) { return };
       if (this.searchShimo('')) { return };
 
     }
@@ -521,6 +524,35 @@ var app = new Vue({
             case 'xl': return '800px';
           }
         }, */
+
+    isMobileSafari() {
+      var ua = navigator.userAgent;
+
+      // IOS系统
+      if (/ OS \d/.test(ua)) {
+        // 不是Chrome
+        if (!~ua.indexOf('CriOS')) {
+          // 开头必须为Mozilla
+          if (!ua.indexOf('Mozilla')) {
+            // 结尾需为：Safari/xxx.xx
+            if (/Safari\/[\d\.]+$/.test(ua)) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    },
+    saveDesktopIcon(browser) {
+      browser = browser.toLowerCase();
+      if (browser == 'safari' && this.isMobileSafari()) {
+        this.browserDialog = false;
+        this.saveDesktopIconDialog = true;
+        return
+      }
+      window.location.href = `addIcon/?browser=${browser}`;
+      return
+    },
     autoLogin() {
       var user = AV.User.current()
       if (user) {
@@ -688,31 +720,45 @@ var app = new Vue({
       }, 800);
     },
     loadMoreItems: async function () {
-      var query = new AV.Query('ShimoBed');
-      query.descending("updatedAt");
-      query.limit(this.maxItemsPerPage * (this.hasLoadedPages + 1));//请求数量上限为1000条
-      var every = await query.find();
-
-      console.log(every);
-
-      app.mainList.results = app.makeAList(every);
-      this.loadingItems = false;
+      var realThis = this;
+      return new Promise(async function (resolve, reject) {
+        var query = new AV.Query('ShimoBed');
+        query.descending("updatedAt");
+        query.limit(realThis.maxItemsPerPage * (realThis.hasLoadedPages + 1));//请求数量上限为1000条
+        var every = await query.find();
+        console.log(every);
+        app.mainList.results = app.makeAList(every);
+        if (every) {
+          resolve(every);
+        } else {
+          reject("没有返回结果");
+        }
+      });
     },
     autoLoad() {
-        //变量scrollTop是滚动条滚动时，距离顶部的距离
-        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        //变量windowHeight是可视区的高度
-        var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
-        //变量scrollHeight是滚动条的总高度
-        var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-        //滚动条到底部的条件
-        if (scrollTop + windowHeight == scrollHeight) {
-          //写后台加载数据的函数
-          console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
-          this.loadingItems = true;
-          this.hasLoadedPages++;
-          this.loadMoreItems();
-        }
+      //变量scrollTop是滚动条滚动时，距离顶部的距离
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop || window.pageYOffset;
+      //变量windowHeight是可视区的高度
+      var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+      //变量scrollHeight是滚动条的总高度
+      var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      //滚动条到底部的条件
+      var offset = 200;
+      if ((scrollTop + windowHeight + offset >= scrollHeight) && !this.loadingItems) {//如果已经进行过搜索的话,就不会进行自动加载
+        //写后台加载数据的函数
+        // console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
+        app.loadingDialog = {
+          model: true,
+          text: '正在加载更多项目...'
+        };
+
+        this.loadingItems = true;
+        this.hasLoadedPages++;
+        this.loadMoreItems().then(() => {
+          this.loadingItems = false;
+          app.loadingDialog.model = false;
+        });
+      }
     },
 
     occurFab() {
@@ -1026,6 +1072,12 @@ var app = new Vue({
         return true
       } else {
         return false
+      }
+    },
+    getB() {
+      var browser = this.getUrlVars().b;
+      if (browser && !window.navigator.standalone) {
+        this.saveDesktopIcon(browser);
       }
     },
     getQ() {

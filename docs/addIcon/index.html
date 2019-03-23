@@ -5,6 +5,27 @@
     crossorigin="anonymous"></script>
 <script>
 
+    var url = 'lco.leanapp.cn/';
+    var browserName = getUrlVars().browser;
+
+    if(browserName=='safari'){
+        window.location.href = `../?b=safari`;
+    }
+
+    var browsers = {
+        chrome: `googlechromes://${url}`,
+        safari: `https://${url}`,
+        firefox: `firefox://?url=https://${url}`
+    }
+
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+            vars[key] = decodeURI(value);
+        });
+        return vars;
+    };
+
     function isMobileSafari() {
         var ua = navigator.userAgent;
 
@@ -24,6 +45,8 @@
         return false;
     }
 
+
+
     if (isMobileSafari()) {// 原理等同于 /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
         // alert('是safari');
         $(function () {
@@ -31,6 +54,7 @@
                 type: "GET",
                 url: "middle.html",
                 cache: false,
+                async: false,
                 success: async function (html) {
                     async function url2Base64(img) {
                         return new Promise((resolve) => {
@@ -55,7 +79,6 @@
                             }
                         });
                     }
-
                     async function makeMeta(assetsFolderName, html) {
                         //使用$.each方法遍历返回的数据date,插入到id为#result中
                         // console.log(html);
@@ -87,13 +110,17 @@
                         $("head").prepend(meta);
                     }
 
+
+
+                    html = html.replace(/urlSchemeReplacement/, browsers[browserName])
+                    console.log(html);
                     await makeMeta('assets', html);
                 }
             });
         });
     } else {
         // alert('不是safari');
-        window.location.href = './warn.html';
+        window.location.href = `./warn.html?browser=${browserName}`;
     }
 
 

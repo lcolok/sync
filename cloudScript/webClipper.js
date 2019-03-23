@@ -42,9 +42,10 @@ function webClipper(request) {
             var author = $('.profile_nickname').text();
 
             var headerContent =
-                `|摘抄时间|原作者|原地址| 
-            |:----:|:----:|:----:|
-            |${date}|${author}|[${url}](${url})| 
+                `
+                **摘抄时间:**  ${date}  
+                **原作者:** ${author}  
+                **原地址:** [${url}](${url})
             `;
 
             var data = headerContent + markdown;

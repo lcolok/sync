@@ -17,6 +17,41 @@
   <link rel='stylesheet' href='https://unpkg.com/ant-design-vue@1.3.5/dist/antd.min.css'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.css">
 
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPhone%20XS%20Max.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPhone%20XS.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPhone%20XR.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPhone%208%20Plus.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPhone%208.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPhone%20SE.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPad%20Pro%2012.9-inch.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPad%20Pro%2011-inch.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPad%20Pro%2010.5-inch.png?alt=media">
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
+    href="https://firebasestorage.googleapis.com/v0/b/glide-prod.appspot.com/o/pwa-assets%2FTJFoUfPDxGpVA8plcsJv-splash-iPad%209.7-inch,%20iPad%20Mini%204.png?alt=media">
+
+
 
   <link rel="stylesheet" href="css/style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -701,11 +736,11 @@
           </v-flex>
           <v-flex>
             <v-container v-model="browserChoice">
-                <v-layout align-center justify-center column fill-height/>
+              <v-layout align-center justify-center column fill-height />
               <v-flex v-for="browser in browsers" :key="browser.name" ma-2>
                 <v-hover>
                   <v-card slot-scope="{ hover }" :class="`elevation-${hover ? 12 : 2}`" style="border-radius: 8px"
-                    height=120 width=120>
+                    height=120 width=120 @click='saveDesktopIcon(browser.name)'>
                     <v-layout align-center justify-center column fill-height />
                     <v-icon large :color="browser.color">{{browser.icon}}</v-icon>
                     <div :color="browser.color">{{browser.name}}</div>
@@ -717,6 +752,39 @@
         </v-card>
       </v-dialog>
 
+      <v-dialog v-model="saveDesktopIconDialog" max-width="400">
+
+        <v-card>
+
+          <v-container>
+            <v-layout align-center justify-center column fill-height />
+            <v-flex ma-1>
+              <v-img src="addIcon/assets/UploadCloud.jpg" class='customToast' width='50px' height='auto'></v-img>
+            </v-flex>
+            <v-flex class='title' ma-1>
+              石墨床
+            </v-flex>
+            <v-flex class='body-2' ma-1>
+              将此应用程序添加到您的主屏幕，
+            </v-flex>
+            <v-flex class='body-2' ma-1>
+              以获取更方便的访问体验。
+            </v-flex>
+            <v-flex class='body-2 primary--text' >
+              <v-layout align-center justify-center row fill-height />
+             点击
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                style="margin: 0px 5px;">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                <polyline points="16 6 12 2 8 6"></polyline>
+                <line x1="12" y1="2" x2="12" y2="15"></line>
+              </svg>
+              <div>然后按「添加到主屏幕」</div>
+            </v-flex>
+          </v-container>
+        </v-card>
+      </v-dialog>
 
       <v-footer :inset="footer.inset" v-cloak>
 
