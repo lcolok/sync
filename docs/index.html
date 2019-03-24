@@ -119,6 +119,8 @@
 
     <v-app id="sandbox" v-if='user' :dark="dark" v-scroll="autoLoad">
 
+
+
       <v-dialog v-model="loadingDialog.model" hide-overlay persistent width="300">
         <v-card color="primary" dark>
           <v-card-text>
@@ -352,8 +354,8 @@
                 <div class="text-xs-center" v-for="rightClickMenuItem in bottomSheetToolbar"
                   v-show='rightClickMenuItem.showInSheet||$vuetify.breakpoint.name!=="xs"'
                   :key='bottomSheetToolbar.text'>
-                  <v-btn flat fab @click="rightClickMenuItem.action(currentVideo,$event);"
-                    :id='rightClickMenuItem.text' :name='rightClickMenuItem.name'>
+                  <v-btn flat fab @click="rightClickMenuItem.action(currentVideo,$event);" :id='rightClickMenuItem.text'
+                    :name='rightClickMenuItem.name'>
                     <v-flex class='caption'>
                       <v-layout align-center justify-center column fill-height />
                       <v-icon size=20>{{rightClickMenuItem.icon}}</v-icon>{{rightClickMenuItem.text}}
@@ -662,7 +664,7 @@
             <v-btn fab dark :color="activeFab.color" slot="activator">
               <v-icon>{{ activeFab.icon }}</v-icon>
             </v-btn>
-            <v-btn fab dark v-for="(fab,i) in floatBTN.fabs" :key='i' :color="fab.color" :name="fab.name" 
+            <v-btn fab dark v-for="(fab,i) in floatBTN.fabs" :key='i' :color="fab.color" :name="fab.name"
               :small="fab.small" @click='fab.action?fab.action():""'>
               <v-icon>{{ fab.icon }}</v-icon>
             </v-btn>
@@ -760,6 +762,33 @@
           </v-flex>
         </v-card>
       </v-dialog>
+
+
+      <v-dialog v-model="progressDialog.model" persistent max-width="300">
+        <v-card>
+          <v-flex>
+            <v-card-title>
+              <v-layout align-start justify-start column fill-height />
+              <div class="headline primary--text">正在下载</div>
+              <div class="body-2">{{progressDialog.filename}}</div>
+            </v-card-title>
+
+          </v-flex>
+          <v-flex>
+            <v-container v-model="browserChoice">
+              <v-layout align-center justify-center column fill-height />
+              <v-flex ma-2>
+                <a-progress type="circle" :percent="progressDialog.percent"
+                  :format="(percent, successPercent) => {return percent<100? `${percent} %`:'完成'}" />
+              </v-flex>
+            </v-container>
+
+          </v-flex>
+
+        </v-card>
+      </v-dialog>
+
+
 
       <v-dialog v-model="saveDesktopIconDialog" max-width="400">
 

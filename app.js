@@ -14,7 +14,11 @@ var fs = require('fs');
 // 加载云函数定义，你可以将云函数拆分到多个文件方便管理，但需要在主文件中加载它们
 require('require-all')({
   dirname: __dirname + '/cloudScript',
-  filter: /(.+)\.js$/,
+  filter: function (fileName) {
+    if (fileName == 'tempCodeRunnerFile.js') return; //排除掉tempCodeRunnerFile.js这种临时生成的文件
+    if (!fileName.match(/(.+)\.js$/)) return; //符合js命名格式的才能通过
+    return fileName;
+  },
 })
 
 var app = express();

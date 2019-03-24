@@ -22,6 +22,11 @@ var app = new Vue({
 
     saveDesktopIconDialog: false,
     moreBottomSheet: false,
+
+    progressDialog: {
+      model: false,
+      percent: 0,
+    },
     loadingDialog: {},
     fileDescription: [
       {
@@ -280,7 +285,7 @@ var app = new Vue({
         }
       },
       {
-        icon: 'mdi-share', text: '分享网址',name:'shareThisApp', action: () => {
+        icon: 'mdi-share', text: '分享网址', name: 'shareThisApp', action: () => {
 
         }
       },
@@ -495,7 +500,7 @@ var app = new Vue({
       this.initPlayers();
       this.initPasteEvent();
       //处理Params
-      // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchShimo('')))
+      // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchGlobal('')))
       var param = this.getUrlVars();
       if (param !== {}) {
         if (param.q) { return this.getQ(param.q) };
@@ -504,7 +509,7 @@ var app = new Vue({
         if (param.b) { return this.getB(param.b) };
       }
 
-      if (this.searchShimo('')) { return };
+      if (this.searchGlobal('')) { return };
 
     }
   },
@@ -659,7 +664,7 @@ var app = new Vue({
         console.log(app.user);
       }).catch(alert);
     },
-    copySuccess() {
+    copySuccess(e) {
       /* app.snackbar.show = false;
 
       app.snackbar = {
@@ -672,10 +677,12 @@ var app = new Vue({
 
         }
       } */
-      app.$message.success('已复制');
-
+      e = e ? e : '已复制'
+      app.$message.success(e);
       sfx.play('https://uploader.shimo.im/f/YOwjiyzl4Kk0Dd5H.mp3?attname=Paste_Copy.mp3');
     },
+
+
     pasteEventHandler(e) {
       var cbd = e.clipboardData;
       var ua = window.navigator.userAgent;
@@ -705,7 +712,7 @@ var app = new Vue({
             item.getAsString((text) => {
               console.log(text);
               return
-              app.searchShimo(text);
+              app.searchGlobal(text);
             })
  
             break;
@@ -728,13 +735,12 @@ var app = new Vue({
                   console.log(`这是第${k}项目的解析结果:${text}`);
                   k++;
                   return
-                  app.searchShimo(text);
+                  app.searchGlobal(text);
                 })
               }
             } */
             cbd.items[0].getAsString((text) => {
-              app.keyword = text;
-              app.searchShimo(text);
+              app.searchGlobal(text);
             })
           }
         }
@@ -891,18 +897,109 @@ var app = new Vue({
       // console.log(app.currentVideo.url);
       window.location.href = downloadURL;
     },
+
+    renameDownload(url, filename) {
+
+
+      function updateProgress(evt) {
+        if (evt.lengthComputable) {  //evt.loaded the bytes browser receive
+          //evt.total the total bytes seted by the header
+          //
+          var percentComplete = (evt.loaded / evt.total) * 100;
+
+          var density = 5;//进度条运动密度
+          app.progressDialog.percent = Math.floor(percentComplete / density) * density;
+          // console.log(app.progressDialog.percent);
+          // $('#progressbar').progressbar("option", "value", percentComplete);
+        }
+      }
+
+
+
+      /**
+ * 获取 blob
+ * @param  {String} url 目标文件地址
+ * @return {Promise} 
+ */
+      function getBlob(url) {
+        return new Promise(resolve => {
+          const xhr = new XMLHttpRequest();
+
+          xhr.onprogress = updateProgress;
+          xhr.open('GET', url, true);
+          xhr.responseType = 'blob';
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              resolve(xhr.response);
+            }
+          };
+
+          xhr.send();
+        });
+      }
+
+      /**
+      * 保存
+      * @param  {Blob} blob     
+      * @param  {String} filename 想要保存的文件名称
+      */
+      function saveAs(blob, filename) {
+        if (window.navigator.msSaveOrOpenBlob) {
+          navigator.msSaveBlob(blob, filename);
+        } else {
+          const link = document.createElement('a');
+          const body = document.querySelector('body');
+
+          link.href = window.URL.createObjectURL(blob);
+          link.download = filename;
+
+          // fix Firefox
+          link.style.display = 'none';
+          body.appendChild(link);
+
+          link.click();
+          body.removeChild(link);
+
+          window.URL.revokeObjectURL(link.href);
+        }
+      }
+
+      /**
+      * 下载
+      * @param  {String} url 目标文件地址
+      * @param  {String} filename 想要保存的文件名称
+      */
+      function download(url, filename, finishedCallBack) {
+        app.progressDialog.filename = filename;
+        app.progressDialog.model = true;//进度条出现
+
+
+
+        getBlob(url).then(blob => {
+          finishedCallBack(blob);
+          setTimeout(() => { app.progressDialog.model = false; }, 1500)//进度条消失
+          saveAs(blob, filename);
+        });
+      }
+
+      download(url, filename, blob => {
+        //完成后会执行的
+        app.$message.success(`已完成下载`);
+      });
+    }
+    ,
     initClipboardJS() {
 
-      [
-        app.shareThisAppCopyBTN,
-        app.bottomSheetCopyBTN,
-        app.moreCopyBTN,
-        app.bottomSheetIdCopyBTN,
-        app.moreIdCopyBTN
-      ].forEach(e => {
-        e ? e.destroy() : null
-      })
-
+      /*       [
+              app.shareThisAppCopyBTN,
+              app.bottomSheetCopyBTN,
+              app.moreCopyBTN,
+              app.bottomSheetIdCopyBTN,
+              app.moreIdCopyBTN
+            ].forEach(e => {
+              e ? e.destroy() : null
+            })
+       */
 
       /* var arr = [];
       for (var i in app) {
@@ -911,20 +1008,64 @@ var app = new Vue({
       console.log(arr); */
 
       //分享当前网址的复制按钮初始化
-      function init(name, newCB) {
-        app[name] ? app[name].destroy() : null
-        app[name] = newCB
+      function init(name, params) {
+        var CBN = 'ClipboardBTN_' + name;
+        app[CBN] ? app[CBN].destroy() : null
+        app[CBN] = new ClipboardJS(document.getElementsByName(name), {
+          text: function (trigger) {
+            return params.text(trigger);
+          }
+        }).on('success', function (e) {
+          app.copySuccess(params.message ? params.message : '已复制');
+        }).on('error', function (e) {
+          console.error(e);
+          app.$message.error(e);
+        })
       }
 
-      init('shareThisAppCopyBTN', new ClipboardJS(document.getElementsByName('shareThisApp'), {
+      init('shareThisApp', {
+        text: () => window.location.href,
+        message: '已复制本网站地址,请分享给好友吧'
+      })
+
+      init('copyBTN', {
+        text: e => e.getAttribute('copyContent') || app.currentVideo.attributes.copyContent,
+        message: '已复制本网站地址,请分享给好友吧'
+      })
+
+      init('getID', {
+        text: e => e.getAttribute('objectID') || app.currentVideo.id,
+        message: '已复制本网站地址,请分享给好友吧'
+      })
+
+      /*  //more按钮的复制按钮初始化
+       app.moreCopyBTN = new ClipboardJS(document.getElementsByName('copyBTN'), {
+         text: function (trigger) {
+           return trigger.getAttribute('copyContent') || app.currentVideo.attributes.copyContent
+         } 
+ 
+       }).on('success', function (e) {
+         // console.log(e);
+         app.copySuccess();
+       }).on('error', function (e) {
+         console.log(e);
+       });
+       */
+
+      /* //more按钮的获取ID的复制按钮初始化
+      app.moreIdCopyBTN = new ClipboardJS(document.getElementsByName('getID'), {
         text: function (trigger) {
-          return window.location.href;
+          // console.log(trigger);
+          // console.log(trigger.getAttribute('objectID'));
+          return trigger.getAttribute('objectID') || app.currentVideo.id;
         }
+
       }).on('success', function (e) {
+        // console.log(e);
         app.copySuccess();
       }).on('error', function (e) {
         console.log(e);
-      }))
+      }); */
 
       //bottomSheet里面的复制按钮初始化
       /*       app.bottomSheetCopyBTN = new ClipboardJS(document.getElementById('复制短链'), {
@@ -939,20 +1080,6 @@ var app = new Vue({
               console.log(e);
             }); */
 
-
-      //more按钮的复制按钮初始化
-      app.moreCopyBTN = new ClipboardJS(document.getElementsByName('copyBTN'), {
-        text: function (trigger) {
-          return trigger.getAttribute('copyContent') || app.currentVideo.attributes.copyContent
-        }
-
-      }).on('success', function (e) {
-        // console.log(e);
-        app.copySuccess();
-      }).on('error', function (e) {
-        console.log(e);
-      });
-
       //bottomSheet里面的获取ID的复制按钮初始化
       /*       app.bottomSheetIdCopyBTN = new ClipboardJS(document.getElementById('获取ID'), {
               text: function (trigger) {
@@ -964,22 +1091,6 @@ var app = new Vue({
               console.log(e);
             });
        */
-      //more按钮的获取ID的复制按钮初始化
-      app.moreIdCopyBTN = new ClipboardJS(document.getElementsByName('getID'), {
-        text: function (trigger) {
-          // console.log(trigger);
-          // console.log(trigger.getAttribute('objectID'));
-          return trigger.getAttribute('objectID') || app.currentVideo.id;
-        }
-
-      }).on('success', function (e) {
-        // console.log(e);
-        app.copySuccess();
-      }).on('error', function (e) {
-        console.log(e);
-      });
-
-
     },
     expandPanel() {
       this.arrowDegree += 180;
@@ -1466,79 +1577,118 @@ var app = new Vue({
       return app.makeAList(every);
       // console.log(results);
     },
-    searchShimo: async function (key) {
+
+    webClipper(matchedURL) {
+      console.log('即将执行webClipper');
+      app.loadingDialog = {
+        model: true,
+        text: '正在摘抄您指定的URL'
+      };
+      matchedURL.forEach(e => {
+        AV.Cloud.run('webClipper', {
+          url: e,
+        }).then(function (data) {
+          // 成功
+          console.log(data);
+          app.loadingDialog.model = false;
+          /* app.snackbar.show = false;
+          app.snackbar = {
+            show: true,
+            color: 'success',
+            ripple: false,
+            snackbarText: `文章已保存到石墨上`,
+            snackbarIcon: 'mdi-content-save',
+            actionText: '点击查看',
+            action: () => {
+              window.open(data.docURL);
+            }
+          }; */
+          // app.$message.success(`文章已保存到石墨上`);
+          const key = `open${Date.now()}`;
+          app.$notification.open({
+            message: `文章已保存到石墨上`,
+            description: `标题:${data.title}`,
+
+            style: {
+              width: `${358}px`,
+            },
+            btn: (h) => {
+              return h('a-button', {
+                props: {
+                  type: 'primary',
+                  size: 'small',
+                },
+                on: {
+                  click: () => {
+                    app.$notification.close(key);
+                    window.open(data.docURL);
+                  }
+                }
+              }, '点击查看')
+            },
+            key,
+            onClose: close,
+          });
+        }, function (error) {
+          // 失败
+          console.log(error);
+        });
+      })
+
+    }
+    ,
+    searchGlobal: async function (key) {
       var startTime = new Date();
       var results;
 
+      //如果不存在搜索关键词的话,就直接进行常规加载(也就是加载最近20个项目)
       if (!key) {
         results = await this.regularCheckUpdate();
       } else {
         //如果识别为网址的话 正则
-        var matchedURL = key.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gm);
-        if (matchedURL) {
-          console.log('即将执行webClipper');
-          app.loadingDialog = {
-            model: true,
-            text: '正在摘抄您指定的URL'
-          };
-          matchedURL.forEach(e => {
-            AV.Cloud.run('webClipper', {
-              url: e,
-            }).then(function (data) {
-              // 成功
-              console.log(data);
-              app.loadingDialog.model = false;
-              /* app.snackbar.show = false;
-              app.snackbar = {
-                show: true,
-                color: 'success',
-                ripple: false,
-                snackbarText: `文章已保存到石墨上`,
-                snackbarIcon: 'mdi-content-save',
-                actionText: '点击查看',
-                action: () => {
-                  window.open(data.docURL);
-                }
-              }; */
-              // app.$message.success(`文章已保存到石墨上`);
-              const key = `open${Date.now()}`;
-              app.$notification.open({
-                message: `文章已保存到石墨上`,
-                description: `标题:${data.title}`,
+        var matchedURLs = key.match(/(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/gm);
+        if (matchedURLs) {
+          matchedURLs.forEach(eachURL => {
+            //尝试识别是不是58pic的网址,并读取其ID号
+            var qiantuID = eachURL.match(/(?<=(www\.58pic\.com\/newpic\/))([0-9]{8})(?!(html))/gm);
+            console.log(qiantuID);
 
-                style: {
-                  width: `${358}px`,
-                },
-                btn: (h) => {
-                  return h('a-button', {
-                    props: {
-                      type: 'primary',
-                      size: 'small',
-                    },
-                    on: {
-                      click: () => {
-                        app.$notification.close(key);
-                        window.open(data.docURL);
-                      }
-                    }
-                  }, '点击查看')
-                },
-                key,
-                onClose: close,
-              });
-            }, function (error) {
-              // 失败
-              console.log(error);
-            });
+            if (qiantuID) {
+              var downloadURL = `http://cdn.52picc.com/qiantu/${qiantuID}.zip?e=1553441694&token=YsxlOcIuU76uwayGqcefhCHsE3FGs14Vv-ePdvBZ:-3V0KLZqtVO3zUhvjYYnZbr2vns=`;
+              AV.Cloud.run('getWebTitle',
+                {
+                  url: eachURL,
+                }
+              ).then(data => {
+                // 成功
+                console.log(data.qiantuTitle);
+                app.$message.success(`将唤起下载千图网素材「${data.qiantuTitle}」`);
+                app.renameDownload(downloadURL, `${data.qiantuTitle}.zip`);
+              }).catch(err => {
+                // 失败
+                console.log(err);
+              })
+
+              // window.location.href = `http://cdn.52picc.com/qiantu/${qiantuID}.zip?e=1553441694&token=YsxlOcIuU76uwayGqcefhCHsE3FGs14Vv-ePdvBZ:-3V0KLZqtVO3zUhvjYYnZbr2vns=` 
+              return
+            }
+
+
+            //不符合以上正则检测,最终则会进行网页剪藏
+            app.webClipper(eachURL);
           })
+
           return
         }
+
         //如果识别为objectID的话
         var objectID = key.match(/[0-9a-zA-Z]{24}/gm);
         if (objectID) {
           this.getID(objectID);
+          return
         }
 
+        app.keyword = key;
         results = await app.searchLC(key);
 
         if (results == "") {
@@ -1570,6 +1720,8 @@ var app = new Vue({
         app.keywordLasttime = key;
       }
 
+
+
       app.resultSumLasttime = results.length;
 
       app.mainList.results = results;
@@ -1597,7 +1749,7 @@ var app = new Vue({
         // window.location.href = `?q=${key}`
         // console.log('关键词为:' + key);
         // bingDic(key);
-        app.searchShimo(key);
+        app.searchGlobal(key);
       }, delay)
     },
     searchByKeyword(request) {
