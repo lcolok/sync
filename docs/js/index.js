@@ -1584,56 +1584,56 @@ var app = new Vue({
         model: true,
         text: '正在摘抄您指定的URL'
       };
-      matchedURL.forEach(e => {
-        AV.Cloud.run('webClipper', {
-          url: e,
-        }).then(function (data) {
-          // 成功
-          console.log(data);
-          app.loadingDialog.model = false;
-          /* app.snackbar.show = false;
-          app.snackbar = {
-            show: true,
-            color: 'success',
-            ripple: false,
-            snackbarText: `文章已保存到石墨上`,
-            snackbarIcon: 'mdi-content-save',
-            actionText: '点击查看',
-            action: () => {
-              window.open(data.docURL);
-            }
-          }; */
-          // app.$message.success(`文章已保存到石墨上`);
-          const key = `open${Date.now()}`;
-          app.$notification.open({
-            message: `文章已保存到石墨上`,
-            description: `标题:${data.title}`,
 
-            style: {
-              width: `${358}px`,
-            },
-            btn: (h) => {
-              return h('a-button', {
-                props: {
-                  type: 'primary',
-                  size: 'small',
-                },
-                on: {
-                  click: () => {
-                    app.$notification.close(key);
-                    window.open(data.docURL);
-                  }
+      AV.Cloud.run('webClipper', {
+        url: matchedURL,
+      }).then(function (data) {
+        // 成功
+        console.log(data);
+        app.loadingDialog.model = false;
+        /* app.snackbar.show = false;
+        app.snackbar = {
+          show: true,
+          color: 'success',
+          ripple: false,
+          snackbarText: `文章已保存到石墨上`,
+          snackbarIcon: 'mdi-content-save',
+          actionText: '点击查看',
+          action: () => {
+            window.open(data.docURL);
+          }
+        }; */
+        // app.$message.success(`文章已保存到石墨上`);
+        const key = `open${Date.now()}`;
+        app.$notification.open({
+          message: `文章已保存到石墨上`,
+          description: `标题:${data.title}`,
+
+          style: {
+            width: `${358}px`,
+          },
+          btn: (h) => {
+            return h('a-button', {
+              props: {
+                type: 'primary',
+                size: 'small',
+              },
+              on: {
+                click: () => {
+                  app.$notification.close(key);
+                  window.open(data.docURL);
                 }
-              }, '点击查看')
-            },
-            key,
-            onClose: close,
-          });
-        }, function (error) {
-          // 失败
-          console.log(error);
+              }
+            }, '点击查看')
+          },
+          key,
+          onClose: close,
         });
-      })
+      }, function (error) {
+        // 失败
+        console.log(error);
+      });
+
 
     }
     ,
