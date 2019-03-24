@@ -161,7 +161,7 @@
 
         <v-list>
           <v-list-tile v-for="(item, i) in generalMenu" :key="i" v-show="item.hide?item.hide():true"
-            @click="item.action();this.tempPlayingID='';primaryDrawer.model=!primaryDrawer.model">
+            @click="item.action();this.tempPlayingID='';primaryDrawer.model=!primaryDrawer.model" :name="item.name">
             <v-list-tile-avatar>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-tile-avatar>
@@ -353,7 +353,7 @@
                   v-show='rightClickMenuItem.showInSheet||$vuetify.breakpoint.name!=="xs"'
                   :key='bottomSheetToolbar.text'>
                   <v-btn flat fab @click="rightClickMenuItem.action(currentVideo,$event);"
-                    :id='rightClickMenuItem.text'>
+                    :id='rightClickMenuItem.text' :name='rightClickMenuItem.name'>
                     <v-flex class='caption'>
                       <v-layout align-center justify-center column fill-height />
                       <v-icon size=20>{{rightClickMenuItem.icon}}</v-icon>{{rightClickMenuItem.text}}
@@ -376,7 +376,7 @@
                       <template v-for="(menuItem, i) in bottomSheetToolbar" v-if='!menuItem.showInSheet'>
                         <v-subheader v-if='menuItem.subheader' class='caption'>{{ menuItem.subheader}}</v-subheader>
                         <v-divider v-if='menuItem.subheader' class="mx-3"></v-divider>
-                        <v-list-tile :name="menuItem.name" :objectID="currentVideo.id" :key="i"
+                        <v-list-tile :name="menuItem.name" :id="menuItem.name" :objectID="currentVideo.id" :key="i"
                           @click="menuItem.action(currentVideo,$event);moreBottomSheet=false;">
                           <v-list-tile-avatar>
                             <v-icon>{{ menuItem.icon }}</v-icon>
@@ -643,21 +643,30 @@
       <v-flex v-scroll="occurFab" v-cloak>
 
         <v-fab-transition>
-          <v-speed-dial slot="activator" v-show="floatBTN_Occur" v-model="fab" :top="top" :bottom="bottom"
-            :right="right" :left="left" :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
+          <v-speed-dial v-show="floatBTN_Occur" v-model='fab' :top="top" :bottom="bottom" :right="right" :left="left"
+            :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
 
-            <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab>
+            <!-- <v-btn fab dark :color="activeFab.color" slot="activator">
               <v-icon>{{ activeFab.icon }}</v-icon>
             </v-btn>
             <v-btn fab dark small color="orange" @click="$vuetify.goTo(0);">
               <v-icon>keyboard_arrow_up</v-icon>
             </v-btn>
-            <v-btn fab dark small color="indigo">
-              <v-icon>add</v-icon>
+            <v-btn fab dark small color="indigo" name='shareThisApp'>
+              <v-icon>mdi-share</v-icon>
             </v-btn>
             <v-btn fab dark small color="green" @click="hoverOrNot;backToSearchTarget;">
               <v-icon>search</v-icon>
+            </v-btn> -->
+
+            <v-btn fab dark :color="activeFab.color" slot="activator">
+              <v-icon>{{ activeFab.icon }}</v-icon>
             </v-btn>
+            <v-btn fab dark v-for="(fab,i) in floatBTN.fabs" :key='i' :color="fab.color" :name="fab.name" 
+              :small="fab.small" @click='fab.action?fab.action():""'>
+              <v-icon>{{ fab.icon }}</v-icon>
+            </v-btn>
+
           </v-speed-dial>
         </v-fab-transition>
 

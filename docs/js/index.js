@@ -107,7 +107,7 @@ var app = new Vue({
     ],
 
     direction: 'top',
-    fab: false,
+    fab: true,
     fling: false,
     hover: true,
     tabs: null,
@@ -116,9 +116,39 @@ var app = new Vue({
     bottom: true,
     left: false,
     transition: 'scale-transition',
-    floatBTN_Occur: 0,
     windowSize: {},
 
+    floatBTN_Occur: 0,
+    floatBTN: {
+      fabs: [
+        {
+          icon: 'keyboard_arrow_up',
+          small: true,
+          color: 'orange',
+          action() {
+            app.$vuetify.goTo(0);
+          }
+        },
+        {
+          icon: 'mdi-share',
+          small: true,
+          color: 'indigo',
+          name: 'shareThisApp',
+          action() {
+
+          }
+        },
+        {
+          icon: 'search',
+          small: true,
+          color: 'green',
+          action() {
+            app.hoverOrNot();
+            app.$refs.searchBar.focus();
+          }
+        },
+      ]
+    },
 
     originalName: '',
     renameInput: '',
@@ -247,6 +277,11 @@ var app = new Vue({
       {
         icon: 'mdi-database-edit', text: '数据管理', action: () => {
           window.open('https://leancloud.cn/dashboard/data.html?appid=Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz#/ShimoBed')
+        }
+      },
+      {
+        icon: 'mdi-share', text: '分享网址',name:'shareThisApp', action: () => {
+
         }
       },
       {
@@ -857,12 +892,17 @@ var app = new Vue({
       window.location.href = downloadURL;
     },
     initClipboardJS() {
-      try {
-        app.bottomSheetCopyBTN.destroy();
-        app.moreCopyBTN.destroy();
-        app.bottomSheetIDbtn.destroy();
-        app.moreIDbtn.destroy();
-      } catch (e) { }
+
+      [
+        app.shareThisAppCopyBTN,
+        app.bottomSheetCopyBTN,
+        app.moreCopyBTN,
+        app.bottomSheetIdCopyBTN,
+        app.moreIdCopyBTN
+      ].forEach(e => {
+        e ? e.destroy() : null
+      })
+
 
       /* var arr = [];
       for (var i in app) {
@@ -870,25 +910,40 @@ var app = new Vue({
       }
       console.log(arr); */
 
-      //bottomSheet里面的复制按钮初始化
-      app.bottomSheetCopyBTN = new ClipboardJS(document.getElementById('复制短链'), {
-        text: function (trigger) {
-          // return app.makeNewDic(app.currentVideo).attributes.copyContent;
-          return app.currentVideo.attributes.copyContent;
+      //分享当前网址的复制按钮初始化
+      function init(name, newCB) {
+        app[name] ? app[name].destroy() : null
+        app[name] = newCB
+      }
 
+      init('shareThisAppCopyBTN', new ClipboardJS(document.getElementsByName('shareThisApp'), {
+        text: function (trigger) {
+          return window.location.href;
         }
       }).on('success', function (e) {
         app.copySuccess();
       }).on('error', function (e) {
         console.log(e);
-      });
+      }))
 
-      console.log(app.bottomSheetCopyBTN);
+      //bottomSheet里面的复制按钮初始化
+      /*       app.bottomSheetCopyBTN = new ClipboardJS(document.getElementById('复制短链'), {
+              text: function (trigger) {
+                // return app.makeNewDic(app.currentVideo).attributes.copyContent;
+                return app.currentVideo.attributes.copyContent;
+      
+              }
+            }).on('success', function (e) {
+              app.copySuccess();
+            }).on('error', function (e) {
+              console.log(e);
+            }); */
+
 
       //more按钮的复制按钮初始化
       app.moreCopyBTN = new ClipboardJS(document.getElementsByName('copyBTN'), {
         text: function (trigger) {
-          return trigger.getAttribute('copyContent')
+          return trigger.getAttribute('copyContent') || app.currentVideo.attributes.copyContent
         }
 
       }).on('success', function (e) {
@@ -899,22 +954,22 @@ var app = new Vue({
       });
 
       //bottomSheet里面的获取ID的复制按钮初始化
-      app.bottomSheetIDbtn = new ClipboardJS(document.getElementById('获取ID'), {
-        text: function (trigger) {
-          return app.currentVideo.id;
-        }
-      }).on('success', function (e) {
-        app.copySuccess();
-      }).on('error', function (e) {
-        console.log(e);
-      });
-
+      /*       app.bottomSheetIdCopyBTN = new ClipboardJS(document.getElementById('获取ID'), {
+              text: function (trigger) {
+                return app.currentVideo.id;
+              }
+            }).on('success', function (e) {
+              app.copySuccess();
+            }).on('error', function (e) {
+              console.log(e);
+            });
+       */
       //more按钮的获取ID的复制按钮初始化
-      app.moreIDbtn = new ClipboardJS(document.getElementsByName('getID'), {
+      app.moreIdCopyBTN = new ClipboardJS(document.getElementsByName('getID'), {
         text: function (trigger) {
           // console.log(trigger);
           // console.log(trigger.getAttribute('objectID'));
-          return trigger.getAttribute('objectID')
+          return trigger.getAttribute('objectID') || app.currentVideo.id;
         }
 
       }).on('success', function (e) {
@@ -1392,7 +1447,7 @@ var app = new Vue({
           snackbarText: `新增${data}条记录`,
           snackbarIcon: 'mdi-sync',
           action: () => {
-
+    
           }
         }; */
         app.$message.success(`新增${data}条记录`);
