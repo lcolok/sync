@@ -1,6 +1,9 @@
 var AV = require('leanengine');
 
-AV.Cloud.define('updateShimo', function (request) {
+AV.Cloud.define('updateShimo', (request) => { return updateShimo(request) })
+
+
+function updateShimo(request) {
     try {
         var AV = require('leancloud-storage');
         // 初始化存储 SDK
@@ -455,4 +458,12 @@ AV.Cloud.define('updateShimo', function (request) {
 
     return update(newDiscussionID, getAttachmentID);//返回更新了多少个文件
 
-})
+}
+
+
+require('../toolScript/identifier.js').run({
+    rules: 'vscode',
+    func: () => {
+        updateShimo();
+    }
+}) 
