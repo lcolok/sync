@@ -154,9 +154,19 @@ app.post('/upload', function (req, res) {
     const r = request.post({
       url: 'https://uploader.shimo.im/upload2',
       // header: headers,
-    }, function optionalCallback(err, httpResponse, body) {
+    }, function optionalCallback(err, httpResponse, body) {//上传成功后的callback
       console.log(body);
-      res.send(body);//返回消息
+      res.send(body);//返回消息,告诉前端已经上传成功
+      var json = JSON.parse(body);
+
+      var arr = filename.split('.');
+      var suffix = arr.pop();
+      var realName = arr.join('.');
+
+      json.data.type = suffix;
+      json.data.name = realName;
+
+      AV.Cloud.run('updateShimo', json);
     })
     const form = r.form();
     form.append('server', 'qiniu');
@@ -172,7 +182,7 @@ app.post('/upload', function (req, res) {
       var uploaded = r.req.connection._bytesDispatched;
       var mb = uploaded / (1024 * 1024);
       var percent = (uploaded / size * 100).toFixed(0);
-      if (percent == 100) {
+      if (percent >= 100) {
         clearInterval(interval);
       }
 
