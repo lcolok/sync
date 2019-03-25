@@ -292,7 +292,7 @@ var app = new Vue({
       {
         icon: 'mdi-apple-safari', text: '桌面图标',
         hide: () => {//填写隐藏规则
-          return !window.navigator.standalone
+          return !window.navigator.standalone//检测是否全屏(是否在PWA状态下打开)
         },
         action: () => {
           // window.location.href='mqqapi://';//打开QQ
@@ -506,7 +506,7 @@ var app = new Vue({
         if (param.q) { return this.getQ(param.q) };
         if (param.v) { return this.getV(param.v) };
         if (param.id) { return this.getID(param.id) };
-        if (param.b) { return this.getB(param.b) };
+        if (param.b && (!window.navigator.standalone)) { return this.getB(param.b) };//检测是否带b参数,并且是否在全屏状态下(是否在PWA状态下打开)
       }
 
       if (this.searchGlobal('')) { return };
@@ -784,6 +784,8 @@ var app = new Vue({
       });
     },
     autoLoad() {
+      if (app.keywordLasttime) { return }
+
       //变量scrollTop是滚动条滚动时，距离顶部的距离
       var scrollTop = document.documentElement.scrollTop || document.body.scrollTop || window.pageYOffset;
       //变量windowHeight是可视区的高度
