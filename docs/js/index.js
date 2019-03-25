@@ -275,8 +275,13 @@ var app = new Vue({
         }
       },
       {
-        icon: 'mdi-cloud-upload', text: '上传专用', action: () => {
+        icon: 'mdi-file-upload', text: '石墨文档上传',tip:'将会打开石墨的页面进行上传(需要购买会员才能上传10M以上的文件)', action: () => {
           window.open('https://shimo.im/docs/K8CWmBMqMtYYpU1f');
+        }
+      },
+      {
+        icon: 'mdi-cloud-upload', text: '上传页面',tip:'将会打开一个反向代理的上传页(100M以内的文件应该都无压力的)', action: () => {
+          window.open((window.location.href + 'uploadPage'));
         }
       },
       {
