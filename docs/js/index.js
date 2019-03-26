@@ -55,7 +55,7 @@ var app = new Vue({
         icon: 'mdi-music',
       },
       {
-        rule: ["png", "jpg", "bmp","gif"],
+        rule: ["png", "jpg", "bmp", "gif"],
         emoji: "🖼️",//图片
         type: "图片",
         size: '',
@@ -282,12 +282,12 @@ var app = new Vue({
         }
       },
       {
-        icon: 'mdi-file-upload', text: '石墨文档上传',tip:'将会打开石墨的页面进行上传(需要购买会员才能上传10M以上的文件)', action: () => {
+        icon: 'mdi-file-upload', text: '石墨文档上传', tip: '将会打开石墨的页面进行上传(需要购买会员才能上传10M以上的文件)', action: () => {
           window.open('https://shimo.im/docs/K8CWmBMqMtYYpU1f');
         }
       },
       {
-        icon: 'mdi-cloud-upload', text: '上传页面',tip:'将会打开一个反向代理的上传页(100M以内的文件应该都无压力的)', action: () => {
+        icon: 'mdi-cloud-upload', text: '上传页面', tip: '将会打开一个反向代理的上传页(100M以内的文件应该都无压力的)', action: () => {
           window.open((window.location.href + 'uploadPage'));
         }
       },
@@ -329,7 +329,7 @@ var app = new Vue({
     searchDuration: 0,
     keywordLasttime: null,
     resultSumLasttime: null,
-    typeList: [
+    typeList: [/* 
 
       {
         size: '20', icon: 'fas fa-globe-americas', text: '全部'
@@ -340,7 +340,7 @@ var app = new Vue({
       { size: '', icon: 'mdi-file-pdf', text: 'PDF' },
       { size: '20', icon: 'fas fa-file-archive fa-xs', text: '压缩包' },
 
-    ],
+     */],
     mainList: {
       selected: [],
       results: [
@@ -526,6 +526,11 @@ var app = new Vue({
     }
   },
   watch: {
+    typeList(val) {
+      this.typeListSorted = val.slice().sort((a, b) => {
+        return b.count - a.count
+      });
+    },
     renameDialog(val) {
       if (val) {
         app.removePasteEvent();
