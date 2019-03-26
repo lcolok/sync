@@ -1,6 +1,7 @@
 /**
  * FilePond Custom Styles
  */
+ 
  .filepond--drop-label {
 	color: #4c4e53;
 }
@@ -24,14 +25,18 @@
 }
 
 
+.filepond--root {
+    height:100vh
+}
+
 /**
  * Page Styles
  */
-html {
+/* html {
 	padding:30vh 0 0;
-}
+} */
 
 body {
-	max-width: 20em;
+	/* max-width: 20em; */
 	margin: 0 auto;
 }
