@@ -55,6 +55,13 @@ var app = new Vue({
         icon: 'mdi-music',
       },
       {
+        rule: ["png", "jpg", "bmp","gif"],
+        emoji: "🖼️",//图片
+        type: "图片",
+        size: '',
+        icon: 'mdi-file-image',
+      },
+      {
         rule: ["zip", "7z", "rar"],
         emoji: "📦",//压缩包
         type: "压缩包",
