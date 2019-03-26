@@ -1657,7 +1657,7 @@ var app = new Vue({
         if (matchedURLs) {
           matchedURLs.forEach(eachURL => {
             //尝试识别是不是58pic的网址,并读取其ID号
-            var qiantuURL = eachURL.match(/((www\.58pic\.com\/newpic\/))([0-9]{8})(\.html)/);
+            var qiantuURL = eachURL.match(/((www\.58pic\.com\/newpic\/))([0-9]{8})(\.html)/)[0];
 
             if (qiantuURL) {
               var qiantuID = qiantuURL.match(/([0-9]{8})/);
