@@ -4,9 +4,9 @@ AV.init({
 });
 
 LeanCloudInit();
-setInterval(() => {
+/* setInterval(() => {
     LeanCloudInitMute();
-}, 60000)
+}, 60000) */
 
 
 function LeanCloudInit() {
