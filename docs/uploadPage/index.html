@@ -4,24 +4,26 @@
 <head>
     <title>石墨床上传页面</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-    <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.min.css">
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <link rel="stylesheet" href="sytle.css">
     <link rel="stylesheet"
         href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css">
-
+    <link href="https://unpkg.com/filepond-plugin-file-poster/dist/filepond-plugin-file-poster.css" rel="stylesheet">
 
 </head>
 
-<body>
-
+<body bgcolor="black">
+<div>
     <input type="file" name="filepond" required multiple>
-
+</div>
 </body>
 
-
-
-<script src="https://unpkg.com/filepond-plugin-image-preview"></script>
-<script src="https://unpkg.com/filepond"></script>
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+<script
+    src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-rename/dist/filepond-plugin-file-rename.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-poster/dist/filepond-plugin-file-poster.js"></script>
+<script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 <!-- <script src="https://unpkg.com/vue"></script> -->
 <!-- <script src="https://unpkg.com/vue-filepond"></script> -->
 
@@ -29,21 +31,59 @@
     // get a reference to the input element
     const inputElement = document.querySelector('input[type="file"]');
 
+    FilePond.registerPlugin(
+        FilePondPluginImagePreview,
+        FilePondPluginImageExifOrientation,
+        FilePondPluginFilePoster
+    );
+
+    console.log(inputElement);
+
     // create a FilePond instance at the input element location
     const pond = FilePond.create(inputElement, {
-        maxFiles: 10,
-        // allowBrowse: false
+        // maxFiles: 10,
+        // allowBrowse: false,
+        // allowImagePreview: true,
+        dropOnPage: true,
+        labelIdle:'拖放文件于此或者<span class="filepond--label-action"> 浏览本地 </span>',
+        files: [
+            {
+                // the server file reference
+                source: '12345',
+
+                // set type to local to indicate an already uploaded file
+                options: {
+                    type: 'local',
+
+                    // stub file information
+                    file: {
+                        name: 'my-file.png',
+                        size: 3001025,
+                        type: 'image/png'
+                    },
+
+                    // pass poster property
+                    metadata: {
+                        poster: 'fog_blurred.png'
+                    }
+                }
+            },
+        ]
     });
 
-    FilePond.setOptions({
-        server: '/upload/'
+
+
+    pond.setOptions({
+        server: '/upload/',
     });
+
+    pond.browse();
 
     // attributes and initial options have been set to pond options
     console.log(pond.name);  // 'filepond'
     console.log(pond.maxFiles); // 10
     console.log(pond.required); // true
-    console.log(pond.allowMultiple); // true
+    console.log(pond.allowImagePreview); // true
 </script>
 
 </html>
