@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>石墨床上传页面</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.min.css">
+    <link rel="stylesheet"
+        href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css">
+
+</head>
+
+<body>
+
+    <div id="app">
+        <file-pond name="test" ref="pond" class-name="my-pond" label-idle="Drop files here..." allow-multiple="true"
+            :files="myFiles" @init="handleFilePondInit" @addfile='upload' />>
+        </file-pond>
+    </div>
+
+    <script src="https://unpkg.com/filepond-plugin-image-preview"></script>
+    <script src="https://unpkg.com/filepond"></script>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-filepond"></script>
+
+
+
+</body>
+
+
+<script>
+        new Vue({
+            el: '#app',
+            components: {
+                FilePond: vueFilePond.default(FilePondPluginImagePreview)
+            },
+            data() {
+                return { myFiles: [] };
+            },
+            methods: {
+                handleFilePondInit: function () {
+                    console.log('FilePond has initialized');
+
+  
+                    // example of instance method call on pond reference
+                    this.$refs.pond.getFiles();
+
+                    FilePond.setOptions({
+                        server: '/upload/'
+                    });
+                },
+                upload() {
+                    console.log('准备上传啦');
+                }
+            },
+        })
+    </script>
+
+</html>
