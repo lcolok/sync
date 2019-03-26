@@ -10,33 +10,40 @@
         href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css">
 
 
-    <script src="https://unpkg.com/filepond-plugin-image-preview"></script>
-    <script src="https://unpkg.com/filepond"></script>
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://unpkg.com/vue-filepond"></script>
 </head>
 
 <body>
-  
-        <input type="file" name="filepond" required multiple>
+
+    <input type="file" name="filepond" required multiple>
 
 </body>
 
 
+
+<script src="https://unpkg.com/filepond-plugin-image-preview"></script>
+<script src="https://unpkg.com/filepond"></script>
+<!-- <script src="https://unpkg.com/vue"></script> -->
+<!-- <script src="https://unpkg.com/vue-filepond"></script> -->
+
 <script>
-        // get a reference to the input element
-        const inputElement = document.querySelector('input[type="file"]');
-        
-        // create a FilePond instance at the input element location
-        const pond = FilePond.create( inputElement, {
-            maxFiles: 10,
-            allowBrowse: false
-        });
-        
-        // attributes and initial options have been set to pond options
-        console.log(pond.name);  // 'filepond'
-        console.log(pond.maxFiles); // 10
-        console.log(pond.required); // true
-        console.log(pond.allowMultiple); // true
-        </script>
+    // get a reference to the input element
+    const inputElement = document.querySelector('input[type="file"]');
+
+    // create a FilePond instance at the input element location
+    const pond = FilePond.create(inputElement, {
+        maxFiles: 10,
+        // allowBrowse: false
+    });
+
+    FilePond.setOptions({
+        server: '/upload/'
+    });
+
+    // attributes and initial options have been set to pond options
+    console.log(pond.name);  // 'filepond'
+    console.log(pond.maxFiles); // 10
+    console.log(pond.required); // true
+    console.log(pond.allowMultiple); // true
+</script>
+
 </html>
