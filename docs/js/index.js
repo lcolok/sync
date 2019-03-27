@@ -673,13 +673,32 @@ var app = new Vue({
 
       // create a FilePond instance at the input element location
       const pond = FilePond.create(inputElement, {
-        // maxFiles: 10,
-        // allowBrowse: false,
-        // allowImagePreview: true,
         server: '/upload/',
         dropOnPage: true,
-        labelIdle: '拖放文件于此或者<span class="filepond--label-action"> 浏览本地 </span>',
 
+        //以下为本地化
+        labelIdle: '拖放文件于此或者<span class="filepond--label-action"> 浏览本地 </span>',
+        labelInvalidField: '字段包含无效文件',
+        labelFileWaitingForSize: '正在计算大小',
+        labelFileSizeNotAvailable: '未知大小',
+        labelFileLoading: '载入中',
+        labelFileLoadError: '加载出错',
+        labelFileProcessing: '上传中',
+        labelFileProcessingComplete: '上传完成',
+        labelFileProcessingAborted: '上传已取消',
+        labelFileProcessingError: '上传时出错',
+        labelFileProcessingRevertError: '还原时出错',
+        labelFileRemoveError: '删除时出错',
+        labelTapToCancel: '点击取消',
+        labelTapToRetry: '点击重试',
+        labelTapToUndo: '点击撤消',
+        labelButtonRemoveItem: '移除',
+        labelButtonAbortItemLoad: '中止',
+        labelButtonRetryItemLoad: '重试',
+        labelButtonAbortItemProcessing: '取消',
+        labelButtonUndoItemProcessing: '撤回',
+        labelButtonRetryItemProcessing: '重试',
+        labelButtonProcessItem: '上传',
       });
     },
 
