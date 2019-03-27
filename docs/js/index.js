@@ -20,6 +20,10 @@ var app = new Vue({
     maxItemsPerPage: 20,
     hasLoadedPages: 0,
 
+    dropAndUploadDialog: {
+      model: true,
+      show: false
+    },
     saveDesktopIconDialog: false,
     moreBottomSheet: false,
 
@@ -142,12 +146,12 @@ var app = new Vue({
           }
         },
         {
-          icon: 'mdi-share',
+          icon: 'mdi-cloud-upload',
           small: true,
           color: 'indigo',
-          name: 'shareThisApp',
+          name: 'upload',
           action() {
-
+            app.dropAndUploadDialog.show = true;
           }
         },
         {
@@ -511,6 +515,8 @@ var app = new Vue({
       this.getScrollStyle();
       this.initPlayers();
       this.initPasteEvent();
+      this.initFilePond();
+      this.initDropFiled();
       //处理Params
       // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchGlobal('')))
       var param = this.getUrlVars();
@@ -588,6 +594,84 @@ var app = new Vue({
             case 'xl': return '800px';
           }
         }, */
+    initDropFiled() {
+      //拖拽的目标节点
+      var dropZone = document.getElementById('app');
+
+
+      function showDropZone() {
+        console.log("visible");
+        app.dropAndUploadDialog.show = true;
+
+        // dropZone.style.visibility = "visible";
+      }
+      function hideDropZone() {
+        console.log("hidden");
+        app.dropAndUploadDialog.show = false;
+        // dropZone.style.visibility = "hidden";
+      }
+
+      function allowDrag(e) {
+        if (true) {
+          // Test that the item being dragged is a valid one
+          e.dataTransfer.dropEffect = 'copy';
+          e.preventDefault();
+        }
+      }
+
+      function handleDrop(e) {
+        if (app.timerCloseDialog) { clearTimeout(app.timerCloseDialog); }
+        e.preventDefault();
+        
+        // hideDropZone();
+
+        console.log(e);
+      }
+
+      // 监听widow上的事件
+      window.addEventListener('dragenter', function (e) {
+        showDropZone();
+      });
+
+      dropZone.addEventListener('dragenter', allowDrag);
+      dropZone.addEventListener('dragover', allowDrag);
+
+      dropZone.addEventListener('dragover', () => {
+        if (app.timerCloseDialog) { clearTimeout(app.timerCloseDialog); }
+        app.timerCloseDialog = setTimeout(() => {
+          hideDropZone();
+        }, 500)
+      });
+
+      // dropZone.addEventListener('dragleave', hideDropZone);
+
+      // document.getElementById('filepond').addEventListener('dragleave', hideDropZone);
+
+      dropZone.addEventListener('drop', handleDrop);
+    },
+    initFilePond() {
+      const inputElement = document.querySelector('input[type="file"]');
+      const inputElement2 = document.getElementById('filepond2');
+
+      FilePond.registerPlugin(
+        FilePondPluginImagePreview,
+        FilePondPluginImageExifOrientation,
+        FilePondPluginFilePoster
+      );
+
+      console.log(inputElement);
+
+      // create a FilePond instance at the input element location
+      const pond = FilePond.create(inputElement, {
+        // maxFiles: 10,
+        // allowBrowse: false,
+        // allowImagePreview: true,
+        server: '/upload/',
+        dropOnPage: true,
+        labelIdle: '拖放文件于此或者<span class="filepond--label-action"> 浏览本地 </span>',
+
+      });
+    },
 
     isMobileSafari() {
       var ua = navigator.userAgent;

@@ -17,6 +17,12 @@
   <link rel='stylesheet' href='https://unpkg.com/ant-design-vue@1.3.5/dist/antd.min.css'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.25.0/DPlayer.min.css">
 
+  <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css">
+  <link href="https://unpkg.com/filepond-plugin-file-poster/dist/filepond-plugin-file-poster.css" rel="stylesheet">
+
+
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
@@ -164,14 +170,14 @@
           <v-list-tile v-for="(item, i) in generalMenu" :key="i" v-show="item.hide?item.hide():true"
             @click="item.action();this.tempPlayingID='';primaryDrawer.model=!primaryDrawer.model" :name="item.name">
 
-            <a-tooltip placement="right"  :title="item.tip">
-                <v-layout align-center justify-center row fill-height />
-                <v-list-tile-avatar>
-                  <v-icon>{{ item.icon }}</v-icon>
-                </v-list-tile-avatar>
-                <v-list-tile-title>
-                  {{ item.text }}
-                </v-list-tile-title>
+            <a-tooltip placement="right" :title="item.tip">
+              <v-layout align-center justify-center row fill-height />
+              <v-list-tile-avatar>
+                <v-icon>{{ item.icon }}</v-icon>
+              </v-list-tile-avatar>
+              <v-list-tile-title>
+                {{ item.text }}
+              </v-list-tile-title>
             </a-tooltip>
           </v-list-tile>
 
@@ -792,6 +798,18 @@
         </v-card>
       </v-dialog>
 
+      <v-bottom-sheet v-model="dropAndUploadDialog.show" inset >
+        <v-card height="180">
+          <v-container>
+            <v-flex xs12>
+              <input class="dropzone" type="file" name="filepond" id="filepond" required multiple>
+            </v-flex>
+          </v-container>
+        </v-card>
+
+
+      </v-bottom-sheet>
+
 
 
       <v-dialog v-model="saveDesktopIconDialog" max-width="400">
@@ -800,7 +818,7 @@
 
           <v-container>
             <v-layout align-center justify-center column fill-height />
-            <v-flex ma-1>
+            <v-flex>
               <v-img src="addIcon/assets/UploadCloud.jpg" class='customToast' width='50px' height='auto'></v-img>
             </v-flex>
             <v-flex class='title' ma-1>
@@ -887,6 +905,14 @@
   crossorigin="anonymous"></script>
 <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+
+
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+<script
+  src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-rename/dist/filepond-plugin-file-rename.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-poster/dist/filepond-plugin-file-poster.js"></script>
+<script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 
 
 <script src="js/leanCloudInit.js"></script>

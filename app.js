@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';
 
 var express = require('express');
 var timeout = require('connect-timeout');
@@ -99,7 +99,27 @@ app.get('/oldver', function (req, res) {
 
 //只能以Form形式上传name为mFile的文件
 
+app.post('/uploadPipe', async function (req, res) {
 
+/*   var upload = multer({ dest: 'uploadPipe/' }).any();
+  upload(req, res, function (err) {
+    //添加错误处理
+    if (err) {
+      console.log(err);
+      return;
+    }
+  });
+ */
+ 
+  console.log(req.data);
+
+  return
+  var r = request.post('https://uploader.shimo.im/upload2', function optionalCallback(err, httpResponse, body) {
+    console.log(body);
+  });
+  r.pipe(res);
+
+});
 
 app.post('/upload', function (req, res) {
   console.log("---------访问上传路径-------------");
@@ -145,7 +165,9 @@ app.post('/upload', function (req, res) {
     /** A better way to copy the uploaded file. **/
     console.log(filename);
 
-    var token = await getTokenShimo();
+    // var token = await getTokenShimoRaw();
+    var token = await AV.Cloud.run('getTokenShimoRaw');
+
     console.log("拿到石墨评论中的Token:  " + token);
 
     var data = fs.createReadStream(src);
@@ -157,7 +179,7 @@ app.post('/upload', function (req, res) {
       // header: headers,
     }, function optionalCallback(err, httpResponse, body) {//上传成功后的callback
       console.log(body);
-      res.send(body);//返回消息,告诉前端已经上传成功
+
       var json = JSON.parse(body);
 
       var arr = filename.split('.');
@@ -168,6 +190,11 @@ app.post('/upload', function (req, res) {
       json.data.name = realName;
 
       AV.Cloud.run('updateShimo', json);
+      res.send(body);//返回消息,告诉前端已经上传成功
+      fs.unlink(src, (err) => {//上传完删除文件
+        if (err) throw err;
+        console.log('\033[1;31;47m' + `已删除文件：${src}` + '\033[0m');
+      });
     })
     const form = r.form();
     form.append('server', 'qiniu');
@@ -197,24 +224,7 @@ app.post('/upload', function (req, res) {
   }
 
 
-  function getTokenShimo() {
-    return new Promise((resolve, reject) => {
-      request.post('https://shimo.im/api/upload/token', {
-        json: true,
-        headers: {
-          'Cookie': process.env.shimoCookie,
-        }
-      }, (err, httpResponse, body) => {
-        if (!err) {
-          var token = body.data.accessToken.toString();
-          // console.log(token);
-          resolve(token)
-        } else {
-          reject(false);
-        }
-      })
-    })
-  }
+
 
 
 });

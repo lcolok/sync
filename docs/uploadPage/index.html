@@ -10,12 +10,46 @@
         href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css">
     <link href="https://unpkg.com/filepond-plugin-file-poster/dist/filepond-plugin-file-poster.css" rel="stylesheet">
 
+    <style type="text/css">
+        div#dropZone {
+            background: gray;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            opacity: 0.6;
+            visibility: hidden;
+        }
+
+        .desc {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+        }
+
+        .dropzone {
+            padding: 30vh 0 0;
+            max-width: 20em;
+            margin: 5 auto;
+            opacity: 1;
+        }
+    </style>
 </head>
 
-<body bgcolor="black">
-<div>
-    <input type="file" name="filepond" required multiple>
-</div>
+<body>
+    <div id="dropZone">
+
+        <div>
+            <input class="dropzone" type="file" name="filepond" required multiple>
+
+
+            <!-- <input type="file" id="filepond2" required multiple> -->
+        </div>
+        <!-- <p class="desc">释放即可上传</p> -->
+    </div>
+
 </body>
 
 <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
@@ -24,12 +58,26 @@
 <script src="https://unpkg.com/filepond-plugin-file-rename/dist/filepond-plugin-file-rename.js"></script>
 <script src="https://unpkg.com/filepond-plugin-file-poster/dist/filepond-plugin-file-poster.js"></script>
 <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.11.1/dist/av-min.js"></script>
+
 <!-- <script src="https://unpkg.com/vue"></script> -->
 <!-- <script src="https://unpkg.com/vue-filepond"></script> -->
 
 <script>
+    AV.init({
+        //以下是石墨床的
+        appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+        appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+
+
+        //以下是Sync的
+        // appId: '1oHwyqv3qyzH6hFsjCJULJ31-gzGzoHsz',
+        // appKey: 'g7G4uPGRbJc5GaK4yn36FqkC',
+    });
+
     // get a reference to the input element
     const inputElement = document.querySelector('input[type="file"]');
+    const inputElement2 = document.getElementById('filepond2');
 
     FilePond.registerPlugin(
         FilePondPluginImagePreview,
@@ -44,47 +92,139 @@
         // maxFiles: 10,
         // allowBrowse: false,
         // allowImagePreview: true,
-        dropOnPage: true,
-        labelIdle:'拖放文件于此或者<span class="filepond--label-action"> 浏览本地 </span>',
-        
-/*         files: [
-            {
-                // the server file reference
-                source: '12345',
-
-                // set type to local to indicate an already uploaded file
-                options: {
-                    type: 'local',
-
-                    // stub file information
-                    file: {
-                        name: 'my-file.png',
-                        size: 3001025,
-                        type: 'image/png'
-                    },
-
-                    // pass poster property
-                    metadata: {
-                        poster: 'fog_blurred.png'
-                    }
-                }
-            },
-        ] */
-    });
-
-
-
-    pond.setOptions({
         server: '/upload/',
+        dropOnPage: true,
+        labelIdle: '拖放文件于此或者<span class="filepond--label-action"> 浏览本地 </span>',
+
+        /*         files: [
+                    {
+                        // the server file reference
+                        source: '12345',
+        
+                        // set type to local to indicate an already uploaded file
+                        options: {
+                            type: 'local',
+        
+                            // stub file information
+                            file: {
+                                name: 'my-file.png',
+                                size: 3001025,
+                                type: 'image/png'
+                            },
+        
+                            // pass poster property
+                            metadata: {
+                                poster: 'fog_blurred.png'
+                            }
+                        }
+                    },
+                ] */
     });
 
-    pond.browse();
+
+
+    const pond2 = FilePond.create(inputElement2, {
+        // maxFiles: 10,
+        // allowBrowse: false,
+        // allowImagePreview: true,
+        server: {
+            process: {
+                url: '/uploadPipe/',
+                method: 'POST',
+                // headers: {
+                //     'x-customheader': 'Hello World'
+                // },
+                withCredentials: false,
+                onload: (response) => response.key,
+                onerror: (response) => response.data,
+                ondata: async (formData) => {
+                    formData.append('Hello', 'World');
+                    formData.append('server', 'qiniu');
+                    formData.append('type', 'attachments');
+
+                    var token = await AV.Cloud.run('getTokenShimoRaw');
+                    console.log("拿到石墨评论中的Token:  " + token);
+                    formData.append('accessToken', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjI2MTczLCJpYXQiOjE1NTM2ODI5MjUsImV4cCI6MTU1Mzc2OTMyNX0.AWj_BMH0oYbn4GW8wix3Ki78-Nw17OixaLMcsXfxLwU');
+                    return formData;
+                }
+            }
+        },
+        dropOnPage: true,
+        labelIdle: '<div style="color:blue">此上传使用Pipe方法</div><div>拖放文件于此或者<span class="filepond--label-action"> 浏览本地 </span></div>',
+
+        /*         files: [
+                    {
+                        // the server file reference
+                        source: '12345',
+        
+                        // set type to local to indicate an already uploaded file
+                        options: {
+                            type: 'local',
+        
+                            // stub file information
+                            file: {
+                                name: 'my-file.png',
+                                size: 3001025,
+                                type: 'image/png'
+                            },
+        
+                            // pass poster property
+                            metadata: {
+                                poster: 'fog_blurred.png'
+                            }
+                        }
+                    },
+                ] */
+    });
+
 
     // attributes and initial options have been set to pond options
-    console.log(pond.name);  // 'filepond'
-    console.log(pond.maxFiles); // 10
-    console.log(pond.required); // true
-    console.log(pond.allowImagePreview); // true
+    /*    console.log(pond.name);  // 'filepond'
+       console.log(pond.maxFiles); // 10
+       console.log(pond.required); // true
+       console.log(pond.allowImagePreview); // true */
+</script>
+
+<script type="text/javascript">
+    //拖拽的目标节点
+    var dropZone = document.getElementById('dropZone');
+
+    function showDropZone() {
+        dropZone.style.visibility = "visible";
+    }
+    function hideDropZone() {
+        dropZone.style.visibility = "hidden";
+    }
+
+    function allowDrag(e) {
+        if (true) {
+            // Test that the item being dragged is a valid one
+            e.dataTransfer.dropEffect = 'copy';
+            e.preventDefault();
+        }
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        // hideDropZone();
+
+        console.log(e);
+    }
+
+    // 监听widow上的事件
+    window.addEventListener('dragenter', function (e) {
+        showDropZone();
+    });
+
+    dropZone.addEventListener('dragenter', allowDrag);
+    dropZone.addEventListener('dragover', allowDrag);
+
+    dropZone.addEventListener('dragleave', function (e) {
+        // hideDropZone();
+    });
+
+
+    dropZone.addEventListener('drop', handleDrop);
 </script>
 
 </html>
