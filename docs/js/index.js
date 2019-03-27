@@ -1312,7 +1312,8 @@ var app = new Vue({
       return this.scrollStyle = `max-height: ${window.innerHeight - 120}px`
     },
     cutHTTP(input) {
-      return input.replace(/[a-zA-z]+:\/\//g, '');
+      // return input.replace(/[a-zA-z]+:\/\//g, '');
+      return input;
     },
     makeEmoji(suffix) {
       var emoji;
