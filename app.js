@@ -41,7 +41,6 @@ app.enable('trust proxy');
 app.use(AV.Cloud.HttpsRedirect());// 重定向到 HTTPS
 
 app.get('/', async function (req, res) {
-  console.log('aaaa');
   var query = req.query;
   console.log(query);
   if (!query) { return }
