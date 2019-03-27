@@ -30,7 +30,6 @@ var ejs = require('ejs');  //我是新引入的ejs插件,让express也能够加�
 app.engine('html', ejs.__express);
 app.set('view engine', 'html');
 
-app.use(express.static(path.join(__dirname, 'docs')));//利用 Express 托管静态文件
 
 // 设置默认超时时间
 app.use(timeout('240s'));
@@ -41,8 +40,8 @@ app.use(AV.express());
 
 
 app.enable('trust proxy');
-// 需要重定向到 HTTPS 可去除下一行的注释。
-app.use(AV.Cloud.HttpsRedirect());
+app.use(AV.Cloud.HttpsRedirect());// 重定向到 HTTPS
+app.use(express.static(path.join(__dirname, 'docs')));//利用 Express 托管静态文件
 
 app.use(bodyParser.json({ limit: '1000gb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -51,8 +50,10 @@ app.use(cookieParser());
 
 app.get('/', async function (req, res) {
 
-  var r = req.query.r;
-  if (r) {
+  var query = req.query;
+  if (!query) { return }
+
+  if (query.r) {
     var query = new AV.Query('randomTCN');
     var redirectURL = await new Promise((resolve) => {
       query.equalTo('r', r).find().then(e => {
