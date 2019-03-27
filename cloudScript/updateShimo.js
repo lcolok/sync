@@ -16,7 +16,7 @@ var ShimoBed = AV.Object.extend('ShimoBed');
 var newDiscussionID = "K8CWmBMqMtYYpU1f";
 var getAttachmentID = "K8CWmBMqMtYYpU1f";
 
-console.log(process.env.shimoCookie);
+// console.log(process.env.shimoCookie);
 
 var shimoCookie = process.env.shimoCookie;
 
@@ -502,7 +502,7 @@ function updateShimo(request) {
 
 
 require('../toolScript/identifier.js').run({
-    rules: 'vscode||local',
+    rules: 'vscode',
     func: () => {
         updateShimo();
     }

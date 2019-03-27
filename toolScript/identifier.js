@@ -61,7 +61,7 @@ function run(json,func) {
         } catch (err) {
             console.log(err); return err
         }
-        console.log(runner);
+        // console.log(runner);
         if (judgement) {
             func();
         }

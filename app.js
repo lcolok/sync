@@ -37,11 +37,11 @@ app.use(timeout('240s'));
 // 加载云引擎中间件
 app.use(AV.express());
 
-
+app.use(express.static(path.join(__dirname, 'docs')));//利用 Express 托管静态文件
 
 app.enable('trust proxy');
 app.use(AV.Cloud.HttpsRedirect());// 重定向到 HTTPS
-app.use(express.static(path.join(__dirname, 'docs')));//利用 Express 托管静态文件
+
 
 app.use(bodyParser.json({ limit: '1000gb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -51,6 +51,7 @@ app.use(cookieParser());
 app.get('/', async function (req, res) {
 
   var query = req.query;
+  console.log(query);
   if (!query) { return }
 
   if (query.r) {
@@ -86,6 +87,7 @@ app.get('/', async function (req, res) {
 
 
 app.get('/aaa', function (req, res) {
+  console.log('aaa');
   res.redirect('http://www.baidu.com')
 });
 
@@ -98,6 +100,7 @@ app.get('/oldver', function (req, res) {
 });
 
 //只能以Form形式上传name为mFile的文件
+
 
 app.post('/uploadPipe', async function (req, res) {
 
