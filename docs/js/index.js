@@ -262,10 +262,20 @@ var app = new Vue({
         }
       },
       {
-        icon: 'mdi-egg-easter', text: '获取ID', name: 'getID', action: () => {
+        icon: 'mdi-link-box-variant-outline', text: '纯短链', name: 'copyShortURL', action: () => {
 
         }
       },
+      {
+        icon: 'mdi-link-variant', text: '纯长链', name: 'copyLongURL', action: () => {
+
+        }
+      },
+      /*       {
+              icon: 'mdi-egg-easter', text: '获取ID', name: 'getID', action: () => {
+      
+              }
+            }, */
       {
         icon: 'mdi-delete', text: '删除该项', subheader: '敏感操作', action: (deleteOjbect) => {
           app.deleteOjbect = deleteOjbect;
@@ -622,7 +632,7 @@ var app = new Vue({
       function handleDrop(e) {
         if (app.timerCloseDialog) { clearTimeout(app.timerCloseDialog); }
         e.preventDefault();
-        
+
         // hideDropZone();
 
         console.log(e);
@@ -1129,17 +1139,27 @@ var app = new Vue({
       init('shareThisApp', {
         text: () => window.location.href,
         message: '已复制本网站地址,请分享给好友吧'
-      })
+      });
 
       init('copyBTN', {
         text: e => e.getAttribute('copyContent') || app.currentVideo.attributes.copyContent,
-        message: '已复制本网站地址,请分享给好友吧'
-      })
+        message: '已复制短链分享组合'
+      });
 
       init('getID', {
         text: e => e.getAttribute('objectID') || app.currentVideo.id,
-        message: '已复制本网站地址,请分享给好友吧'
-      })
+        message: '已复制本项目的ID号'
+      });
+
+      init('copyLongURL', {
+        text: e => e.getAttribute('copyLongURL') || app.currentVideo.attributes.url,
+        message: '已复制纯长链'
+      });
+
+      init('copyShortURL', {
+        text: e => e.getAttribute('copyShortURL') || app.currentVideo.attributes.shortURL,
+        message: '已复制纯短链'
+      });
 
       /*  //more按钮的复制按钮初始化
        app.moreCopyBTN = new ClipboardJS(document.getElementsByName('copyBTN'), {
