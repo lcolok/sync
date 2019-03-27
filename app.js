@@ -37,24 +37,17 @@ app.use(timeout('240s'));
 // 加载云引擎中间件
 app.use(AV.express());
 
-app.use(express.static(path.join(__dirname, 'docs')));//利用 Express 托管静态文件
-
 app.enable('trust proxy');
 app.use(AV.Cloud.HttpsRedirect());// 重定向到 HTTPS
 
-
-app.use(bodyParser.json({ limit: '1000gb' }));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-
-
 app.get('/', async function (req, res) {
-
+  console.log('aaaa');
   var query = req.query;
   console.log(query);
   if (!query) { return }
 
   if (query.r) {
+    var r = req.query.r;
     var query = new AV.Query('randomTCN');
     var redirectURL = await new Promise((resolve) => {
       query.equalTo('r', r).find().then(e => {
@@ -80,10 +73,19 @@ app.get('/', async function (req, res) {
     res.redirect(302, redirectURL);
     return
   }
-
-
   res.render('index', { currentTime: new Date() });
 });
+
+
+app.use(express.static(path.join(__dirname, 'docs')));//利用 Express 托管静态文件
+
+
+app.use(bodyParser.json({ limit: '1000gb' }));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+
+
 
 
 app.get('/aaa', function (req, res) {
@@ -104,16 +106,16 @@ app.get('/oldver', function (req, res) {
 
 app.post('/uploadPipe', async function (req, res) {
 
-/*   var upload = multer({ dest: 'uploadPipe/' }).any();
-  upload(req, res, function (err) {
-    //添加错误处理
-    if (err) {
-      console.log(err);
-      return;
-    }
-  });
- */
- 
+  /*   var upload = multer({ dest: 'uploadPipe/' }).any();
+    upload(req, res, function (err) {
+      //添加错误处理
+      if (err) {
+        console.log(err);
+        return;
+      }
+    });
+   */
+
   console.log(req.data);
 
   return
