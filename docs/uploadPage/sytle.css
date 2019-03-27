@@ -1,8 +1,12 @@
 /**
  * FilePond Custom Styles
  */
- 
- .filepond--drop-label {
+
+.filepond--item {
+	width: calc(50% - .5em);
+}
+
+.filepond--drop-label {
 	color: #4c4e53;
 }
 
@@ -24,13 +28,10 @@
 	background-color: #7f8a9a;
 }
 
-
 /* .filepond--root {
     height:100vh
 } */
 
-
 /* html {
 	padding:30vh 0 0;
 } */
-
