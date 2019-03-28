@@ -527,6 +527,7 @@ var app = new Vue({
       this.initPasteEvent();
       this.initFilePond();
       this.initDropFiled();
+
       //处理Params
       // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchGlobal('')))
       var param = this.getUrlVars();
@@ -604,6 +605,15 @@ var app = new Vue({
             case 'xl': return '800px';
           }
         }, */
+    pasteToSearchBar(event) {
+      /*       var pasteText = document.getElementById("searchBar");
+            pasteText.focus();
+            document.execCommand("paste");
+            console.log(pasteText.textContent); */
+            var clipboardData = event.clipboardData || window.clipboardData;
+            return clipboardData.getData("text");
+    }
+    ,
     initDropFiled() {
       //拖拽的目标节点
       var dropZone = document.getElementById('app');

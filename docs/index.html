@@ -257,7 +257,7 @@
 
             <v-text-field solo-inverted ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
               prepend-inner-icon="search" :append-icon="paste ? 'file_copy' : undefined"
-              @click:append="pasteFromClipboard" clearable autofocus @keydown="submit($event)" loading hint="随便搜点什么吧..."
+              @click:append="pasteToSearchBar($event)" clearable autofocus @keydown="submit($event)" loading hint="随便搜点什么吧..."
               :rules="[]">
 
               <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
