@@ -1793,27 +1793,30 @@ var app = new Vue({
         if (matchedURLs) {
           matchedURLs.forEach(eachURL => {
             //尝试识别是不是58pic的网址,并读取其ID号
-            var qiantuURL = eachURL.match(/((www\.58pic\.com\/newpic\/))([0-9]{8})(\.html)/)[0];
+            var qiantuURLs = eachURL.match(/((www\.58pic\.com\/newpic\/))([0-9]{8})(\.html)/gm);
 
-            if (qiantuURL) {
-              var qiantuID = qiantuURL.match(/([0-9]{8})/);
-              console.log(qiantuID);
-              var downloadURL = `http://cdn.52picc.com/qiantu/${qiantuID}.zip?e=1553441694&token=YsxlOcIuU76uwayGqcefhCHsE3FGs14Vv-ePdvBZ:-3V0KLZqtVO3zUhvjYYnZbr2vns=`;
-              AV.Cloud.run('getWebTitle',
-                {
-                  url: eachURL,
-                }
-              ).then(data => {
-                // 成功
-                console.log(data.qiantuTitle);
-                app.$message.success(`将唤起下载千图网素材「${data.qiantuTitle}」`);
-                app.renameDownload(downloadURL, `${data.qiantuTitle}.zip`);
-              }).catch(err => {
-                // 失败
-                console.log(err);
+            if (qiantuURLs) {
+              qiantuURLs.forEach(e => {
+                var qiantuID = e.match(/([0-9]{8})/)[0];
+                console.log(qiantuID);
+                var downloadURL = `http://cdn.52picc.com/qiantu/${qiantuID}.zip?e=1553441694&token=YsxlOcIuU76uwayGqcefhCHsE3FGs14Vv-ePdvBZ:-3V0KLZqtVO3zUhvjYYnZbr2vns=`;
+                AV.Cloud.run('getWebTitle',
+                  {
+                    url: eachURL,
+                  }
+                ).then(data => {
+                  // 成功
+                  console.log(data.qiantuTitle);
+                  app.$message.success(`将唤起下载千图网素材「${data.qiantuTitle}」`);
+                  app.renameDownload(downloadURL, `${data.qiantuTitle}.zip`);
+                }).catch(err => {
+                  // 失败
+                  console.log(err);
+                })
+
+                // window.location.href = `http://cdn.52picc.com/qiantu/${qiantuID}.zip?e=1553441694&token=YsxlOcIuU76uwayGqcefhCHsE3FGs14Vv-ePdvBZ:-3V0KLZqtVO3zUhvjYYnZbr2vns=` 
+
               })
-
-              // window.location.href = `http://cdn.52picc.com/qiantu/${qiantuID}.zip?e=1553441694&token=YsxlOcIuU76uwayGqcefhCHsE3FGs14Vv-ePdvBZ:-3V0KLZqtVO3zUhvjYYnZbr2vns=` 
               return
             }
 
