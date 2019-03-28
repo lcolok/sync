@@ -1,8 +1,8 @@
 {
-  "name": "node-js-getting-started",
+  "name": "sync-for-shimo",
   "version": "1.0.0",
   "private": true,
-  "description": "A sample Node.js app using Express",
+  "description": "A powerful tool to upload, share and download files",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,6 +11,7 @@
   "dependencies": {
     "@mdi/font": "^3.5.94",
     "ant-design-vue": "^1.3.5",
+    "babel-polyfill": "^6.26.0",
     "body-parser": "^1.18.3",
     "browserify-fs": "^1.0.0",
     "buffer-to-stream": "^1.0.0",
@@ -40,9 +41,25 @@
     "vue-clipboard2": "^0.3.0"
   },
   "devDependencies": {
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-runtime": "^6.26.0",
     "nodemon": "^1.18.7"
   },
   "engines": {
     "node": "10.x"
-  }
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lcolok/sync.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lcolok/sync/issues"
+  },
+  "homepage": "https://github.com/lcolok/sync#readme"
 }

@@ -11,6 +11,8 @@ document.oncontextmenu = function () { return false; };
 // 禁止粘贴
 // document.onpaste = function(){ return false; };
 
+
+
 var app = new Vue({
   el: '#app',
 
@@ -967,14 +969,14 @@ var app = new Vue({
       }
     },
     rightClick(index, e) {
-      /*       e.preventDefault()
-            console.log(e);
-            this.showMenu = false
-            this.MenuX = e.clientX
-            this.MenuY = e.clientY
-            this.$nextTick(() => {
-              this.showMenu = true
-            }) */
+            // e.preventDefault()
+            // console.log(e);
+            // this.showMenu = false
+            // this.MenuX = e.clientX
+            // this.MenuY = e.clientY
+            // this.$nextTick(() => {
+            //   this.showMenu = true
+            // })
 
       e.preventDefault()
       // console.log(index);

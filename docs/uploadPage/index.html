@@ -29,27 +29,16 @@
             top: 50%;
         }
 
-        .dropzone {
+        html {
             padding: 30vh 0 0;
-            max-width: 20em;
-            margin: 5 auto;
-            opacity: 1;
         }
     </style>
 </head>
 
 <body>
-    <div id="dropZone">
-
-        <div>
-            <input class="dropzone" type="file" name="filepond" required multiple>
-
-
-            <!-- <input type="file" id="filepond2" required multiple> -->
-        </div>
-        <!-- <p class="desc">释放即可上传</p> -->
+    <div>
+        <input class="dropzone" type="file" name="filepond" required multiple>
     </div>
-
 </body>
 
 <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
@@ -185,7 +174,7 @@
        console.log(pond.allowImagePreview); // true */
 </script>
 
-<script type="text/javascript">
+<!-- <script type="text/javascript">
     //拖拽的目标节点
     var dropZone = document.getElementById('dropZone');
 
@@ -225,6 +214,6 @@
 
 
     dropZone.addEventListener('drop', handleDrop);
-</script>
+</script> -->
 
 </html>
