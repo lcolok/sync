@@ -725,7 +725,7 @@ var app = new Vue({
         labelFileRemoveError: '删除时出错',
         labelTapToCancel: '点击取消',
         labelTapToRetry: '点击重试',
-        labelTapToUndo: '点击撤消',
+        labelTapToUndo: '点击撤回',
         labelButtonRemoveItem: '移除',
         labelButtonAbortItemLoad: '中止',
         labelButtonRetryItemLoad: '重试',
