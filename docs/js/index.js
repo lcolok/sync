@@ -623,7 +623,7 @@ var app = new Vue({
           callback: function () {
             // 上拉事件
             console.log('正在上拉');
-            // miniRefresh.endUpLoading(true);
+            miniRefresh.endUpLoading(true);
           }
         }
       });
