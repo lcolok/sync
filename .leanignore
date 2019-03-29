@@ -3,3 +3,4 @@
 .leancloud/
 node_modules/
 upload/
+uploadPipe/

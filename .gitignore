@@ -4,12 +4,12 @@ start.sh
 .avoscloud
 .leancloud
 upload
+uploadPipe
+
 
 # VIM
 *~
 *.swp
 demo/.DS_Store
 .DS_Store
-.DS_Store
 cloudScript/tempCodeRunnerFile.js
-.DS_Store
