@@ -74,7 +74,7 @@ async function getDiscussion(fileID) {
         headers: headers,
     })
     if (error) {
-        return console.log("getDiscussion请求出错: " + err);
+        return console.log("getDiscussion请求出错: " + error);
     }
     // console.log("getDiscussion请求成功");
 
