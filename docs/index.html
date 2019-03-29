@@ -493,8 +493,8 @@
 
       <!-- minirefresh开头的class请勿修改 -->
       <v-content>
-        <v-flex id="minirefresh">
-          <v-flex class="minirefresh-scroll">
+        <div id="minirefresh">
+          <div class="minirefresh-scroll">
             <v-expand-transition>
               <v-tabs v-model="tabs" v-if='(mainList.results.length!=0)&&(typeList.length!=0)' color="transparent"
                 slider-color="primary" :show-arrows='showArrow'>
@@ -639,8 +639,8 @@
               </v-layout>
             </v-slide-y-transition>
 
-          </v-flex>
-        </v-flex>
+          </div>
+        </div>
       </v-content>
 
 

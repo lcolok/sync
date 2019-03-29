@@ -611,6 +611,7 @@ var app = new Vue({
       var miniRefresh = new MiniRefresh({
         container: '#minirefresh',
         down: {
+          isAuto: true,
           callback: async function () {
             // 下拉事件
             console.log('正在下拉');
