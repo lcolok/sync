@@ -22,6 +22,10 @@
     href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css">
   <link href="https://unpkg.com/filepond-plugin-file-poster/dist/filepond-plugin-file-poster.css" rel="stylesheet">
 
+  <!-- 以下为minirefresh的引入 -->
+  <link href="https://cdn.jsdelivr.net/npm/minirefresh@2.0.2/dist/minirefresh.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/minirefresh@2.0.2/dist/themes/applet/minirefresh.theme.applet.min.css"
+    rel="stylesheet" />
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -257,8 +261,8 @@
 
             <v-text-field solo-inverted ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
               prepend-inner-icon="search" :append-icon="paste ? 'file_copy' : undefined"
-              @click:append="pasteToSearchBar($event)" clearable autofocus @keydown="submit($event)" loading hint="随便搜点什么吧..."
-              :rules="[]">
+              @click:append="pasteToSearchBar($event)" clearable autofocus @keydown="submit($event)" loading
+              hint="随便搜点什么吧..." :rules="[]">
 
               <v-progress-linear v-if="custom" slot="progress" height="3"></v-progress-linear>
 
@@ -491,170 +495,162 @@
 
       </v-dialog>
 
-
-
+      <!-- minirefresh开头的class请勿修改 -->
       <v-content>
+        <v-flex id="minirefresh">
+          <v-flex class="minirefresh-scroll">
+            <v-expand-transition>
+              <v-tabs v-model="tabs" v-if='(mainList.results.length!=0)&&(typeList.length!=0)' color="transparent"
+                slider-color="primary" :show-arrows='showArrow'>
+                <v-layout align-center justify-begin row fill-height />
+                <v-tab :ripple="false" class="badgeGrey" v-for="(n, index)  in typeListSorted" v-if="n.count>0"
+                  :key='index' @change='mainList.results = n.subClassArr;'>
+                  <!-- <v-chip class="shadowChip" color="white" text-color=""> -->
+
+                  <v-icon :size='n.size'>{{n.icon}}</v-icon>
+                  <v-flex ml-2>{{n.text}}</v-flex>
+                  <!-- <v-divider class="mx-1" vertical></v-divider> -->
+                  <v-flex class="circleNumber">
+                    <v-flex>{{n.count<=99 ? n.count:'99+'}}</v-flex>
+                  </v-flex>
+
+                  <!-- </v-chip> -->
+                </v-tab>
+              </v-tabs>
+            </v-expand-transition>
+
+            <v-slide-y-transition>
+              <v-subheader class='caption' v-if='(resultSumLasttime!=null)&&(keywordLasttime!=null)'>
+                找到有关『{{keywordLasttime}}』的{{resultSumLasttime}}条结果（用时{{searchDuration}}秒）
+              </v-subheader>
+            </v-slide-y-transition>
 
 
+            <v-slide-y-transition>
+              <v-layout align-center justify-center v-if='mainList.results.length!=0'>
+                <v-flex>
 
-        <v-expand-transition>
-          <v-tabs v-model="tabs" v-if='(mainList.results.length!=0)&&(typeList.length!=0)' color="transparent"
-            slider-color="primary" :show-arrows='showArrow'>
-            <v-layout align-center justify-begin row fill-height />
-            <v-tab :ripple="false" class="badgeGrey" v-for="(n, index)  in typeListSorted" v-if="n.count>0" :key='index'
-              @change='mainList.results = n.subClassArr;'>
-              <!-- <v-chip class="shadowChip" color="white" text-color=""> -->
+                  <v-list two-line>
 
-              <v-icon :size='n.size'>{{n.icon}}</v-icon>
-              <v-flex ml-2>{{n.text}}</v-flex>
-              <!-- <v-divider class="mx-1" vertical></v-divider> -->
-              <v-flex class="circleNumber">
-                <v-flex>{{n.count<=99 ? n.count:'99+'}}</v-flex>
-              </v-flex>
+                    <template v-for="(result, index) in mainList.results">
 
-              <!-- </v-chip> -->
-            </v-tab>
-          </v-tabs>
-        </v-expand-transition>
+                      <v-list-tile :key="result.attributes.title" avatar ripple @click=""
+                        @contextmenu="rightClick(index,$event)">
+                        <v-badge :color="result.attributes.canPlay?result.attributes.canPlay.color:'primary'" left
+                          overlap>
+                          <!-- <v-icon slot="badge" dark small>done</v-icon> -->
+                          <v-icon v-if='result.attributes.canPlay' color="white" slot="badge">
+                            {{result.attributes.canPlay.icon}}</v-icon>
+                          <v-list-tile-avatar ripple @click="howToPlay(result)">
 
-        <v-slide-y-transition>
-          <v-subheader class='caption' v-if='(resultSumLasttime!=null)&&(keywordLasttime!=null)'>
-            找到有关『{{keywordLasttime}}』的{{resultSumLasttime}}条结果（用时{{searchDuration}}秒）
-          </v-subheader>
-        </v-slide-y-transition>
+                            <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" small
+                              fab>
+                              <v-icon>{{ result.attributes.icon }}</v-icon>
+                            </v-btn>
+                            <v-btn v-else class="grey lighten-1 white--text caption" small fab>
+                              <div>{{ result.attributes.suffix }}</div>
+                            </v-btn>
 
-
-        <v-slide-y-transition>
-          <v-layout align-center justify-center v-if='mainList.results.length!=0'>
-            <v-flex>
-
-              <v-list two-line>
-
-                <template v-for="(result, index) in mainList.results">
-
-                  <v-list-tile :key="result.attributes.title" avatar ripple @click=""
-                    @contextmenu="rightClick(index,$event)">
-                    <v-badge :color="result.attributes.canPlay?result.attributes.canPlay.color:'primary'" left overlap>
-                      <!-- <v-icon slot="badge" dark small>done</v-icon> -->
-                      <v-icon v-if='result.attributes.canPlay' color="white" slot="badge">
-                        {{result.attributes.canPlay.icon}}</v-icon>
-                      <v-list-tile-avatar ripple @click="howToPlay(result)">
-
-                        <v-btn v-if='result.attributes.icon!=undefined' :class="result.attributes.iconClass" small fab>
-                          <v-icon>{{ result.attributes.icon }}</v-icon>
-                        </v-btn>
-                        <v-btn v-else class="grey lighten-1 white--text caption" small fab>
-                          <div>{{ result.attributes.suffix }}</div>
-                        </v-btn>
-
-                      </v-list-tile-avatar>
-                    </v-badge>
-
-
-
-
-
-                    <v-list-tile-content @click="howToPlay(result)">
-                      <v-layout align-start justify-center column fill-height />
-                      <v-card flat class='transparent'>
-                        <v-list-tile-title class="font-weight-bold subheading">{{ result.attributes.name }}
-                        </v-list-tile-title>
-                      </v-card>
-                      <v-card flat class='transparent' v-if="result.attributes.name !== result.attributes.name_trans">
-                        <v-list-tile-sub-title class="body-2 font-weight-regular text--gray">
-                          {{ result.attributes.name_trans }}</v-list-tile-sub-title>
-                      </v-card>
-                      <!-- <v-list-tile-sub-title class="caption font-weight-light" v-if="result.attributes.size">
-                          {{ renderSize(result.attributes.size) }}</v-list-tile-sub-title> -->
-                      <v-card flat class='transparent'>
-                        <v-layout align-center justify-start row fill-height />
-                        <v-card class='shadowChip' v-if="result.attributes.size" color="orange lighten-4">
-                          <v-flex mx-2 class="caption font-weight-light">{{ result.attributes.suffix }}
-                          </v-flex>
-                        </v-card>
-                        <v-card class='shadowChip' v-if="result.attributes.size" color="primary lighten-4">
-                          <v-flex mx-2 class="caption font-weight-light">{{ renderSize(result.attributes.size) }}
-                          </v-flex>
-                        </v-card>
-                      </v-card>
-                    </v-list-tile-content>
-
-
-
-                    <v-list-tile-action>
-                      <v-btn icon ripple @click="rightClick(index,$event)">
-                        <v-icon color="grey lighten-1">more_horiz</v-icon>
-                      </v-btn>
-                    </v-list-tile-action>
-
-                    <v-menu v-model="showMenu" v-if="index==showMenuIndex" :position-x="MenuX" :position-y="MenuY"
-                      absolute offset-y>
-                      <v-list>
-                        <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
-                          @click="menuItem.action(result,$event)" :name="menuItem.name"
-                          :copyContent='result.attributes.copyContent' :objectID="result.id"
-                          :copyShortURL="result.attributes.shortURL" :copyLongURL="result.attributes.uploaderURL">
-                          <v-list-tile-avatar>
-                            <v-icon>{{ menuItem.icon }}</v-icon>
                           </v-list-tile-avatar>
-                          <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
-                        </v-list-tile>
-                      </v-list>
-                    </v-menu>
-
-
-                  </v-list-tile>
-                  <v-divider v-if="index + 1 < mainList.results.length" :key="index" inset></v-divider>
+                        </v-badge>
 
 
 
 
-                </template>
 
-                <!--                   <v-menu v-model='showMenu' :position-x="MenuX" :position-y="MenuY" absolute offset-y>
-                    <v-btn slot="activator" icon ripple>
-                      <v-icon color="grey lighten-1">more_horiz</v-icon>
-                    </v-btn>
-                    <v-list>
-                      <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i" :name="menuItem.name">
-                        <v-list-tile-avatar>
-                          <v-icon>{{ menuItem.icon }}</v-icon>
-                        </v-list-tile-avatar>
-                        <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
+                        <v-list-tile-content @click="howToPlay(result)">
+                          <v-layout align-start justify-center column fill-height />
+                          <v-card flat class='transparent'>
+                            <v-list-tile-title class="font-weight-bold subheading">{{ result.attributes.name }}
+                            </v-list-tile-title>
+                          </v-card>
+                          <v-card flat class='transparent'
+                            v-if="result.attributes.name !== result.attributes.name_trans">
+                            <v-list-tile-sub-title class="body-2 font-weight-regular text--gray">
+                              {{ result.attributes.name_trans }}</v-list-tile-sub-title>
+                          </v-card>
+                          <!-- <v-list-tile-sub-title class="caption font-weight-light" v-if="result.attributes.size">
+                                    {{ renderSize(result.attributes.size) }}</v-list-tile-sub-title> -->
+                          <v-card flat class='transparent'>
+                            <v-layout align-center justify-start row fill-height />
+                            <v-card class='shadowChip' v-if="result.attributes.size" color="orange lighten-4">
+                              <v-flex mx-2 class="caption font-weight-light">{{ result.attributes.suffix }}
+                              </v-flex>
+                            </v-card>
+                            <v-card class='shadowChip' v-if="result.attributes.size" color="primary lighten-4">
+                              <v-flex mx-2 class="caption font-weight-light">{{ renderSize(result.attributes.size) }}
+                              </v-flex>
+                            </v-card>
+                          </v-card>
+                        </v-list-tile-content>
+
+
+
+                        <v-list-tile-action>
+                          <v-btn icon ripple @click="rightClick(index,$event)">
+                            <v-icon color="grey lighten-1">more_horiz</v-icon>
+                          </v-btn>
+                        </v-list-tile-action>
+
+                        <v-menu v-model="showMenu" v-if="index==showMenuIndex" :position-x="MenuX" :position-y="MenuY"
+                          absolute offset-y>
+                          <v-list>
+                            <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i"
+                              @click="menuItem.action(result,$event)" :name="menuItem.name"
+                              :copyContent='result.attributes.copyContent' :objectID="result.id"
+                              :copyShortURL="result.attributes.shortURL" :copyLongURL="result.attributes.uploaderURL">
+                              <v-list-tile-avatar>
+                                <v-icon>{{ menuItem.icon }}</v-icon>
+                              </v-list-tile-avatar>
+                              <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
+                            </v-list-tile>
+                          </v-list>
+                        </v-menu>
+
+
                       </v-list-tile>
-                    </v-list>
-                  </v-menu> -->
-
-
-              </v-list>
-
-            </v-flex>
+                      <v-divider v-if="index + 1 < mainList.results.length" :key="index" inset></v-divider>
 
 
 
 
+                    </template>
+
+                    <!--                   <v-menu v-model='showMenu' :position-x="MenuX" :position-y="MenuY" absolute offset-y>
+                              <v-btn slot="activator" icon ripple>
+                                <v-icon color="grey lighten-1">more_horiz</v-icon>
+                              </v-btn>
+                              <v-list>
+                                <v-list-tile v-for="(menuItem, i) in bottomSheetToolbar" :key="i" :name="menuItem.name">
+                                  <v-list-tile-avatar>
+                                    <v-icon>{{ menuItem.icon }}</v-icon>
+                                  </v-list-tile-avatar>
+                                  <v-list-tile-title>{{ menuItem.text }}</v-list-tile-title>
+                                </v-list-tile>
+                              </v-list>
+                            </v-menu> -->
 
 
-          </v-layout>
-        </v-slide-y-transition>
+                  </v-list>
+
+                </v-flex>
 
 
 
+
+
+
+              </v-layout>
+            </v-slide-y-transition>
+
+          </v-flex>
+        </v-flex>
       </v-content>
 
-      <v-layout row>
-        <v-flex xs12 sm6 offset-sm3>
-          <v-card>
 
-
-
-          </v-card>
-        </v-flex>
-      </v-layout>
 
 
       <v-flex v-scroll="occurFab" v-cloak>
-
         <v-fab-transition>
           <v-speed-dial v-show="floatBTN_Occur" v-model='fab' :top="top" :bottom="bottom" :right="right" :left="left"
             :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
@@ -914,6 +910,10 @@
 <script src="https://unpkg.com/filepond-plugin-file-rename/dist/filepond-plugin-file-rename.js"></script>
 <script src="https://unpkg.com/filepond-plugin-file-poster/dist/filepond-plugin-file-poster.js"></script>
 <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/minirefresh@2.0.2/dist/minirefresh.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/minirefresh@2.0.2/dist/themes/applet/minirefresh.theme.applet.min.js"></script>
 
 
 <script src="js/leanCloudInit.js"></script>

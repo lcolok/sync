@@ -529,7 +529,7 @@ var app = new Vue({
       this.initPasteEvent();
       this.initFilePond();
       this.initDropFiled();
-
+      this.initMiniRefresh();
       //处理Params
       // this.getQ() ? 0 : (this.getV() ? 0 : (this.getID() ? 0 : this.searchGlobal('')))
       var param = this.getUrlVars();
@@ -607,13 +607,35 @@ var app = new Vue({
             case 'xl': return '800px';
           }
         }, */
+    initMiniRefresh() {
+      var miniRefresh = new MiniRefresh({
+        container: '#minirefresh',
+        down: {
+          callback: function () {
+            // 下拉事件
+            console.log('正在下拉');
+            setTimeout(() => {
+              miniRefresh.endDownLoading();
+            }, 1000);
+          }
+        },
+        up: {
+
+          callback: function () {
+            // 上拉事件
+            console.log('正在上拉');
+            miniRefresh.endUpLoading(true);
+          }
+        }
+      });
+    },
     pasteToSearchBar(event) {
       /*       var pasteText = document.getElementById("searchBar");
             pasteText.focus();
             document.execCommand("paste");
             console.log(pasteText.textContent); */
-            var clipboardData = event.clipboardData || window.clipboardData;
-            return clipboardData.getData("text");
+      var clipboardData = event.clipboardData || window.clipboardData;
+      return clipboardData.getData("text");
     }
     ,
     initDropFiled() {
@@ -969,14 +991,14 @@ var app = new Vue({
       }
     },
     rightClick(index, e) {
-            // e.preventDefault()
-            // console.log(e);
-            // this.showMenu = false
-            // this.MenuX = e.clientX
-            // this.MenuY = e.clientY
-            // this.$nextTick(() => {
-            //   this.showMenu = true
-            // })
+      // e.preventDefault()
+      // console.log(e);
+      // this.showMenu = false
+      // this.MenuX = e.clientX
+      // this.MenuY = e.clientY
+      // this.$nextTick(() => {
+      //   this.showMenu = true
+      // })
 
       e.preventDefault()
       // console.log(index);

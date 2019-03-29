@@ -92,6 +92,7 @@ app.get('/aaa', function (req, res) {
   res.redirect('http://www.baidu.com')
 });
 
+
 app.get('/o', function (req, res) {
   res.redirect('./oldver/')
 });
@@ -123,6 +124,10 @@ app.post('/uploadPipe', async function (req, res) {
   });
   r.pipe(res);
 
+});
+
+app.get('/u', function (req, res) {
+  res.redirect('/uploadPage')
 });
 
 app.post('/upload', function (req, res) {
