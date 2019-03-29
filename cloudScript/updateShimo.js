@@ -278,6 +278,10 @@ async function update(newDiscussionID, getAttachmentID) {//更新上传专用的
 
 
     attachmentsList = await getAttachment(getAttachmentID);//get附件的文档
+
+ 
+
+
     if (list.length != 0) {//检测评论区目标是否一条评论都没有
         joinList = list.join("\n");
     } else {
@@ -289,6 +293,7 @@ async function update(newDiscussionID, getAttachmentID) {//更新上传专用的
             sumSize += Number(JSON.parse(list[j]).size);
         }
     }
+
 
     attachmentsList.forEach(async e => {
 
@@ -461,7 +466,7 @@ async function getToken() {
 
 
 
-function updateShimo(request) {
+async function updateShimo(request) {
     /*     try {
             var AV = require('leancloud-storage');
             // 初始化存储 SDK
@@ -493,7 +498,8 @@ function updateShimo(request) {
         save2DataBase(params);
         feedback = 1;
     } else {
-        feedback = update(newDiscussionID, getAttachmentID);
+      
+        feedback = await update(newDiscussionID, getAttachmentID);
     }
 
     return feedback//返回更新了多少个文件

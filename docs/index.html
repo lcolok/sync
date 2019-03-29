@@ -69,11 +69,7 @@
 
 <body>
 
-
-
-
-
-  <v-flex id="app" v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true' v-resize="onResize">
+  <v-app id="app" v-cloak v-on:keydown.esc='bottomSheet=bottomSheet?false:true' v-resize="onResize">
 
 
     <v-app id="loginView" v-if='!user' v-cloak>
@@ -855,35 +851,7 @@
 
 
 
-  </v-flex>
-
-  <!--   <v-flex id="floatBTN" v-scroll="occurFab" v-cloak>
-
-    <v-fab-transition>
-      <v-speed-dial slot="activator" v-show="floatBTN_Occur" v-model="fab" :top="top" :bottom="bottom" :right="right"
-        :left="left" :direction="direction" :open-on-hover="hover" :transition="transition" fixed>
-
-        <v-btn slot="activator" v-model="fab" :color="activeFab.color" dark fab>
-          <v-icon>{{ activeFab.icon }}</v-icon>
-        </v-btn>
-        <v-btn fab dark small color="orange" @click="$vuetify.goTo(0);">
-          <v-icon>keyboard_arrow_up</v-icon>
-        </v-btn>
-        <v-btn fab dark small color="indigo">
-          <v-icon>add</v-icon>
-        </v-btn>
-        <v-btn fab dark small color="green" @click="hoverOrNot;backToSearchTarget;">
-          <v-icon>search</v-icon>
-        </v-btn>
-      </v-speed-dial>
-    </v-fab-transition>
-
-  </v-flex> -->
-
-
-
-
-
+  </v-app>
 
 </body>
 <script src="https://cdn.jsdelivr.net/gh/lcolok/sfx@0.0.1/dist/sfx.min.js"></script>

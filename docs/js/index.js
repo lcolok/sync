@@ -1723,8 +1723,9 @@ var app = new Vue({
       return app.makeAList(resp);
     },
     regularCheckUpdate: async function () {
+
       var data = await AV.Cloud.run('updateShimo');
-      console.log(data);
+      console.log(`updateShimo返回结果：${data}`);
 
       if (data > 0) {
         /* app.snackbar.show = false;
