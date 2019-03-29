@@ -611,10 +611,11 @@ var app = new Vue({
       var miniRefresh = new MiniRefresh({
         container: '#minirefresh',
         down: {
-          isAuto: true,
+          // isAuto: true,
           callback: async function () {
-            // 下拉事件
+            // 下拉事件 刷新
             console.log('正在下拉');
+            // window.location.reload();//页面刷新
             await app.regularCheckUpdate();
             miniRefresh.endDownLoading();
           }
