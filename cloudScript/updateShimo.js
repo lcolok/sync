@@ -144,7 +144,7 @@ async function postDiscussion(fileID, content) {
         },
     })
     if (error) {
-        return console.log("Discussion请求出错: " + err);
+        return console.log("Discussion请求出错: " + error);
     };
 
     if (resp.data.code !== 0) {
