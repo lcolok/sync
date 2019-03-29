@@ -8,10 +8,28 @@
   <link rel="shortcut icon" href="https://uploader.shimo.im/f/xNTnWjbfgksiTeda.png">
   <title>出错啦！</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+  <style type="text/css">
+    .bm {
+      text-align: center;
+      /*让div内部文字居中*/
+      background-color: #fff;
+      border-radius: 20px;
+      margin: auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+
 </head>
 
 <body>
-  <div id="bm" onclick='console.log("aaaaa")'> </div>
+
+  <div class="bm" id="bm" onclick='console.log("aaaaa")'> </div>
+
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.4.4/lottie.min.js"></script>
@@ -21,7 +39,8 @@
     renderer: 'svg',
     loop: true,
     autoplay: true,
-    path: 'lottie/404-not-found.json'
+    path: 'lottie/404-not-found.json',
+
   })
 </script>
 

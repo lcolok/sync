@@ -64,7 +64,7 @@ function downloadBlob(json) {
                     return console.error('upload failed:', err);
                 }
                 console.log(`Upload successful! Server responded with:`);
-                // console.log(body);
+                console.log(body);
                 resolve(body);
                 //上传成功之后执行临时文件的删除;
                 fs.unlink(src, (err) => {
