@@ -611,12 +611,11 @@ var app = new Vue({
       var miniRefresh = new MiniRefresh({
         container: '#minirefresh',
         down: {
-          callback: function () {
+          callback: async function () {
             // 下拉事件
             console.log('正在下拉');
-            setTimeout(() => {
-              miniRefresh.endDownLoading();
-            }, 1000);
+            await app.regularCheckUpdate();
+            miniRefresh.endDownLoading();
           }
         },
         up: {
@@ -624,7 +623,7 @@ var app = new Vue({
           callback: function () {
             // 上拉事件
             console.log('正在上拉');
-            miniRefresh.endUpLoading(true);
+            // miniRefresh.endUpLoading(true);
           }
         }
       });
