@@ -42,7 +42,7 @@ app.use(AV.Cloud.HttpsRedirect());// 重定向到 HTTPS
 
 app.get('/', async function (req, res) {
   var query = req.query;
-  if (JSON.stringify(query) !== '{}') { console.log(query.a); }
+  if (JSON.stringify(query) !== '{}') { console.log(query); }
 
   if (query.r) {
     var r = req.query.r;
