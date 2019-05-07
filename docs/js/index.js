@@ -516,9 +516,10 @@ var app = new Vue({
     },
   },
   created() {
+
     this.autoLogin();
     this.captchaInit();
-
+    this.shimoData = AV.Cloud.run('updateShimo');
 
   },
   mounted() {
@@ -1725,8 +1726,8 @@ var app = new Vue({
     },
     regularCheckUpdate: async function () {
 
-      var data = await AV.Cloud.run('updateShimo');
-      console.log(`updateShimo返回结果：${data}`);
+      const data = this.shimoData;
+      console.log(`updateShimo返回结果：${this.shimoData}`);
 
       if (data > 0) {
         /* app.snackbar.show = false;
@@ -1967,7 +1968,12 @@ var app = new Vue({
       
               }
             } */
-      app.$message.success('已为你搜索最近20条项目');
+      const timer=setInterval(() => {
+        if(app.$message){
+          app.$message.success('已为你搜索最近20条项目');
+          clearInterval(timer);
+        }
+      }, 100);
     }
 
 
