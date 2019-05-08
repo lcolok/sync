@@ -4,7 +4,7 @@ AV.init({
     appKey: 'vLplaY3j4OYf3e6e603sb0JX',
 
 
-    //以下是Sync的
+    // // //以下是Sync的
     // appId: '1oHwyqv3qyzH6hFsjCJULJ31-gzGzoHsz',
     // appKey: 'g7G4uPGRbJc5GaK4yn36FqkC',
 });
@@ -81,6 +81,6 @@ function LeanCloudInitMute() {
         };
         setInterval(() => {
             LeanCloudInitMute();
-        }, 1000)
+        }, 2000)
     });
 }

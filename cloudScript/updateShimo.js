@@ -7,7 +7,7 @@ AV.Cloud.define('updateShimo', (request) => { return updateShimo(request) })
 var axios = require('axios');
 const Qs = require("qs");
 var fs = require('fs');
-var request = require('request');
+var requestJS = require('request');
 // var FormData = require('form-data');
 
 var ShimoBed = AV.Object.extend('ShimoBed');
@@ -262,10 +262,22 @@ function save2LeanCloud(dic) {
     // file.set('owner', AV.User.current());
     file.save().then(function () {
         console.log("已上传到LeanCloud");
+        bark(dic);
     }, function (error) {
         console.log(JSON.stringify(error));
     });
 };
+
+function bark(e){
+    const thisEmoji = emoji(e.type);
+    const id = 'Rux656xS5Ue8HbxPNM7Q66';
+    const title = `石墨床`;
+    const content = `『${thisEmoji} ${e.name}』已上传，链接已复制到你的剪贴板，点开查看`;
+    const copyContent = `${thisEmoji} ${e.name} | ${cutHTTP(e.shortURL)}`;//输出到控制台
+    let url = `https://api.day.app/${id}/${title}/${content}?url=${e.uploaderURL}&automaticallyCopy=1&copy=${copyContent}`;
+    url = encodeURI(url);
+    requestJS.get(url);
+}
 
 
 async function update(newDiscussionID, getAttachmentID) {//更新上传专用的石墨文档的项目是否与评论区同步
@@ -489,7 +501,7 @@ async function updateShimo(request) {
         var params = {
             type: e.type,
             name: e.name,
-            size: e.size,
+            size: Number(e.size),
             uploaderURL: e.url
         }
 
