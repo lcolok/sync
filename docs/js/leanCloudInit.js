@@ -1,10 +1,14 @@
 AV.init({
     //以下是石墨床的
-    appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
-    appKey: 'vLplaY3j4OYf3e6e603sb0JX',
+    // appId: 'Km0N0lCryHeME8pYGOpOLag5-gzGzoHsz',
+    // appKey: 'vLplaY3j4OYf3e6e603sb0JX',
 
     // serverURLs: 'https://avoscloud.com',
-    
+
+    //以下是 smc 的
+	appId: 'tSaaSytepnN8bI2MQ1ubO68s-gzGzoHsz',
+	appKey: 'hpdGl56rjXKR0DvGMKypVpwk',
+
     // // //以下是Sync的
     // appId: '1oHwyqv3qyzH6hFsjCJULJ31-gzGzoHsz',
     // appKey: 'g7G4uPGRbJc5GaK4yn36FqkC',

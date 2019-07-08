@@ -253,7 +253,7 @@
         </v-flex> -->
 
         <v-flex>
-          <form action="javascript:return true">
+          <v-form @submit.prevent="checkLogin" id="check-login-form">
 
             <v-text-field solo-inverted ref="searchBar" id="searchBar" v-model="keyword" label="搜索"
               prepend-inner-icon="search" :append-icon="paste ? 'file_copy' : undefined"
@@ -264,7 +264,7 @@
 
             </v-text-field>
 
-          </form>
+          </v-form>
         </v-flex>
 
 
@@ -876,7 +876,8 @@
 <script
   src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.js"></script>
 <script src="https://unpkg.com/filepond-plugin-file-rename/dist/filepond-plugin-file-rename.js"></script>
-<script src="https://raw.githubusercontent.com/pqina/filepond-plugin-file-poster/master/dist/filepond-plugin-file-poster.min.js"></script>
+<script
+  src="https://raw.githubusercontent.com/pqina/filepond-plugin-file-poster/master/dist/filepond-plugin-file-poster.min.js"></script>
 <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/minirefresh@2.0.2/dist/minirefresh.min.js"></script>

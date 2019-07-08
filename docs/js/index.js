@@ -702,7 +702,7 @@ var app = new Vue({
       FilePond.registerPlugin(
         FilePondPluginImagePreview,
         FilePondPluginImageExifOrientation,
-        FilePondPluginFilePoster
+        // FilePondPluginFilePoster
       );
 
       console.log(inputElement);
@@ -750,7 +750,7 @@ var app = new Vue({
                   var suffix = arr.pop();
                   var realName = arr.join('.');
 
-                  json.data.type = suffix;
+                  json.data.suffix = suffix;
                   json.data.name = realName;
 
                   AV.Cloud.run('updateShimo', json);
@@ -1543,7 +1543,7 @@ var app = new Vue({
     },
     submit(e) {
       // key.Code === 13表示回车键 
-      // console.log(e);
+      console.log(e);
       if (e.keyCode === 13) {
         //逻辑处理
         this.searchByKeyword({ delay: 0 })
@@ -1731,11 +1731,11 @@ var app = new Vue({
 
       var dic = e.attributes;
 
-      e.attributes.suffix = dic.type;//后缀
+      e.attributes.suffix = dic.suffix;//后缀
 
-      // console.log(dic.type);
+      // console.log(dic.suffix);
 
-      var handle = app.suffixHandle(dic.type);
+      var handle = app.suffixHandle(dic.suffix);
 
       var emoji = handle.emoji;
 
