@@ -760,7 +760,7 @@ var app = new Vue({
                     params: { url: json.data.url },
                   }).then(resp => {
                     console.log(resp.data.expandedURL);
-                    json.data.attatchmentURL = resp.data.expandedURL;
+                    json.data.attachmentURL = resp.data.expandedURL;
                     AV.Cloud.run('updateShimo', json);
                     load(res); //完成后，应该用文件对象或blob调用load方法 load方法接受字符串(id)或对象
                   });
