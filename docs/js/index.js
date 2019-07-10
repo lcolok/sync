@@ -741,7 +741,7 @@ var app = new Vue({
                 console.log(res);
                 if (res.code == 0) {
 
-      
+
                   var json = res;
                   console.log(json);
                   var filename = file.name;
@@ -753,9 +753,17 @@ var app = new Vue({
                   json.data.suffix = suffix;
                   json.data.name = realName;
 
-                  AV.Cloud.run('updateShimo', json);
 
-                  load(res); //完成后，应该用文件对象或blob调用load方法 load方法接受字符串(id)或对象
+                  axios({
+                    method: 'GET',
+                    url: "https://smc.leanapp.cn/functions/expand",
+                    params: { url: json.data.url },
+                  }).then(resp => {
+                    console.log(resp.data.expandedURL);
+                    json.data.attatchmentURL = resp.data.expandedURL;
+                    AV.Cloud.run('updateShimo', json);
+                    load(res); //完成后，应该用文件对象或blob调用load方法 load方法接受字符串(id)或对象
+                  });
                 }
 
               }
