@@ -1754,7 +1754,7 @@ var app = new Vue({
 
       var name = dic.name;
 
-      var shortURL = app.cutHTTP(dic.shortURL);
+      var shortURL = app.cutHTTP(dic.newShortURL);
 
       var copyContent = `${emoji} ${name} | ${shortURL}`;
 
