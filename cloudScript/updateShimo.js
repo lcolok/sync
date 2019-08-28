@@ -162,7 +162,7 @@ async function shortenURL(input) {
     var longURL = input.match(/[a-zA-z]+:\/\/[^\s]*/g);
 
     for (i = 0; i < longURL.length; i++) {
-        var url = 'http://api.weibo.com/2/short_url/shorten.json?source=2849184197&url_long=' + encodeURIComponent(longURL[i]);
+        var url = 'http://api.t.sina.com.cn/short_url/shorten.json?source=2849184197&url_long=' + encodeURIComponent(longURL[i]);
         var response = await axios.get(url);
         var json = response.data;
         var shortURL = json['urls'][0]["url_short"];
