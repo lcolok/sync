@@ -26,7 +26,7 @@
     "hawk": "^7.0.10",
     "hoek": "^6.1.2",
     "iconv-lite": "^0.4.24",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "leancloud-storage": "^3.11.0",
     "leanengine": "^3.3.2",
     "lottie-web": "^5.4.4",
